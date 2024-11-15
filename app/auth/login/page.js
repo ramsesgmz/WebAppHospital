@@ -26,8 +26,8 @@ export default function Login() {
                 <label className="sr-only" htmlFor="password">Password</label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 8a3 3 0 016 0v1h1a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4a2 2 0 012-2h1V8zm4-1a1 1 0 00-2 0v1h2V7zm-5 5v4h10v-4H4z" clipRule="evenodd" />
+                    <svg 
+                      width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M6 6c0-3.311 2.689-6 6-6s6 2.688 6 6v4h3v14h-18v-14h3v-4zm14 5h-16v12h16v-12zm-13-5v4h10v-4c0-2.76-2.24-5-5-5s-5 2.24-5 5z"/>
                     </svg>
                   </span>
                   <input
