@@ -3,7 +3,7 @@ export default function Login() {
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-blue-600">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
             <div className="flex justify-center mb-6">
-              <img src="logo.jpg" alt="Hombres de Blanco Logo" className="w-24 h-24" />
+              <img src="/logo.jpg" alt="Hombres de Blanco Logo" className="w-24 h-24" />
             </div>
             <form className="space-y-4">
               <div>
