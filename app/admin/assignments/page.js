@@ -9,11 +9,11 @@ export default function Page() {
         <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
           {/* Logo y Título con más espacio */}
           <div className="flex items-center space-x-3 w-72">
-            <div className="p-1.5 bg-white rounded-full shadow-md">
+            <div className="p-1.5 bg-white rounded-lg shadow-md">
               <img
-                src="/logo.png"
+                src="/logo.jpg"
                 alt="Hombres de Blanco"
-                className="h-9 w-9 rounded-full"
+                className="h-9 w-9 object-cover"
               />
             </div>
             <h1 className="text-xl font-bold tracking-tight whitespace-nowrap">
