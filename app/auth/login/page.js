@@ -1,6 +1,31 @@
 'use client';
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
 export default function Login() {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setIsLoading(true)
+        
+        try {
+            if (username === 'admin' && password === '123456') {
+                await router.push('/admin/assignments')
+            } else {
+                alert('Credenciales incorrectas')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800">
             <div className="relative w-full max-w-md">
@@ -28,7 +53,7 @@ export default function Login() {
                     </div>
 
                     {/* Formulario */}
-                    <form className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="username">
@@ -43,6 +68,8 @@ export default function Login() {
                                     <input
                                         type="text"
                                         id="username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
                                         placeholder="Ingresa tu usuario"
                                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                                     />
@@ -62,6 +89,8 @@ export default function Login() {
                                     <input
                                         type="password"
                                         id="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Ingresa tu contraseña"
                                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                                     />
@@ -69,29 +98,18 @@ export default function Login() {
                             </div>
                         </div>
 
-                        {/* Recordar y Olvidé contraseña */}
-                        <div className="flex items-center justify-between text-sm">
-                            <label className="flex items-center space-x-2 text-gray-600">
-                                <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                <span>Recordarme</span>
-                            </label>
-                            <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                                ¿Olvidaste tu contraseña?
-                            </a>
-                        </div>
-
-                        {/* Botón de Login */}
-                        <button 
-                            type="submit" 
-                            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-medium
-                                     hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                                     transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className={`w-full bg-blue-600 text-white py-3 rounded-lg font-medium
+                                    hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                                    focus:ring-offset-2 transition-colors ${isLoading ? 'opacity-50' : ''}`}
                         >
-                            Iniciar sesión
+                            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                         </button>
                     </form>
                 </div>
             </div>
         </div>
-    );
+    )
 }

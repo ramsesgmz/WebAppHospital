@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaCalendarAlt, FaClock, FaRegCalendarCheck } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -40,7 +40,8 @@ export default function AssignmentClient() {
   // Estado para nuevo usuario
   const [newUser, setNewUser] = useState({
     name: "",
-    turno: ""
+    turno: "",
+    rol: "usuario"
   });
 
   // AGREGAR AQUÍ LOS NUEVOS ESTADOS
@@ -321,7 +322,7 @@ export default function AssignmentClient() {
           usuarios: [...prev[newUser.turno].usuarios, newUser.name]
         }
       }));
-      setNewUser({ name: "", turno: "" });
+      setNewUser({ name: "", turno: "", rol: "usuario" });
       setShowAddUserModal(false);
     }
   };

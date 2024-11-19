@@ -128,7 +128,7 @@ export default function RRHHPage() {
         nombre: `${newEmployee.nombre} ${newEmployee.apellido}`,
         cargo: newEmployee.rol,
         departamento: newEmployee.ubicacion,
-        turno: 'Mañana',
+        turno: '',
         estado: 'Activo',
         rol: newEmployee.rol as 'usuario' | 'admin' | 'enterprise',
         fechaIngreso: new Date().toISOString().split('T')[0],
@@ -141,6 +141,21 @@ export default function RRHHPage() {
       setEmployees([...employees, employee]);
       setShowAddModal(false);
       toast.success('Usuario creado exitosamente');
+
+      // Si es usuario regular, agregarlo al estado de turnos en AssignmentClient
+      if (employee.rol === 'usuario') {
+        // Aquí deberías implementar la lógica para actualizar AssignmentClient
+        // Por ejemplo, usando un contexto global o una API
+        const newAssignment = {
+          user: employee.nombre,
+          task: "",
+          area: employee.departamento,
+          shift: ""
+        };
+        
+        // Actualizar el estado en AssignmentClient
+        setAssignments(prev => [...prev, newAssignment]);
+      }
     };
 
     return (
