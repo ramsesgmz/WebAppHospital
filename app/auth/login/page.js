@@ -1,88 +1,192 @@
 'use client'
-import { useState } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
+import { toast } from 'react-hot-toast'
+import { calculateDistance } from './DynamicMap'
 
-export default function Login() {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+const Map = dynamic(() => import('./DynamicMap'), { ssr: false })
+
+const LoginPage = () => {
     const router = useRouter()
-    const [isLoading, setIsLoading] = useState(false)
+    const gpsSimulatorRef = useRef(null)
     
-    const handleSubmit = async (e) => {
+    const [formState, setFormState] = useState({
+        username: '',
+        password: '',
+        showPassword: false
+    })
+
+    const [locationState, setLocationState] = useState({
+        showMap: false,
+        userLocation: null,
+        showConfirmation: false,
+        error: '',
+        isLoading: false
+    })
+
+    const workArea = useRef({
+        lat: 8.993133054652601,
+        lng: -79.50287017589892,
+        radius: 100
+    }).current
+
+    const simulateGPSPosition = useCallback(() => {
+        if (!gpsSimulatorRef.current) {
+            gpsSimulatorRef.current = {
+                latitude: workArea.lat + (Math.random() - 0.5) * 0.001,
+                longitude: workArea.lng + (Math.random() - 0.5) * 0.001
+            }
+        }
+        return {
+            coords: {
+                latitude: gpsSimulatorRef.current.latitude,
+                longitude: gpsSimulatorRef.current.longitude
+            }
+        }
+    }, [workArea])
+
+    useEffect(() => {
+        return () => {
+            gpsSimulatorRef.current = null
+        }
+    }, [])
+
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
-        setIsLoading(true)
-        
+        setLocationState(prev => ({ ...prev, error: '', isLoading: true }))
+
         try {
-            if (username === 'admin' && password === '123456') {
-                await router.push('/admin/inventory')
+            // Admin de la empresa de limpieza
+            if (formState.username === 'admin' && formState.password === 'admin123') {
+                router.push('/admin/dashboard')
+                return
+            }
+            
+            // Cliente final (enterprise)
+            if (formState.username === 'enterprise' && formState.password === 'enterprise123') {
+                router.push('/enterprise/dashboard')
+                return
+            }
+
+            // Usuario de limpieza (requiere verificación GPS)
+            if (formState.username === 'user' && formState.password === '123456') {
+                const position = simulateGPSPosition()
+                
+                setLocationState(prev => ({
+                    ...prev,
+                    userLocation: {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    },
+                    showMap: true,
+                    showConfirmation: true
+                }))
+                
+                toast.success('Ubicación obtenida correctamente')
             } else {
-                alert('Credenciales incorrectas')
+                setLocationState(prev => ({ ...prev, error: 'Credenciales incorrectas' }))
             }
         } catch (error) {
-            console.error('Error:', error)
+            setLocationState(prev => ({ ...prev, error: 'Error al procesar la solicitud' }))
         } finally {
-            setIsLoading(false)
+            setLocationState(prev => ({ ...prev, isLoading: false }))
         }
-    }
+    }, [formState, simulateGPSPosition, router])
+
+    const handleMapConfirmation = useCallback(() => {
+        if (locationState.showConfirmation) {
+            router.push('/user/cleaningService')
+        }
+    }, [locationState.showConfirmation, router])
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-blue-600">
-            <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
-                <div className="flex justify-center mb-6">
-                    <img src="/logo.jpg" alt="Hombres de Blanco Logo" className="w-24 h-24" />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 p-4">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+                <div className="text-center mb-8">
+                    <div className="mb-6">
+                        <Image
+                            src="/logo.jpg"
+                            alt="Hombres de Blanco"
+                            width={120}
+                            height={120}
+                            className="mx-auto"
+                            style={{ objectFit: 'contain' }}
+                        />
+                    </div>
+                    <h2 className="mt-4 text-2xl font-bold text-gray-900">Bienvenido</h2>
+                    <p className="mt-1 text-sm text-gray-600">Ingresa tus credenciales para continuar</p>
                 </div>
-                <form className="space-y-4" onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="sr-only" htmlFor="username">Username</label>
-                        <div className="relative">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a5 5 0 100-10 5 5 0 000 10zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z" />
-                                </svg>
-                            </span>
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Username"
-                                className="w-full pl-10 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Usuario
+                        </label>
+                        <input
+                            type="text"
+                            value={formState.username}
+                            onChange={(e) => setFormState(prev => ({ ...prev, username: e.target.value }))}
+                            className="mt-1 block w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                            required
+                        />
                     </div>
                     <div>
-                        <label className="sr-only" htmlFor="password">Password</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Contraseña
+                        </label>
                         <div className="relative">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                <svg 
-                                    width="24" 
-                                    height="24" 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    fillRule="evenodd" 
-                                    clipRule="evenodd"
-                                >
-                                    <path d="M6 6c0-3.311 2.689-6 6-6s6 2.688 6 6v4h3v14h-18v-14h3v-4zm14 5h-16v12h16v-12zm-13-5v4h10v-4c0-2.76-2.24-5-5-5s-5 2.24-5 5z"/>
-                                </svg>
-                            </span>
                             <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Password"
-                                className="w-full pl-10 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                type={formState.showPassword ? 'text' : 'password'}
+                                value={formState.password}
+                                onChange={(e) => setFormState(prev => ({ ...prev, password: e.target.value }))}
+                                className="mt-1 block w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                                required
                             />
+                            <button
+                                type="button"
+                                onClick={() => setFormState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            >
+                                {formState.showPassword ? 'Ocultar' : 'Mostrar'}
+                            </button>
                         </div>
                     </div>
-                    <button 
-                        type="submit" 
-                        className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        disabled={isLoading}
+                    {locationState.error && (
+                        <div className="text-red-600 text-sm">{locationState.error}</div>
+                    )}
+                    <button
+                        type="submit"
+                        disabled={locationState.isLoading}
+                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                     >
-                        {isLoading ? 'Cargando...' : 'Iniciar sesión'}
+                        {locationState.isLoading ? 'Cargando...' : 'Iniciar Sesión'}
                     </button>
                 </form>
+                <div className="mt-4 text-center">
+                    <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+                {locationState.showMap && (
+                    <div className="mt-6">
+                        <Map 
+                            userLocation={locationState.userLocation} 
+                            workArea={workArea}
+                            key={`${locationState.userLocation?.lat}-${locationState.userLocation?.lng}`}
+                        />
+                        <button
+                            onClick={handleMapConfirmation}
+                            className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
+                            Confirmar y Continuar
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
-    );
+    )
 }
+
+export default LoginPage
+
