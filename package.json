@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
+    "axios": "^1.7.7",
+    "daisyui": "^4.12.14",
+    "jspdf": "^2.5.2",
     "next": "15.0.3",
     "react": "^18.3.1",
     "react-datepicker": "^7.5.0",
@@ -19,8 +22,11 @@
     "recharts": "^2.13.3"
   },
   "devDependencies": {
+    "@types/node": "22.9.1",
+    "@types/react": "18.3.12",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.15"
+    "tailwindcss": "^3.4.15",
+    "typescript": "5.6.3"
   }
 }

@@ -82,33 +82,24 @@ export default function SchedulePage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col gap-2">
-            <nav className="text-sm">
-              <ol className="list-none p-0 inline-flex text-gray-500">
-                <li className="flex items-center">
-                  <span>Inicio</span>
-                  <svg className="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </li>
-                <li className="text-gray-700 font-medium">Calendario</li>
-              </ol>
-            </nav>
             <h1 className="text-3xl font-bold text-gray-900">Calendario de Actividades</h1>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Calendar 
-          tasks={tasks} 
-          onTaskClick={handleTaskClick}
-          onAddTask={(date) => {
-            setSelectedDate(date)
-            setSelectedTask(null)
-            setIsModalOpen(true)
-          }}
-          onDeleteTask={handleDeleteTask}
-        />
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border-l-4 border-blue-500">
+          <Calendar 
+            tasks={tasks} 
+            onTaskClick={handleTaskClick}
+            onAddTask={(date) => {
+              setSelectedDate(date)
+              setSelectedTask(null)
+              setIsModalOpen(true)
+            }}
+            onDeleteTask={handleDeleteTask}
+          />
+        </div>
       </div>
 
       <TaskModal 

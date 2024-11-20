@@ -2,9 +2,9 @@
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-import Navbar from '../shared/componentes/navbar'
+import Navbar from './componentes/navbar'
 
-export default function AdminLayout({
+export default function SharedLayout({
   children,
 }: {
   children: React.ReactNode
@@ -13,8 +13,8 @@ export default function AdminLayout({
   const pathname = usePathname()
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('userRole') === 'admin'
-    if (!isAuthenticated) {
+    const userRole = localStorage.getItem('userRole')
+    if (!userRole || (userRole !== 'admin' && userRole !== 'enterprise')) {
       router.push('/auth/login')
     }
   }, [router])

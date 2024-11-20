@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import RouteGuard from './components/RouteGuard';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,29 +18,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        {children}
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              style: {
-                background: '#22c55e',
-              },
-            },
-            error: {
-              duration: 3000,
-              style: {
-                background: '#ef4444',
-              },
-            },
-          }}
-        />
+        <RouteGuard>
+          {children}
+        </RouteGuard>
+        <Toaster />
       </body>
     </html>
   );

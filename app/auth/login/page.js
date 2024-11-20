@@ -2,6 +2,26 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'react-hot-toast'
+
+// Credenciales de prueba
+const USERS = {
+  admin: {
+    username: 'admin',
+    password: '123456',
+    role: 'admin'
+  },
+  enterprise: {
+    username: 'enterprise',
+    password: '123456',
+    role: 'enterprise'
+  },
+  usuario: {
+    username: 'usuario',
+    password: '123456',
+    role: 'usuario'
+  }
+};
 
 export default function Login() {
     const [username, setUsername] = useState('')
@@ -14,10 +34,12 @@ export default function Login() {
         setIsLoading(true)
         
         try {
-            if (username === 'admin' && password === '123456') {
-                await router.push('/admin/assignments')
+            const user = USERS[username];
+            if (user && user.password === password) {
+                localStorage.setItem('userRole', user.role);
+                await router.push(`/${user.role}/dashboard`);
             } else {
-                alert('Credenciales incorrectas')
+                toast.error('Credenciales incorrectas');
             }
         } catch (error) {
             console.error('Error:', error)

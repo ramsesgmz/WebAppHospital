@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Navbar from '../shared/componentes/navbar'
 
-export default function AdminLayout({
+export default function EnterpriseLayout({
   children,
 }: {
   children: React.ReactNode
@@ -13,7 +13,7 @@ export default function AdminLayout({
   const pathname = usePathname()
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('userRole') === 'admin'
+    const isAuthenticated = true
     if (!isAuthenticated) {
       router.push('/auth/login')
     }
@@ -22,7 +22,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-      <main className="flex-1 p-6">
+      <main className="flex-1">
         {children}
       </main>
     </div>

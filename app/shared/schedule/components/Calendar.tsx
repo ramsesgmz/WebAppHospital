@@ -1,5 +1,9 @@
 'use client'
 import { useState, useMemo } from 'react'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { MonthView } from './MonthView'
+import { WeekView } from './WeekView'
+import { DayView } from './DayView'
 
 interface CalendarProps {
   tasks: ScheduledTask[]
@@ -26,6 +30,9 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
   const [selectedTask, setSelectedTask] = useState<ScheduledTask | null>(null)
   const [showTaskDetails, setShowTaskDetails] = useState(false)
   const [view, setView] = useState<'month' | 'week' | 'day'>('month')
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth())
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear())
+  const [selectedDayTasks, setSelectedDayTasks] = useState<{ date: Date; tasks: ScheduledTask[] } | null>(null);
 
   // Obtener el primer día del mes actual
   const firstDayOfMonth = useMemo(() => {
@@ -144,13 +151,11 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
           <button
             onClick={(e) => {
               e.stopPropagation()
-              const tasksForDate = getTasksForDate(date)
-              setSelectedTask(tasksForDate[0]) // Select the first task
-              setShowTaskDetails(true)
+              setSelectedDayTasks({ date, tasks: dayTasks })
             }}
-            className="w-full text-xs text-gray-500 hover:text-gray-700 py-0.5"
+            className="w-full text-xs text-blue-600 hover:text-blue-800 font-medium py-1"
           >
-            +{dayTasks.length - MAX_VISIBLE_TASKS} más
+            Ver {dayTasks.length - MAX_VISIBLE_TASKS} más...
           </button>
         )}
       </div>
@@ -169,6 +174,20 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
       days.push(day)
     }
     return days
+  }
+
+  // Función para manejar el cambio de mes
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const month = parseInt(event.target.value)
+    setSelectedMonth(month)
+    setCurrentDate(new Date(selectedYear, month))
+  }
+
+  // Función para manejar el cambio de año
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const year = parseInt(event.target.value)
+    setSelectedYear(year)
+    setCurrentDate(new Date(year, selectedMonth))
   }
 
   // Renderizar el contenido según la vista seleccionada
@@ -224,27 +243,39 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
       default:
         return (
           <div className="grid grid-cols-7 flex-1">
-            {daysInMonth.map(({ date, isCurrentMonth, isWeekend }, index) => (
+            {/* Cabecera mejorada con los días de la semana */}
+            <div className="col-span-7 grid grid-cols-7 bg-gray-50 border-b">
+              {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, index) => (
+                <div 
+                  key={day} 
+                  className={`py-3 text-sm font-semibold text-center
+                    ${index === 0 || index === 6 ? 'text-blue-600' : 'text-gray-600'}
+                    ${index !== 6 ? 'border-r border-gray-200' : ''}
+                  `}
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Días del mes */}
+            {daysInMonth.map(({ date, isCurrentMonth }, index) => (
               <div
                 key={index}
-                className={`border-r border-b p-2 transition-colors ${
+                className={`min-h-[100px] p-3 border-b border-r transition-colors ${
                   isCurrentMonth 
-                    ? isWeekend
-                      ? 'bg-gray-50 hover:bg-gray-100'
-                      : 'bg-white hover:bg-gray-50'
-                    : 'bg-gray-100/50 text-gray-400'
+                    ? 'bg-white hover:bg-gray-50'
+                    : 'bg-gray-50/50 text-gray-400'
                 } ${
                   formatDate(date) === formatDate(new Date())
-                    ? 'ring-2 ring-inset ring-gray-500'
+                    ? 'ring-2 ring-inset ring-blue-500'
                     : ''
                 }`}
                 onClick={() => onAddTask(formatDate(date))}
               >
-                <div className={`text-sm font-medium ${
-                  isWeekend && isCurrentMonth ? 'text-gray-700' : ''
-                }`}>
+                <span className="text-sm font-medium">
                   {date.getDate()}
-                </div>
+                </span>
                 {renderCellTasks(date)}
               </div>
             ))}
@@ -255,54 +286,57 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
 
   return (
     <div className="flex gap-4 h-[calc(100vh-16rem)]">
-      <div className="bg-white rounded-lg shadow flex-1 flex flex-col">
-        {/* Header con mejor contraste */}
-        <div className="p-4 border-b bg-gradient-to-r from-gray-800 to-gray-900">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
-                className="p-2 hover:bg-blue-600 rounded-lg text-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <div>
-                <h2 className="text-xl font-bold text-white">
-                  {currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
-                </h2>
-              </div>
-              <button
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}
-                className="p-2 hover:bg-blue-600 rounded-lg text-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex rounded-lg bg-gray-700/50 p-1">
-                {['Mes', 'Semana', 'Día'].map((viewType) => (
-                  <button
-                    key={viewType}
-                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                      view.toLowerCase() === viewType.toLowerCase()
-                        ? 'bg-white text-gray-800'
-                        : 'text-white hover:bg-gray-600'
-                    }`}
-                    onClick={() => setView(viewType.toLowerCase() as 'month' | 'week' | 'day')}
+      <div className="bg-white rounded-lg shadow-lg flex-1 flex flex-col border border-gray-100">
+        {/* Header con mejor diseño */}
+        <div className="p-6">
+          <div className="mb-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setCurrentDate(new Date())}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 
+                           rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  Hoy
+                </button>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={currentDate.getMonth()}
+                    onChange={handleMonthChange}
+                    className="text-base font-semibold text-gray-900 px-3 py-2 bg-white rounded-lg shadow-sm 
+                             border border-gray-100/50 hover:shadow-md transition-all duration-200
+                             focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {viewType}
-                  </button>
-                ))}
+                    {[
+                      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                    ].map((month, index) => (
+                      <option key={month} value={index}>{month}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={currentDate.getFullYear()}
+                    onChange={handleYearChange}
+                    className="text-base font-semibold text-gray-900 px-3 py-2 bg-white rounded-lg shadow-sm 
+                             border border-gray-100/50 hover:shadow-md transition-all duration-200
+                             focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {Array.from({ length: 10 }, (_, i) => 2024 + i).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
               <button
-                onClick={() => onAddTask(formatDate(new Date()))}
-                className="px-4 py-2 bg-white text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+                onClick={() => onAddTask(formatDate(currentDate))}
+                className="px-5 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg font-medium 
+                         transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2"
               >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
                 Nueva Tarea
               </button>
             </div>
@@ -312,9 +346,9 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
         {renderContent()}
       </div>
 
-      {/* Panel lateral con mejor contraste */}
+      {/* Panel lateral mejorado */}
       {showTaskDetails && selectedTask && (
-        <div className="w-80 bg-white rounded-lg shadow-lg p-6">
+        <div className="w-80 bg-white rounded-lg shadow-lg p-6 border border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-900">Detalles de la Tarea</h3>
             <button
@@ -371,6 +405,72 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
               >
                 Eliminar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de tareas del día */}
+      {selectedDayTasks && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Tareas del {selectedDayTasks.date.toLocaleDateString('es-ES', { 
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                  })}
+                </h3>
+                <button
+                  onClick={() => setSelectedDayTasks(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                {selectedDayTasks.tasks.map(task => (
+                  <div
+                    key={task.id}
+                    onClick={() => {
+                      setSelectedTask(task)
+                      setShowTaskDetails(true)
+                      setSelectedDayTasks(null)
+                    }}
+                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                      task.status === 'completed'
+                        ? 'bg-green-50 border-green-200 hover:bg-green-100'
+                        : task.status === 'cancelled'
+                        ? 'bg-red-50 border-red-200 hover:bg-red-100'
+                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium text-gray-900">{task.title}</h4>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {task.startTime} - {task.endTime}
+                        </p>
+                      </div>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        task.status === 'completed'
+                          ? 'bg-green-100 text-green-800'
+                          : task.status === 'cancelled'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {task.status === 'completed' ? 'Completado' : 
+                         task.status === 'cancelled' ? 'Cancelado' : 'Pendiente'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
