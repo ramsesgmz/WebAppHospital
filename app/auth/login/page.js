@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic'
 import { toast } from 'react-hot-toast'
 import { calculateDistance } from './DynamicMap'
 
-const Map = dynamic(() => import('./DynamicMap'), { ssr: false })
+const Map = dynamic(() => import('./DynamicMap'), { ssr: false, loading: () => <p>Cargando mapa...</p> })
 
 const LoginPage = () => {
     const router = useRouter()
@@ -58,19 +58,6 @@ const LoginPage = () => {
         setLocationState(prev => ({ ...prev, error: '', isLoading: true }))
 
         try {
-            // Admin de la empresa de limpieza
-            if (formState.username === 'admin' && formState.password === 'admin123') {
-                router.push('/admin/dashboard')
-                return
-            }
-            
-            // Cliente final (enterprise)
-            if (formState.username === 'enterprise' && formState.password === 'enterprise123') {
-                router.push('/enterprise/dashboard')
-                return
-            }
-
-            // Usuario de limpieza (requiere verificación GPS)
             if (formState.username === 'user' && formState.password === '123456') {
                 const position = simulateGPSPosition()
                 
@@ -93,11 +80,11 @@ const LoginPage = () => {
         } finally {
             setLocationState(prev => ({ ...prev, isLoading: false }))
         }
-    }, [formState, simulateGPSPosition, router])
+    }, [formState, simulateGPSPosition])
 
     const handleMapConfirmation = useCallback(() => {
         if (locationState.showConfirmation) {
-            router.push('/user/cleaningService')
+            router.push('/user/taskHistory')
         }
     }, [locationState.showConfirmation, router])
 
@@ -173,7 +160,6 @@ const LoginPage = () => {
                         <Map 
                             userLocation={locationState.userLocation} 
                             workArea={workArea}
-                            key={`${locationState.userLocation?.lat}-${locationState.userLocation?.lng}`}
                         />
                         <button
                             onClick={handleMapConfirmation}
