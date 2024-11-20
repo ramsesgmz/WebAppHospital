@@ -200,241 +200,188 @@ export default function InventoryModal({ isOpen, onClose, onSubmit, item }: Inve
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
-      <div className="bg-white p-6 rounded-lg w-full max-w-6xl m-4">
-        <div className="flex justify-between mb-6">
-          <h2 className="text-xl font-bold">{item ? 'Editar Item' : 'Nuevo Item'}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-12 gap-6">
-          {/* Columna izquierda: Formulario principal */}
-          <div className="col-span-4">
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              onSubmit(formData)
-            }}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Categoría</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="select select-bordered w-full"
-                  >
-                    <option value="cleaning">Limpieza</option>
-                    <option value="safety">Seguridad</option>
-                    <option value="tools">Herramientas</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Cantidad</label>
-                  <input
-                    type="number"
-                    value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
-                    className="input input-bordered w-full"
-                    required
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Unidad</label>
-                  <input
-                    type="text"
-                    value={formData.unit}
-                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Stock Mínimo</label>
-                  <input
-                    type="number"
-                    value={formData.minStock}
-                    onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) })}
-                    className="input input-bordered w-full"
-                    required
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Ubicación</label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Duración Estimada</label>
-                  <input
-                    type="number"
-                    value={formData.estimatedDuration}
-                    onChange={(e) => setFormData({ ...formData, estimatedDuration: Number(e.target.value) })}
-                    className="input input-bordered w-full"
-                    required
-                    min="0"
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary w-full">
-                  {item ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-8 z-50">
+      <div className="bg-white rounded-lg w-full max-w-[90%] md:max-w-[800px] my-auto">
+        <div className="p-5">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold text-gray-900">
+              {item ? 'Editar Item' : 'Nuevo Item'}
+            </h2>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
-          {/* Columna central: Registros de uso y reposición */}
-          {item && (
-            <div className="col-span-4 space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4 text-red-600">Registrar Uso</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Cantidad</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max={item.quantity}
-                        value={usageAmount}
-                        onChange={(e) => setUsageAmount(Number(e.target.value))}
-                        className="input input-bordered w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Usuario</label>
-                      <input
-                        type="text"
-                        value={user}
-                        onChange={(e) => setUser(e.target.value)}
-                        className="input input-bordered w-full"
-                        placeholder="Nombre del usuario"
-                      />
-                    </div>
+          {/* Content */}
+          <div className="grid grid-cols-3 gap-5 mb-5">
+            {/* Columna izquierda: Formulario principal */}
+            <div className="space-y-3">
+              <form onSubmit={(e) => {
+                e.preventDefault()
+                onSubmit(formData)
+              }}>
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="input input-bordered w-full h-8 text-sm"
+                      required
+                    />
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleUseItem}
-                    disabled={!usageAmount || !user || usageAmount > item.quantity}
-                    className="btn btn-error w-full"
-                  >
-                    Registrar Uso
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="select select-bordered w-full h-8 text-sm"
+                    >
+                      <option value="cleaning">Limpieza</option>
+                      <option value="safety">Seguridad</option>
+                      <option value="tools">Herramientas</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                    <input
+                      type="number"
+                      value={formData.quantity}
+                      onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                      className="input input-bordered w-full h-8 text-sm"
+                      required
+                      min="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Unidad</label>
+                    <input
+                      type="text"
+                      value={formData.unit}
+                      onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                      className="input input-bordered w-full h-8 text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo</label>
+                    <input
+                      type="number"
+                      value={formData.minStock}
+                      onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) })}
+                      className="input input-bordered w-full h-8 text-sm"
+                      required
+                      min="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      className="input input-bordered w-full h-8 text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Duración Estimada</label>
+                    <input
+                      type="number"
+                      value={formData.estimatedDuration}
+                      onChange={(e) => setFormData({ ...formData, estimatedDuration: Number(e.target.value) })}
+                      className="input input-bordered w-full h-8 text-sm"
+                      required
+                      min="0"
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary w-full h-8">
+                    {item ? 'Actualizar' : 'Crear'}
                   </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Columna central: Registros */}
+            <div className="space-y-3">
+              {/* Registrar Uso */}
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-red-600">Registrar Uso</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Cantidad</label>
+                    <input
+                      type="number"
+                      className="input input-bordered w-full h-8 text-sm"
+                      value={usageAmount}
+                      onChange={(e) => setUsageAmount(Number(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full h-8 text-sm"
+                      value={user}
+                      onChange={(e) => setUser(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <button className="btn btn-error btn-sm w-full mt-2 h-8">Registrar Uso</button>
+              </div>
+
+              {/* Registrar Reposición */}
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-green-600">Registrar Reposición</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Cantidad</label>
+                    <input
+                      type="number"
+                      className="input input-bordered w-full h-8 text-sm"
+                      value={restockAmount}
+                      onChange={(e) => setRestockAmount(Number(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full h-8 text-sm"
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <button className="btn btn-success btn-sm w-full mt-2 h-8">Registrar Reposición</button>
+              </div>
+            </div>
+
+            {/* Columna derecha: Historiales */}
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-red-600">Historial de Uso</h3>
+                <div className="text-sm text-gray-500 text-center">
+                  No hay registros de uso
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4 text-green-600">Registrar Reposición</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Cantidad</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={restockAmount}
-                        onChange={(e) => setRestockAmount(Number(e.target.value))}
-                        className="input input-bordered w-full"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Proveedor</label>
-                      <input
-                        type="text"
-                        value={supplier}
-                        onChange={(e) => setSupplier(e.target.value)}
-                        className="input input-bordered w-full"
-                        placeholder="Nombre del proveedor"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleRestockItem}
-                    disabled={!restockAmount || !supplier}
-                    className="btn btn-success w-full"
-                  >
-                    Registrar Reposición
-                  </button>
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-green-600">Historial de Reposición</h3>
+                <div className="text-sm text-gray-500 text-center">
+                  No hay registros de reposición
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Columna derecha: Historiales */}
+          {/* Footer con estadísticas */}
           {item && (
-            <div className="col-span-4 space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-3 flex items-center text-red-600">
-                  Historial de Uso
-                </h3>
-                <div className="overflow-y-auto max-h-40">
-                  {item.usageHistory.length > 0 ? (
-                    item.usageHistory.map((record) => (
-                      <div key={record.id} className="flex items-center justify-between py-2 border-b">
-                        <div className="flex items-center">
-                          <span className="font-bold text-red-600">-{record.quantity}</span>
-                          <span className="ml-2 text-gray-700">{record.user}</span>
-                        </div>
-                        <span className="text-sm text-gray-500">
-                          {new Date(record.date).toLocaleDateString()}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center py-2">No hay registros de uso</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-3 flex items-center text-green-600">
-                  Historial de Reposición
-                </h3>
-                <div className="overflow-y-auto max-h-40">
-                  {item.restockHistory.length > 0 ? (
-                    item.restockHistory.map((record) => (
-                      <div key={record.id} className="flex items-center justify-between py-2 border-b">
-                        <div className="flex items-center">
-                          <span className="font-bold text-green-600">+{record.quantity}</span>
-                          <span className="ml-2 text-gray-700">{record.supplier}</span>
-                        </div>
-                        <span className="text-sm text-gray-500">
-                          {new Date(record.date).toLocaleDateString()}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center py-2">No hay registros de reposición</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Estadísticas en la parte inferior */}
-        {item && stats && (
-          <div className="mt-6">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-500">Stock vs. Mínimo</h4>
                 <div className="mt-2">
@@ -472,8 +419,8 @@ export default function InventoryModal({ isOpen, onClose, onSubmit, item }: Inve
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

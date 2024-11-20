@@ -77,18 +77,9 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header similar al de inventory */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-bold text-gray-900">Calendario de Actividades</h1>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border-l-4 border-blue-500">
+    <div className="h-screen bg-gray-50 flex flex-col">
+      <div className="flex-1 w-[90vw] max-w-[1200px] mx-auto px-1 py-1">
+        <div className="h-full bg-white rounded-xl shadow-lg overflow-hidden border-l-4 border-blue-500">
           <Calendar 
             tasks={tasks} 
             onTaskClick={handleTaskClick}

@@ -285,70 +285,101 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
   }
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-16rem)]">
-      <div className="bg-white rounded-lg shadow-lg flex-1 flex flex-col border border-gray-100">
-        {/* Header con mejor diseño */}
-        <div className="p-6">
-          <div className="mb-6">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setCurrentDate(new Date())}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 
-                           rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
-                >
-                  Hoy
-                </button>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={currentDate.getMonth()}
-                    onChange={handleMonthChange}
-                    className="text-base font-semibold text-gray-900 px-3 py-2 bg-white rounded-lg shadow-sm 
-                             border border-gray-100/50 hover:shadow-md transition-all duration-200
-                             focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {[
-                      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-                    ].map((month, index) => (
-                      <option key={month} value={index}>{month}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={currentDate.getFullYear()}
-                    onChange={handleYearChange}
-                    className="text-base font-semibold text-gray-900 px-3 py-2 bg-white rounded-lg shadow-sm 
-                             border border-gray-100/50 hover:shadow-md transition-all duration-200
-                             focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {Array.from({ length: 10 }, (_, i) => 2024 + i).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <button
-                onClick={() => onAddTask(formatDate(currentDate))}
-                className="px-5 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg font-medium 
-                         transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2"
+    <div className="h-full flex flex-col">
+      {/* Header section */}
+      <div className="p-2 border-b">
+        <div className="flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentDate(new Date())}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 
+                       rounded-lg border border-gray-200 shadow-sm transition-all duration-200"
+            >
+              Hoy
+            </button>
+            <div className="flex items-center gap-1">
+              <select
+                value={currentDate.getMonth()}
+                onChange={handleMonthChange}
+                className="text-sm font-semibold text-gray-900 px-2 py-1.5 bg-white rounded-lg 
+                         shadow-sm border border-gray-100/50 hover:shadow-md transition-all duration-200"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Nueva Tarea
-              </button>
+                {[
+                  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ].map((month, index) => (
+                  <option key={month} value={index}>{month}</option>
+                ))}
+              </select>
+
+              <select
+                value={currentDate.getFullYear()}
+                onChange={handleYearChange}
+                className="text-sm font-semibold text-gray-900 px-2 py-1.5 bg-white rounded-lg 
+                         shadow-sm border border-gray-100/50 hover:shadow-md transition-all duration-200"
+              >
+                {Array.from({ length: 10 }, (_, i) => 2024 + i).map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
             </div>
           </div>
-        </div>
 
-        {renderContent()}
+          <button
+            onClick={() => onAddTask(formatDate(new Date()))}
+            className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 
+                     transition-colors duration-200 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva Tarea
+          </button>
+        </div>
       </div>
 
-      {/* Panel lateral mejorado */}
+      {/* Calendar grid */}
+      <div className="flex-1 grid grid-cols-7 gap-px bg-gray-200 p-px">
+        {/* Weekday headers */}
+        {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, index) => (
+          <div 
+            key={day} 
+            className={`bg-gray-50 p-2 text-sm font-semibold text-center
+              ${index === 0 || index === 6 ? 'text-blue-600' : 'text-gray-600'}
+            `}
+          >
+            {day}
+          </div>
+        ))}
+
+        {/* Calendar days */}
+        {daysInMonth.map((day, index) => (
+          <div
+            key={index}
+            onClick={() => onAddTask(formatDate(day.date))}
+            className={`
+              bg-white p-2 relative overflow-hidden
+              ${day.isCurrentMonth ? '' : 'bg-gray-50'}
+              ${day.isWeekend ? 'bg-gray-50/50' : ''}
+              hover:bg-gray-50 transition-colors cursor-pointer
+              flex flex-col h-[calc((100vh-8rem)/6)]
+            `}
+          >
+            <div className="text-sm">
+              <span className={`font-medium ${!day.isCurrentMonth ? 'text-gray-400' : 'text-gray-900'}`}>
+                {day.date.getDate()}
+              </span>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {renderCellTasks(day.date)}
+            </div>
+          </div>
+        ))}
+      </div>
+
       {showTaskDetails && selectedTask && (
-        <div className="w-80 bg-white rounded-lg shadow-lg p-6 border border-gray-100">
+        <div className="w-full lg:w-80 bg-white rounded-lg shadow-lg p-4 lg:p-6 border border-gray-100 
+                      flex-shrink-0 overflow-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-900">Detalles de la Tarea</h3>
             <button
@@ -410,7 +441,6 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
         </div>
       )}
 
-      {/* Modal de tareas del día */}
       {selectedDayTasks && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">

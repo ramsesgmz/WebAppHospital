@@ -84,23 +84,40 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
       }}
     >
       <div 
-        className="bg-white rounded-lg p-6 max-w-md w-full"
+        className="bg-white rounded-lg p-4 w-full sm:max-w-[500px] md:max-w-[600px]"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold mb-4 text-gray-900">
+        <h2 className="text-lg font-bold mb-3 text-gray-900">
           {task ? 'Editar Tarea' : 'Nueva Tarea'}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Título</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="input input-bordered w-full"
-              required
-            />
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Título</label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="input input-bordered w-full h-9 text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Área</label>
+              <select
+                value={formData.area}
+                onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                className="select select-bordered w-full h-9 text-sm"
+                required
+              >
+                <option value="">Seleccionar área</option>
+                {areas.map(area => (
+                  <option key={area.id} value={area.name}>{area.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
@@ -108,13 +125,13 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="textarea textarea-bordered w-full"
-              rows={3}
+              className="textarea textarea-bordered w-full text-sm"
+              rows={2}
               required
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700">Fecha</label>
               <input
@@ -122,7 +139,7 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
                 value={formData.date}
                 min={new Date().toISOString().split('T')[0]}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full h-9 text-sm"
                 required
               />
             </div>
@@ -131,7 +148,7 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
               <select
                 value={formData.shift}
                 onChange={(e) => setFormData({ ...formData, shift: e.target.value as 'A' | 'B' | 'C' })}
-                className="select select-bordered w-full"
+                className="select select-bordered w-full h-9 text-sm"
               >
                 <option value="A">Turno A</option>
                 <option value="B">Turno B</option>
@@ -140,14 +157,14 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700">Hora Inicio</label>
               <input
                 type="time"
                 value={formData.startTime}
                 onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full h-9 text-sm"
                 required
               />
             </div>
@@ -157,27 +174,10 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
                 type="time"
                 value={formData.endTime}
                 onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full h-9 text-sm"
                 required
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Área</label>
-            <select
-              value={formData.area}
-              onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-              className="select select-bordered w-full"
-              required
-            >
-              <option value="">Seleccionar área</option>
-              {areas.map(area => (
-                <option key={area.id} value={area.name}>
-                  {area.name}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div>
@@ -192,23 +192,21 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
                   })
                 }
               }}
-              className="select select-bordered w-full"
+              className="select select-bordered w-full h-9 text-sm"
             >
               <option value="">Seleccionar usuario</option>
               {users
                 .filter(user => !formData.assignedTo.includes(user.name))
                 .map(user => (
-                  <option key={user.id} value={user.name}>
-                    {user.name}
-                  </option>
-              ))}
+                  <option key={user.id} value={user.name}>{user.name}</option>
+                ))}
             </select>
 
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-1">
               {formData.assignedTo.map((userName, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                 >
                   {userName}
                   <button
@@ -228,19 +226,19 @@ export default function TaskModal({ isOpen, onClose, onSubmit, task, initialDate
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 pt-3 mt-3 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-ghost"
+              className="btn btn-ghost btn-sm"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-primary btn-sm"
             >
-              {task ? 'Actualizar' : 'Crear'}
+              {task ? 'Guardar Cambios' : 'Crear Tarea'}
             </button>
           </div>
         </form>
