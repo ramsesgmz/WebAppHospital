@@ -39,6 +39,12 @@ export default function Navbar() {
 
   const navItems = NAV_ITEMS[userRole] || [];
 
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    router.push('/auth/login');
+  };
+
   return (
     <header className="bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-lg">
       <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
@@ -71,7 +77,7 @@ export default function Navbar() {
         <div className="flex items-center">
           <div className="h-6 w-px bg-blue-400/50 mx-4 hidden md:block"></div>
           <button 
-            onClick={() => router.push('/auth/login')}
+            onClick={handleLogout}
             className="flex items-center space-x-2 px-3 py-2 rounded-lg 
                       text-blue-100 hover:bg-blue-800/50 hover:text-white
                       transition-all duration-200"

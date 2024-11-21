@@ -4,12 +4,17 @@ import { usePathname } from 'next/navigation'
 
 interface ChatMessage {
   id: string
-  type: 'report' | 'question' | 'other'
+  type: 'report' | 'question' | 'other' | 'response'
   subject?: string
   context?: string
   message: string
   status: 'pending' | 'answered'
-  response?: string
+  responses?: Array<{
+    id: string
+    message: string
+    timestamp: Date
+    isAdmin: boolean
+  }>
   attachment?: string
   timestamp: Date
 }
@@ -118,27 +123,32 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
     e.preventDefault()
     if (!selectedMessage || !response.trim()) return
 
-    let attachmentUrl = ''
-    if (attachment) {
-      // Aquí iría la lógica para subir la imagen al servidor
-      attachmentUrl = URL.createObjectURL(attachment)
+    // Crear un nuevo mensaje de respuesta
+    const adminResponse = {
+      id: Date.now().toString(),
+      type: 'response',
+      message: response.trim(),
+      status: 'answered',
+      timestamp: new Date(),
+      isAdmin: true
     }
 
+    // Actualizar el mensaje seleccionado con la nueva respuesta
     const updatedMessage = {
       ...selectedMessage,
       status: 'answered' as const,
-      response: response.trim(),
-      attachment: attachmentUrl
+      responses: [...(selectedMessage.responses || []), adminResponse]
     }
 
-    setMessages(messages.map(msg => 
-      msg.id === selectedMessage.id ? updatedMessage : msg
-    ))
+    setMessages(prevMessages => 
+      prevMessages.map(msg => 
+        msg.id === selectedMessage.id ? updatedMessage : msg
+      )
+    )
     
     setUnreadCount(Math.max(0, unreadCount - 1))
     setResponse('')
-    setAttachment(null)
-    setSelectedMessage(null)
+    setSelectedMessage(updatedMessage) // Mantener el mensaje seleccionado actualizado
   }
 
   // Si es admin, mostrar el contador de mensajes no leídos
@@ -170,7 +180,7 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
           </div>
         </div>
         
-        <div className="overflow-y-auto max-h-[60vh]">
+        <div className="overflow-y-auto overflow-x-hidden" style={{ height: '500px' }}>
           {messages.map((msg) => (
             <div 
               key={msg.id} 
@@ -179,20 +189,18 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
             >
               <div className="flex items-center gap-3">
                 <div className="avatar placeholder">
-                  <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
-                    <span>{msg.type.charAt(0).toUpperCase()}</span>
+                  <div className="bg-neutral-focus text-neutral-content rounded-full w-10">
+                    <span>CF</span>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="font-medium">{msg.subject || 'Sin asunto'}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-primary mb-1">Cliente Final</div>
+                  <div className="font-medium truncate">{msg.subject || 'Sin asunto'}</div>
                   <p className="text-sm opacity-70 truncate">{msg.message}</p>
                   <div className="text-xs opacity-50 mt-1">
                     {new Date(msg.timestamp).toLocaleString()}
                   </div>
                 </div>
-                {msg.status === 'pending' && (
-                  <div className="badge badge-primary">Nuevo</div>
-                )}
               </div>
             </div>
           ))}
@@ -202,35 +210,36 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
   )
 
   const renderMessageDetail = () => (
-    <div className="card w-[450px] bg-base-100 shadow-2xl">
-      <div className="card-body p-0">
-        <div className="bg-primary text-primary-content p-4 rounded-t-2xl">
-          <div className="flex items-center gap-2">
-            <button 
-              className="btn btn-circle btn-sm btn-ghost text-primary-content hover:bg-primary-focus"
-              onClick={() => setSelectedMessage(null)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </button>
-            <div>
-              <h2 className="card-title text-primary-content mb-1">{selectedMessage?.subject || 'Mensaje'}</h2>
-              <p className="text-sm opacity-75">{new Date(selectedMessage?.timestamp || '').toLocaleString()}</p>
-            </div>
+    <div className="card w-[450px] bg-base-100 shadow-2xl flex flex-col">
+      <div className="bg-primary text-primary-content p-4 rounded-t-2xl">
+        <div className="flex items-center gap-2">
+          <button 
+            className="btn btn-circle btn-sm btn-ghost text-primary-content hover:bg-primary-focus"
+            onClick={() => setSelectedMessage(null)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+          <div>
+            <h2 className="card-title text-primary-content mb-1">{selectedMessage?.subject || 'Mensaje'}</h2>
+            <p className="text-sm opacity-75">{new Date(selectedMessage?.timestamp || '').toLocaleString()}</p>
           </div>
         </div>
+      </div>
 
-        <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" style={{ maxHeight: '350px' }}>
+        <div className="p-6 space-y-4">
           <div className="chat chat-start">
             <div className="chat-image avatar placeholder">
-              <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
-                <span className="text-lg">{selectedMessage?.type.charAt(0).toUpperCase()}</span>
+              <div className="bg-primary text-primary-content rounded-full w-10">
+                <span>CF</span>
               </div>
             </div>
-            <div className="chat-bubble chat-bubble-primary">
+            <div className="chat-bubble bg-base-200 text-gray-800">
+              <div className="font-bold text-primary mb-1">Cliente Final</div>
               {selectedMessage?.context && (
-                <div className="bg-primary-focus/20 p-3 rounded-lg mb-3 text-sm">
+                <div className="bg-base-300 p-3 rounded-lg mb-3 text-sm">
                   <span className="font-semibold">Contexto:</span> {selectedMessage.context}
                 </div>
               )}
@@ -238,67 +247,50 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
             </div>
           </div>
 
-          <div className="divider">Respuesta</div>
-
-          <form onSubmit={handleResponseSubmit} className="space-y-4">
-            <textarea 
-              className="textarea textarea-bordered w-full min-h-[120px] text-lg"
-              placeholder="Escribe tu respuesta..."
-              value={response}
-              onChange={(e) => setResponse(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleResponseSubmit(e);
-                }
-              }}
-            />
-            
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="btn btn-outline btn-sm gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {attachment ? attachment.name : 'Adjuntar imagen'}
-                  <input 
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file && file.type.startsWith('image/')) {
-                        setAttachment(file)
-                      } else {
-                        alert('Por favor, selecciona solo archivos de imagen')
-                      }
-                    }}
-                  />
-                </label>
+          {selectedMessage?.responses?.map((response, index) => (
+            <div key={response.id} className="chat chat-end">
+              <div className="chat-image avatar placeholder">
+                <div className="bg-primary text-primary-content rounded-full w-10">
+                  <span>AD</span>
+                </div>
               </div>
-              <button 
-                type="submit" 
-                className="btn btn-primary btn-lg gap-2"
-                disabled={!response.trim()}
-              >
-                Enviar
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
+              <div className="chat-bubble bg-primary text-primary-content">
+                <div className="font-bold mb-1">Administrador</div>
+                <p className="text-lg">{response.message}</p>
+              </div>
             </div>
-            
-            {attachment && (
-              <div className="mt-2">
-                <img 
-                  src={URL.createObjectURL(attachment)} 
-                  alt="Vista previa" 
-                  className="max-h-32 rounded-lg"
-                />
-              </div>
-            )}
-          </form>
+          ))}
         </div>
+      </div>
+
+      <div className="border-t bg-base-100 p-4">
+        <div className="divider my-0">Respuesta</div>
+        <form onSubmit={handleResponseSubmit} className="space-y-3 mt-3">
+          <textarea 
+            className="textarea textarea-bordered w-full min-h-[80px] text-lg"
+            placeholder="Escribe tu respuesta..."
+            value={response}
+            onChange={(e) => setResponse(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                if (response.trim()) {
+                  handleResponseSubmit(e)
+                }
+              }
+            }}
+          />
+          
+          <div className="flex justify-end">
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={!response.trim()}
+            >
+              Enviar
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )
@@ -331,6 +323,14 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
                 placeholder="Escribe tu mensaje..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    if (message.trim()) {
+                      handleSubmit(e)
+                    }
+                  }
+                }}
                 required
               />
               <div className="flex justify-end gap-2">

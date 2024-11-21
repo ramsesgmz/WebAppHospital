@@ -1,10 +1,10 @@
 'use client'
+
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/app/shared/componentes/navbar'
-import ChatWidget from '@/app/shared/componentes/ChatWidget'
 
-export default function AdminLayout({
+export default function UserLayout({
   children,
 }: {
   children: React.ReactNode
@@ -18,7 +18,7 @@ export default function AdminLayout({
       return
     }
     
-    if (userRole !== 'admin') {
+    if (userRole !== 'usuario') {
       router.push('/auth/login')
     }
   }, [router])
@@ -29,12 +29,6 @@ export default function AdminLayout({
       <main className="flex-1 p-6">
         {children}
       </main>
-      <ChatWidget 
-        isAdmin={true}
-        onNewMessage={(message) => {
-          console.log('Nuevo mensaje:', message)
-        }}
-      />
     </div>
   )
 }

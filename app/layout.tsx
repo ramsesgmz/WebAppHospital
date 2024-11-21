@@ -1,28 +1,57 @@
-import './globals.css';
-import { Inter } from 'next/font/google';
-import { Toaster } from 'react-hot-toast';
-import RouteGuard from './components/RouteGuard';
+import localFont from "next/font/local"
+import "./globals.css"
+import Script from 'next/script'
+import 'leaflet/dist/leaflet.css'
+import { Toaster } from 'react-hot-toast'
+import RouteGuard from './components/RouteGuard'
 
-const inter = Inter({ subsets: ['latin'] });
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+})
+
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+})
 
 export const metadata = {
-  title: 'Hombres de Blanco',
-  description: 'Sistema de Gestión Hospitalaria',
-};
+  title: "Hombres de Blanco",
+  description: "Sistema de Gestión Hospitalaria",
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <head>
+        <meta httpEquiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com" />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
+        <Script 
+          src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossOrigin=""
+          strategy="beforeInteractive"
+        />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <RouteGuard>
-          {children}
+          <div id="app">
+            {children}
+          </div>
         </RouteGuard>
         <Toaster />
       </body>
     </html>
-  );
+  )
 } 
