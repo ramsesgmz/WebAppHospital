@@ -13,17 +13,17 @@ const NAV_ITEMS = {
     { label: 'Reportes', href: '/user/reports' }
   ],
   admin: [
-    { label: 'Dashboard', href: '/admin/dashboard' },
+    { label: 'Panel Principal', href: '/admin/dashboard' },
     { label: 'Asignaciones', href: '/admin/assignments' },
-    { label: 'RRHH', href: '/shared/rrhh' },
-    { label: 'Contingency Report', href: '/shared/contingencyReport' },
+    { label: 'Recursos Humanos', href: '/shared/rrhh' },
+    { label: 'Reporte', href: '/shared/contingencyReport' },
     { label: 'Inventario', href: '/shared/inventory' },
     { label: 'Calendario', href: '/shared/schedule' }
   ],
   enterprise: [
-    { label: 'Dashboard', href: '/enterprise/dashboard' },
+    { label: 'Panel Principal', href: '/enterprise/dashboard' },
     { label: 'Calendario', href: '/shared/schedule' },
-    { label: 'RRHH', href: '/shared/rrhh' },
+    { label: 'Recursos Humanos', href: '/shared/rrhh' },
     { label: 'Inventario', href: '/shared/inventory' }
   ]
 };

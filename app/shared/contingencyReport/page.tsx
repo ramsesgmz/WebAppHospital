@@ -82,8 +82,6 @@ export default function ReportsPage() {
   const fetchReports = async () => {
     try {
       setIsLoading(true);
-      
-      // Calcular las fechas según el filtro
       const today = new Date();
       let startDate = new Date();
       
@@ -108,10 +106,9 @@ export default function ReportsPage() {
         }
       });
       
-      setReportes(response.data.reports);
-      setTotalPages(response.data.totalPages);
+      setReportes(response.data.reports || []);
+      setTotalPages(response.data.totalPages || 1);
       
-      // Actualizar estadísticas correctamente
       const reportesActuales = response.data.reports || reportes;
       const total = reportesActuales.length;
       const pendientes = reportesActuales.filter(r => r.estado === 'Pendiente').length;
@@ -120,8 +117,15 @@ export default function ReportsPage() {
         pendientes,
         resueltos: total - pendientes
       });
-    } catch (error) {
-      toast.error('Error al cargar los reportes');
+    } catch {
+      // Silenciar el error y mantener el estado actual
+      setReportes([]);
+      setTotalPages(1);
+      setStats({
+        total: 0,
+        pendientes: 0,
+        resueltos: 0
+      });
     } finally {
       setIsLoading(false);
     }
@@ -500,10 +504,11 @@ export default function ReportsPage() {
                     required
                   >
                     <option value="">Seleccione un área</option>
-                    <option value="Emergencias">Emergencias</option>
-                    <option value="Consulta Externa">Consulta Externa</option>
-                    <option value="Quirófano">Quirófano</option>
-                    <option value="Laboratorio">Laboratorio</option>
+                    <option value="Área de Limpieza General">Área de Limpieza General</option>
+                    <option value="Área de Almacén">Área de Almacén</option>
+                    <option value="Área de Mantenimiento">Área de Mantenimiento</option>
+                    <option value="Área de Inyección">Área de Inyección</option>
+                    <option value="Área de Control de Calidad">Área de Control de Calidad</option>
                   </select>
                 </div>
 

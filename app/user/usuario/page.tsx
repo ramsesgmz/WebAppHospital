@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Assignment {
   id: number;
@@ -14,39 +15,39 @@ interface Assignment {
 }
 
 export default function UserPage() {
+  const router = useRouter();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    // Cargar asignaciones del localStorage
-    const storedAssignments = localStorage.getItem('userAssignments');
-    if (storedAssignments) {
-      setAssignments(JSON.parse(storedAssignments));
-    } else {
-      // Datos de ejemplo
-      const exampleAssignments = [
-        {
-          id: 1,
-          description: "Limpieza de área de emergencias",
-          area: "Emergencias",
-          date: "2024-03-20",
-          dueDate: "2024-03-21",
-          status: "Pendiente",
-          photos: []
-        },
-        {
-          id: 2,
-          description: "Mantenimiento de equipos",
-          area: "UCI",
-          date: "2024-03-20",
-          dueDate: "2024-03-22",
-          status: "Pendiente",
-          photos: []
-        }
-      ];
+    const exampleAssignments = [
+      {
+        id: 1,
+        description: "LIMPIAR LAS MÁQUINAS CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE",
+        area: "Área de Inyección",
+        date: "2024-03-20",
+        dueDate: "2024-03-21",
+        status: "Pendiente",
+        photos: []
+      },
+      {
+        id: 2,
+        description: "DESCONTAMINAR CON LUZ UV Y OZONO DE AMBIENTE Y SUPERFICIE",
+        area: "Área de Inyección",
+        date: "2024-03-20",
+        dueDate: "2024-03-22",
+        status: "Pendiente",
+        photos: []
+      }
+    ];
+
+    const savedAssignments = localStorage.getItem('userAssignments');
+    if (!savedAssignments) {
       setAssignments(exampleAssignments);
       localStorage.setItem('userAssignments', JSON.stringify(exampleAssignments));
+    } else {
+      setAssignments(JSON.parse(savedAssignments));
     }
   }, []);
 
@@ -72,6 +73,26 @@ export default function UserPage() {
       assignment.id === id ? { ...assignment, status: 'En Proceso' } : assignment
     );
     setAssignments(updatedAssignments);
+    
+    const currentTask = updatedAssignments.find(a => a.id === id);
+    if (currentTask) {
+      const taskWithChecklist = {
+        ...currentTask,
+        checklist: [
+          { id: 1, task: "LIMPIAR LAS MÁQUINAS CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE", completed: false },
+          { id: 2, task: "DESCONTAMINAR CON LUZ UV Y OZONO DE AMBIENTE Y SUPERFICIE", completed: false }
+        ],
+        startTime: new Date().toLocaleString()
+      };
+      localStorage.setItem('currentTask', JSON.stringify(taskWithChecklist));
+      localStorage.setItem('taskPhotos', JSON.stringify({
+        antes: null,
+        durante: null,
+        despues: null
+      }));
+      router.push('/user/currentTask');
+    }
+    
     localStorage.setItem('userAssignments', JSON.stringify(updatedAssignments));
     toast.success('Tarea iniciada');
   };
@@ -95,11 +116,55 @@ export default function UserPage() {
     toast.success('Tarea finalizada exitosamente');
   };
 
+  const handleReset = () => {
+    const initialAssignments = [
+      {
+        id: 1,
+        description: "LIMPIAR LAS MÁQUINAS CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE",
+        area: "Área de Inyección",
+        date: "2024-03-20",
+        dueDate: "2024-03-21",
+        status: "Pendiente",
+        photos: []
+      }
+    ];
+
+    localStorage.removeItem('userAssignments');
+    localStorage.removeItem('currentTask');
+    localStorage.removeItem('taskPhotos');
+    setAssignments(initialAssignments);
+    localStorage.setItem('userAssignments', JSON.stringify(initialAssignments));
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    toast.success('Tareas reiniciadas correctamente');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Mis Asignaciones
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Mis Asignaciones
+        </h1>
+        <button
+          onClick={handleReset}
+          className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-gray-100"
+          title="Reiniciar tareas"
+        >
+          <svg 
+            className="w-6 h-6" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+            />
+          </svg>
+        </button>
+      </div>
 
       <div className="grid gap-6">
         {assignments.map(assignment => (
@@ -114,8 +179,7 @@ export default function UserPage() {
           >
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-semibold">{assignment.description}</h3>
-                <p className="text-sm text-gray-600">Área: {assignment.area}</p>
+                <h3 className="text-lg font-semibold">{assignment.area}</h3>
                 <p className="text-sm text-gray-600">
                   Fecha límite: {new Date(assignment.dueDate).toLocaleDateString()}
                 </p>

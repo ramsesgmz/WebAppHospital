@@ -10,10 +10,12 @@ import {
   ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('dia');
   const [hoveredArea, setHoveredArea] = useState(null);
+  const router = useRouter();
   
   // Estadísticas generales del sistema
   const stats = {
@@ -38,20 +40,20 @@ export default function Dashboard() {
 
   // Datos de ejemplo para el inventario
   const inventarioStats = {
-    suministrosMedicos: {
-      total: 450,
+    Desinfectante: {
+      total: 150,
+      bajoStock: 3,
+      porcentaje: 45
+    },
+    Detergentes: {
+      total: 200,
       bajoStock: 5,
-      porVencer: 12
+      porcentaje: 60
     },
-    equipoLimpieza: {
-      total: 280,
-      bajoStock: 8,
-      porVencer: 0
-    },
-    uniformes: {
-      total: 324,
-      bajoStock: 15,
-      porVencer: 0
+    Implementos: {
+      total: 100,
+      bajoStock: 2,
+      porcentaje: 35
     }
   };
 
@@ -113,72 +115,130 @@ export default function Dashboard() {
   // Modificar las tarjetas para usar el período seleccionado
   const frecuenciaLimpieza = {
     dia: {
-      'Área de Emergencias': {
+      'Área de Baños': {
         frecuencia: 8,
         total: 10,
         porcentaje: 80
       },
-      'Área de Consultas': {
+      'Área de Oficinas': {
         frecuencia: 5,
         total: 10,
         porcentaje: 50
       },
-      'Área de Laboratorio': {
+      'Área de Comedor': {
         frecuencia: 6,
         total: 10,
         porcentaje: 60
       },
-      'Área de Farmacia': {
+      'Área de Vestidores': {
         frecuencia: 4,
         total: 10,
         porcentaje: 40
       }
     },
     semana: {
-      'Área de Emergencias': {
+      'Área de Baños': {
         frecuencia: 85,
         total: 100,
         porcentaje: 85
       },
-      'Área de Consultas': {
+      'Área de Oficinas': {
         frecuencia: 60,
         total: 100,
         porcentaje: 60
       },
-      'Área de Laboratorio': {
+      'Área de Comedor': {
         frecuencia: 70,
         total: 100,
         porcentaje: 70
       },
-      'Área de Farmacia': {
+      'Área de Vestidores': {
         frecuencia: 40,
         total: 100,
         porcentaje: 40
       }
     },
     mes: {
-      'Área de Emergencias': {
+      'Área de Baños': {
         frecuencia: 340,
         total: 400,
         porcentaje: 85
       },
-      'Área de Consultas': {
+      'Área de Oficinas': {
         frecuencia: 280,
         total: 400,
         porcentaje: 70
       },
-      'Área de Laboratorio': {
-        frecuencia: 300,
+      'Área de Comedor': {
+        frecuencia: 320,
         total: 400,
-        porcentaje: 75
+        porcentaje: 80
       },
-      'Área de Farmacia': {
-        frecuencia: 200,
+      'Área de Vestidores': {
+        frecuencia: 240,
         total: 400,
-        porcentaje: 50
+        porcentaje: 60
       }
     }
   };
+
+  // Datos de inventario crítico
+  const inventarioCritico = [
+    { 
+      id: 1, 
+      nombre: 'Papel Higiénico Industrial', 
+      stock: 150, 
+      minimo: 200,
+      area: 'Baños',
+      ultimoUso: '2024-02-20',
+      estado: 'critico'
+    },
+    { 
+      id: 2, 
+      nombre: 'Jabón Líquido', 
+      stock: 80, 
+      minimo: 100,
+      area: 'General',
+      ultimoUso: '2024-02-19',
+      estado: 'advertencia'
+    },
+    { 
+      id: 3, 
+      nombre: 'Bolsas de Basura', 
+      stock: 50, 
+      minimo: 100,
+      area: 'General',
+      ultimoUso: '2024-02-21',
+      estado: 'critico'
+    },
+    { 
+      id: 4, 
+      nombre: 'Desinfectante de Pisos', 
+      stock: 120, 
+      minimo: 150,
+      area: 'General',
+      ultimoUso: '2024-02-18',
+      estado: 'advertencia'
+    },
+    { 
+      id: 5, 
+      nombre: 'Escobas', 
+      stock: 45, 
+      minimo: 100,
+      area: 'Almacén',
+      ultimoUso: '2024-02-20',
+      estado: 'critico'
+    },
+    { 
+      id: 6, 
+      nombre: 'Toallas de Papel', 
+      stock: 85, 
+      minimo: 100,
+      area: 'Baños',
+      ultimoUso: '2024-02-17',
+      estado: 'advertencia'
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -365,8 +425,11 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="mt-6 text-center">
-                <button className="inline-flex items-center justify-center px-4 py-2 bg-blue-50 hover:bg-blue-100 
-                                 text-blue-600 font-medium rounded-lg transition-colors duration-200">
+                <button 
+                  onClick={() => router.push('/shared/inventory')}
+                  className="inline-flex items-center justify-center px-4 py-2 bg-blue-50 hover:bg-blue-100 
+                           text-blue-600 font-medium rounded-lg transition-colors duration-200"
+                >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

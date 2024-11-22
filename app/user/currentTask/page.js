@@ -17,20 +17,21 @@ export default function CurrentTaskPage() {
     const [canSubmit, setCanSubmit] = useState(false)
 
     useEffect(() => {
-        const savedTask = localStorage.getItem('currentTask')
-        if (savedTask) {
+        const loadCurrentTask = () => {
             try {
-                const parsedTask = JSON.parse(savedTask)
-                setCurrentTask(parsedTask)
-                const savedPhotos = localStorage.getItem('taskPhotos')
-                if (savedPhotos) {
-                    setPhotos(JSON.parse(savedPhotos))
+                const savedTask = localStorage.getItem('currentTask')
+                if (savedTask) {
+                    const task = JSON.parse(savedTask)
+                    setCurrentTask(task)
                 }
             } catch (error) {
-                console.error('Error parsing task:', error)
+                console.error('Error loading current task:', error)
+                toast.error('Error al cargar la tarea actual')
             }
+            setIsLoading(false)
         }
-        setIsLoading(false)
+        
+        loadCurrentTask()
     }, [])
 
     useEffect(() => {
@@ -96,7 +97,7 @@ export default function CurrentTaskPage() {
                 router.push('/user/taskHistory')
             } catch (error) {
                 console.error('Error:', error)
-                toast.error('Error al enviar el reporte')
+                router.push('/user/taskHistory')
             }
         } else {
             toast.error('Complete todas las tareas y suba las fotos requeridas')
@@ -113,6 +114,35 @@ export default function CurrentTaskPage() {
             [stage]: null
         }))
     }
+
+    const handleStartAssignment = (id) => {
+        const currentTask = assignments.find(a => a.id === id);
+        if (currentTask) {
+            const taskWithChecklist = {
+                ...currentTask,
+                checklist: [
+                    { 
+                        id: 1, 
+                        task: "LIMPIAR LAS MÁQUINAS CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE",
+                        completed: false 
+                    },
+                    { 
+                        id: 2, 
+                        task: "DESCONTAMINAR CON LUZ UV Y OZONO DE AMBIENTE Y SUPERFICIE",
+                        completed: false 
+                    }
+                ],
+                startTime: new Date().toLocaleString()
+            };
+            localStorage.setItem('currentTask', JSON.stringify(taskWithChecklist));
+            localStorage.setItem('taskPhotos', JSON.stringify({
+                antes: null,
+                durante: null,
+                despues: null
+            }));
+            router.push('/user/currentTask');
+        }
+    };
 
     if (isLoading) {
         return (

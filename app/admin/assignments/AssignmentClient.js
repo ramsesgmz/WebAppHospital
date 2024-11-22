@@ -54,7 +54,6 @@ export default function AssignmentClient() {
 
   const [formData, setFormData] = useState({
     user: "",
-    task: "",
     area: "",
     date: null,
     duration: "",
@@ -69,7 +68,8 @@ export default function AssignmentClient() {
     "Carlos Gómez",
     "Ana Martínez",
     "Pedro Sánchez",
-    "Laura Torres"
+    "Laura Torres",
+    "usuario"
   ];
 
   // Agregar después de availableUsers
@@ -85,34 +85,38 @@ export default function AssignmentClient() {
   };
 
   const handleAssign = () => {
-    if (formData.user && formData.task && formData.area && formData.date) {
-      // Crear nueva tarea
-      const nuevaTarea = {
-        id: Date.now(), // Generar ID único
-        descripcion: formData.task,
-        asignado: formData.user,
-        prioridad: "media", // Valor por defecto
-        estado: "pendiente",
-        fechaLimite: formData.date.toISOString().split('T')[0],
-        startTime: formData.startTime,
-        endTime: formData.endTime
-      };
+    if (formData.user && formData.area && formData.date) {
+      // Obtener todas las tareas del área seleccionada
+      const areaTareas = areasTareas.find(area => area.nombre === formData.area)?.tareas || [];
+      
+      // Crear nuevas tareas para cada tarea del área
+      areaTareas.forEach(tarea => {
+        const nuevaTarea = {
+          id: Date.now() + Math.random(), // Generar ID único
+          descripcion: tarea.descripcion,
+          asignado: formData.user,
+          prioridad: tarea.prioridad || "media",
+          estado: "pendiente",
+          fechaLimite: formData.date.toISOString().split('T')[0],
+          startTime: formData.startTime,
+          endTime: formData.endTime
+        };
 
-      // Actualizar areasTareas
-      setAreasTareas(prev => prev.map(area => {
-        if (area.nombre === formData.area) {
-          return {
-            ...area,
-            tareas: [...area.tareas, nuevaTarea]
-          };
-        }
-        return area;
-      }));
+        // Actualizar areasTareas
+        setAreasTareas(prev => prev.map(area => {
+          if (area.nombre === formData.area) {
+            return {
+              ...area,
+              tareas: [...area.tareas, nuevaTarea]
+            };
+          }
+          return area;
+        }));
+      });
 
       // Limpiar el formulario
       setFormData({
         user: "",
-        task: "",
         area: "",
         date: null,
         duration: "",
@@ -120,9 +124,9 @@ export default function AssignmentClient() {
         endTime: null
       });
       setSelectedDuration(null);
-      toast.success("Tarea asignada correctamente");
+      toast.success("Tareas asignadas correctamente");
     } else {
-      toast.error("Por favor, completa los campos obligatorios (Usuario, Tarea, Área y Fecha)");
+      toast.error("Por favor, completa los campos obligatorios (Usuario, Área y Fecha)");
     }
   };
 
@@ -178,8 +182,14 @@ export default function AssignmentClient() {
     { id: 6, nombre: 'Laura Torres', area: 'UCI', estado: 'Activo', rol: 'Supervisor' },
     { id: 7, nombre: 'Miguel Ángel', area: 'Laboratorio', estado: 'Activo', rol: 'Técnico' },
     { id: 8, nombre: 'Isabel Díaz', area: 'Urgencias', estado: 'Activo', rol: 'Limpieza General' },
-    { id: 9, nombre: 'Roberto Martín', area: 'UCI', estado: 'Inactivo', rol: 'Especialista' },
-    { id: 10, nombre: 'Carmen Vega', area: 'Laboratorio', estado: 'Activo', rol: 'Técnico' }
+    { id: 9, nombre: 'Roberto Martín', area: 'UCI', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
+    { id: 10, nombre: 'Carmen Vega', area: 'Laboratorio', turno: 'Noche', rol: 'Técnico', estado: 'Activo' },
+    { id: 11, nombre: 'Fernando Gil', area: 'Urgencias', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
+    { id: 12, nombre: 'Patricia López', area: 'Farmacia', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+    { id: 13, nombre: 'José Torres', area: 'Pediatría', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+    { id: 14, nombre: 'Lucía Martínez', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+    { id: 15, nombre: 'Alberto Ruiz', area: 'UCI', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
+    { id: 16, nombre: 'usuario', area: 'RRHH', estado: 'Activo', rol: 'Administrativo' },
   ];
 
   // Funciones para manejar las tareas
@@ -341,6 +351,22 @@ export default function AssignmentClient() {
     </div>
   );
 
+  // Agregar este estado al inicio del componente
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showItemModal, setShowItemModal] = useState(false);
+
+  // Modificar el array de alertas
+  const alertasInventario = [
+    {
+      id: 1,
+      tipo: "Productos de Limpieza",
+      mensaje: "Bajo stock en desinfectantes y detergentes",
+      nivel: "warning",
+      fecha: "2024-03-20"
+    },
+    // ... otras alertas
+  ];
+
   // Componente de Turnos Mejorado
   return (
     <div className="container mx-auto px-4 py-8">
@@ -481,28 +507,6 @@ export default function AssignmentClient() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tarea
-              </label>
-              <select
-                name="task"
-                value={formData.task}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                disabled={!formData.area}
-              >
-                <option value="">Seleccionar Tarea</option>
-                {formData.area && areasTareas
-                  .find(area => area.nombre === formData.area)
-                  ?.tareas.map(tarea => (
-                    <option key={tarea.id} value={tarea.descripcion}>
-                      {tarea.descripcion}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Área
               </label>
               <select
@@ -569,11 +573,11 @@ export default function AssignmentClient() {
               <button
                 type="button"
                 onClick={handleAssign}
-                disabled={!formData.user || !formData.task || !formData.area || !formData.date}
+                disabled={!formData.user || !formData.area || !formData.date}
                 className={`
                   w-full py-3 rounded-xl text-lg font-semibold shadow-md 
                   transition-all duration-200
-                  ${(formData.user && formData.task && formData.area && formData.date)
+                  ${(formData.user && formData.area && formData.date)
                     ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                     : 'bg-gray-300 cursor-not-allowed text-gray-500'}
                 `}
@@ -654,6 +658,42 @@ export default function AssignmentClient() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showItemModal && selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Detalles del Inventario
+                </h3>
+                <button
+                  onClick={() => setShowItemModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="space-y-4">
+                <p><strong>Tipo:</strong> {selectedItem.tipo}</p>
+                <p><strong>Mensaje:</strong> {selectedItem.mensaje}</p>
+                <p><strong>Fecha:</strong> {selectedItem.fecha}</p>
+                <p><strong>Nivel de Alerta:</strong> {selectedItem.nivel}</p>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setShowItemModal(false)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>

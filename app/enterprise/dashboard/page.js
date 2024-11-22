@@ -10,22 +10,30 @@ import { getAreas, getPersonal } from '@/utils/initLocalStorage';
 
 // Datos de todo el personal
 const allStaff = [
-  { id: 1, nombre: 'Juan Pérez', area: 'Urgencias', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
-  { id: 2, nombre: 'María López', area: 'UCI', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
-  { id: 3, nombre: 'Carlos Ruiz', area: 'Urgencias', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
-  { id: 4, nombre: 'Ana García', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
-  { id: 5, nombre: 'Pedro Sánchez', area: 'UCI', turno: 'Mañana', rol: 'Supervisor', estado: 'Activo' },
-  { id: 6, nombre: 'Laura Torres', area: 'Laboratorio', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
-  { id: 7, nombre: 'Miguel Ángel', area: 'Farmacia', turno: 'Noche', rol: 'Auxiliar', estado: 'Activo' },
-  { id: 8, nombre: 'Isabel Díaz', area: 'Pediatría', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
-  { id: 9, nombre: 'Roberto Martín', area: 'UCI', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
-  { id: 10, nombre: 'Carmen Vega', area: 'Laboratorio', turno: 'Noche', rol: 'Técnico', estado: 'Activo' },
-  { id: 11, nombre: 'Fernando Gil', area: 'Urgencias', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
-  { id: 12, nombre: 'Patricia López', area: 'Farmacia', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
-  { id: 13, nombre: 'José Torres', area: 'Pediatría', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
-  { id: 14, nombre: 'Lucía Martínez', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
-  { id: 15, nombre: 'Alberto Ruiz', area: 'UCI', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
-  // ... puedes seguir agregando más personal según necesites
+  { id: 1, nombre: 'Juan Pérez', area: 'Área de Producción', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 2, nombre: 'María López', area: 'Área de Almacenes', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+  { id: 3, nombre: 'Carlos Ruiz', area: 'Área de Producción', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+  { id: 4, nombre: 'Ana García', area: 'Área de Oficinas', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+  { id: 5, nombre: 'Pedro Sánchez', area: 'Área de Almacenes', turno: 'Mañana', rol: 'Supervisor', estado: 'Activo' },
+  { id: 6, nombre: 'Laura Torres', area: 'Área de Comedor', turno: 'Tarde', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 7, nombre: 'Miguel Ángel', area: 'Área de Vestidores', turno: 'Noche', rol: 'Auxiliar', estado: 'Activo' },
+  { id: 8, nombre: 'Isabel Díaz', area: 'Área de Producción', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 9, nombre: 'Roberto Martín', area: 'Área de Almacenes', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
+  { id: 10, nombre: 'Carmen Vega', area: 'Área de Comedor', turno: 'Noche', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 11, nombre: 'Fernando Gil', area: 'Área de Producción', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
+  { id: 12, nombre: 'Patricia López', area: 'Área de Vestidores', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+  { id: 13, nombre: 'José Torres', area: 'Área de Producción', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+  { id: 14, nombre: 'Lucía Martínez', area: 'Área de Oficinas', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+  { id: 15, nombre: 'Alberto Ruiz', area: 'Área de Almacenes', turno: 'Tarde', rol: 'Limpieza General', estado: 'Activo' }
+];
+
+const personalTotal = [
+  { id: 1, nombre: 'Juan Pérez', area: 'Área de Producción', estado: 'Activo', rol: 'Limpieza General' },
+  { id: 2, nombre: 'María López', area: 'Área de Almacenes', estado: 'Activo', rol: 'Supervisor' },
+  { id: 3, nombre: 'Carlos Ruiz', area: 'Área de Producción', estado: 'Inactivo', rol: 'Limpieza General' },
+  { id: 4, nombre: 'Ana García', area: 'Área de Oficinas', estado: 'Activo', rol: 'Especialista' },
+  { id: 5, nombre: 'Pedro Sánchez', area: 'Área de Almacenes', estado: 'Activo', rol: 'Supervisor' },
+  { id: 16, nombre: 'usuario', area: 'Administración', estado: 'Activo', rol: 'Administrativo' }
 ];
 
 export default function EnterpriseOverviewPage() {
@@ -38,29 +46,154 @@ export default function EnterpriseOverviewPage() {
   const [areasTareas, setAreasTareas] = useState([
     {
       id: 1,
-      nombre: 'Urgencias',
+      nombre: 'Área de Producción',
       color: '#EF4444',
       tareas: [
         {
           id: 1,
-          descripcion: 'Limpieza general',
+          descripcion: 'Limpieza profunda de maquinaria con desengrasante industrial',
           asignado: 'Juan Pérez',
+          estado: 'pendiente',
+          prioridad: 'alta'
+        },
+        {
+          id: 2,
+          descripcion: 'Desinfección de superficies de trabajo',
+          asignado: 'María López',
+          estado: 'en_progreso',
+          prioridad: 'alta'
+        },
+        {
+          id: 3,
+          descripcion: 'Barrido y trapeado de pisos',
+          asignado: 'Carlos Ruiz',
+          estado: 'pendiente',
+          prioridad: 'media'
+        }
+      ]
+    },
+    {
+      id: 2,
+      nombre: 'Área de Almacenes',
+      color: '#F59E0B',
+      tareas: [
+        {
+          id: 4,
+          descripcion: 'Limpieza de estanterías y racks',
+          asignado: 'Ana García',
+          estado: 'pendiente',
+          prioridad: 'media'
+        },
+        {
+          id: 5,
+          descripcion: 'Desinfección de áreas de alto tráfico',
+          asignado: 'Pedro Sánchez',
+          estado: 'completada',
+          prioridad: 'alta'
+        },
+        {
+          id: 6,
+          descripcion: 'Limpieza de zona de carga y descarga',
+          asignado: 'Laura Torres',
           estado: 'pendiente',
           prioridad: 'alta'
         }
       ]
     },
-    // Puedes agregar más áreas según necesites
+    {
+      id: 3,
+      nombre: 'Área de Oficinas',
+      color: '#3B82F6',
+      tareas: [
+        {
+          id: 7,
+          descripcion: 'Limpieza de escritorios y equipos',
+          asignado: 'Miguel Ángel',
+          estado: 'pendiente',
+          prioridad: 'media'
+        },
+        {
+          id: 8,
+          descripcion: 'Aspirado de alfombras',
+          asignado: 'Isabel Díaz',
+          estado: 'pendiente',
+          prioridad: 'baja'
+        },
+        {
+          id: 9,
+          descripcion: 'Desinfección de áreas comunes',
+          asignado: 'Roberto Martín',
+          estado: 'en_progreso',
+          prioridad: 'alta'
+        }
+      ]
+    },
+    {
+      id: 4,
+      nombre: 'Área de Comedor',
+      color: '#10B981',
+      tareas: [
+        {
+          id: 10,
+          descripcion: 'Limpieza y desinfección de mesas',
+          asignado: 'Carmen Vega',
+          estado: 'pendiente',
+          prioridad: 'alta'
+        },
+        {
+          id: 11,
+          descripcion: 'Trapeado con desinfectante',
+          asignado: 'Fernando Gil',
+          estado: 'pendiente',
+          prioridad: 'alta'
+        },
+        {
+          id: 12,
+          descripcion: 'Limpieza de microondas y electrodomésticos',
+          asignado: 'Patricia López',
+          estado: 'completada',
+          prioridad: 'media'
+        }
+      ]
+    },
+    {
+      id: 5,
+      nombre: 'Área de Vestidores',
+      color: '#6366F1',
+      tareas: [
+        {
+          id: 13,
+          descripcion: 'Desinfección de lockers',
+          asignado: 'José Torres',
+          estado: 'pendiente',
+          prioridad: 'alta'
+        },
+        {
+          id: 14,
+          descripcion: 'Limpieza de duchas y sanitarios',
+          asignado: 'Lucía Martínez',
+          estado: 'en_progreso',
+          prioridad: 'alta'
+        },
+        {
+          id: 15,
+          descripcion: 'Reposición de jabón y papel',
+          asignado: 'Alberto Ruiz',
+          estado: 'pendiente',
+          prioridad: 'media'
+        }
+      ]
+    }
   ]);
   const [personal, setPersonal] = useState(allStaff);
 
   // Datos de áreas
   const areasData = [
-    { nombre: 'Urgencias', personal: 8, color: '#EF4444' },
-    { nombre: 'UCI', personal: 6, color: '#F59E0B' },
-    { nombre: 'Consultas', personal: 10, color: '#3B82F6' },
-    { nombre: 'Quirófano', personal: 4, color: '#10B981' },
-    { nombre: 'Laboratorio', personal: 7, color: '#6366F1' }
+    { nombre: 'Área de Producción', personal: 8, color: '#EF4444' },
+    { nombre: 'Área de Almacenes', personal: 6, color: '#F59E0B' },
+    { nombre: 'Área de Oficinas', personal: 10, color: '#3B82F6' },
+    { nombre: 'Área de Comedor', personal: 4, color: '#10B981' },
+    { nombre: 'Área de Vestidores', personal: 7, color: '#6366F1' }
   ];
 
   // Datos de turnos
@@ -108,34 +241,34 @@ export default function EnterpriseOverviewPage() {
   const inventarioCritico = [
     { 
       id: 1, 
-      nombre: 'Guantes Quirúrgicos', 
+      nombre: 'Limpiador Multiusos', 
       stock: 150, 
       minimo: 200,
-      area: 'Quirófano',
+      area: 'Almacén',
       ultimoUso: '2024-02-20',
       estado: 'critico'
     },
     { 
       id: 2, 
-      nombre: 'Alcohol Gel', 
+      nombre: 'Desengrasante Industrial', 
       stock: 80, 
       minimo: 100,
-      area: 'General',
+      area: 'Producción',
       ultimoUso: '2024-02-19',
       estado: 'advertencia'
     },
     { 
       id: 3, 
-      nombre: 'Mascarillas N95', 
+      nombre: 'Escobas Industriales', 
       stock: 50, 
       minimo: 100,
-      area: 'UCI',
+      area: 'General',
       ultimoUso: '2024-02-21',
       estado: 'critico'
     },
     { 
       id: 4, 
-      nombre: 'Desinfectante', 
+      nombre: 'Trapeadores', 
       stock: 120, 
       minimo: 150,
       area: 'General',
@@ -144,19 +277,19 @@ export default function EnterpriseOverviewPage() {
     },
     { 
       id: 5, 
-      nombre: 'Batas Desechables', 
+      nombre: 'Paños de Microfibra', 
       stock: 45, 
       minimo: 100,
-      area: 'Quirófano',
+      area: 'Producción',
       ultimoUso: '2024-02-20',
       estado: 'critico'
     },
     { 
       id: 6, 
-      nombre: 'Jabón Antiséptico', 
+      nombre: 'Detergente Industrial', 
       stock: 85, 
       minimo: 100,
-      area: 'General',
+      area: 'Almacén',
       ultimoUso: '2024-02-17',
       estado: 'advertencia'
     }
@@ -272,13 +405,13 @@ export default function EnterpriseOverviewPage() {
 
   // Datos de personal por área
   const personalPorArea = {
-    1: [ // Urgencias
+    1: [ // Producción
       { id: 1, nombre: 'Juan Pérez', turno: 'Mañana' },
       { id: 2, nombre: 'María López', turno: 'Tarde' },
       { id: 3, nombre: 'Carlos Ruiz', turno: 'Noche' },
       { id: 4, nombre: 'Ana García', turno: 'Mañana' }
     ],
-    2: [ // UCI
+    2: [ // Almacenes
       { id: 5, nombre: 'Pedro Sánchez', turno: 'Mañana' },
       { id: 6, nombre: 'Laura Torres', turno: 'Tarde' },
       { id: 7, nombre: 'Miguel Ángel', turno: 'Noche' }
@@ -288,21 +421,22 @@ export default function EnterpriseOverviewPage() {
 
   // Componente para mostrar todo el personal
   const PersonalTotal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-bold text-gray-800">Personal Total del Hospital</h3>
-            <p className="text-sm text-gray-500">98 empleados registrados</p>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold text-gray-800">
+              Personal Total de Limpieza Industrial
+            </h3>
+            <button 
+              onClick={() => setShowAllStaff(false)}
+              className="text-gray-400 hover:text-gray-500"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <button 
-            onClick={() => setShowAllStaff(false)}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
         
         <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
@@ -442,7 +576,7 @@ export default function EnterpriseOverviewPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Gráfico de Dona */}
+              {/* Grfico de Dona */}
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -557,7 +691,7 @@ export default function EnterpriseOverviewPage() {
             </div>
             
             <button 
-              onClick={irAInventario}
+              onClick={() => router.push('/shared/inventory')}
               className="mt-6 w-full bg-blue-50 text-blue-600 py-2 px-4 rounded-lg
                        hover:bg-blue-100 transition-colors duration-200 text-sm font-medium"
             >
@@ -658,7 +792,7 @@ export default function EnterpriseOverviewPage() {
 
       {/* Actualizar el botón de inventario */}
       <button 
-        onClick={irAInventario}
+        onClick={() => router.push('/shared/inventory')}
         className="mt-6 w-full bg-blue-50 text-blue-600 py-2 px-4 rounded-lg
                  hover:bg-blue-100 transition-colors duration-200 text-sm font-medium"
       >
@@ -715,8 +849,143 @@ export default function EnterpriseOverviewPage() {
       )}
 
       {/* Modal de Personal Total */}
-      {showAllStaff && <PersonalTotal />}
+      {showAllStaff && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl my-4">
+            {/* Encabezado del Modal */}
+            <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    Personal Total de Limpieza Industrial
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Lista completa del personal por áreas y turnos
+                  </p>
+                </div>
+                <button 
+                  onClick={() => setShowAllStaff(false)}
+                  className="text-gray-400 hover:text-gray-500 p-2 rounded-full hover:bg-gray-100"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Contenido del modal */}
+            <div className="p-6">
+              {/* Filtros y estadísticas */}
+              <div className="mb-6 grid grid-cols-3 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm font-medium text-blue-600">Total Personal</p>
+                  <p className="text-2xl font-bold text-blue-700">{allStaff.length}</p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-sm font-medium text-green-600">Personal Activo</p>
+                  <p className="text-2xl font-bold text-green-700">
+                    {allStaff.filter(p => p.estado === 'Activo').length}
+                  </p>
+                </div>
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <p className="text-sm font-medium text-yellow-600">Supervisores</p>
+                  <p className="text-2xl font-bold text-yellow-700">
+                    {allStaff.filter(p => p.rol === 'Supervisor').length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Lista de Personal */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {allStaff.map((persona) => (
+                  <div key={persona.id} 
+                       className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span className="text-blue-600 font-medium text-lg">
+                          {persona.nombre.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">{persona.nombre}</h4>
+                        <p className="text-sm text-gray-500">{persona.area}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                            {persona.rol}
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
+                            Turno {persona.turno}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium
+                      ${persona.estado === 'Activo' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'}`}>
+                      {persona.estado}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {showAreaModal && <AreaDetalleModal />}
+
+      {/* Cuadro de RRHH */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Recursos Humanos</h3>
+            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              98 empleados
+            </span>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800">Personal Activo</p>
+                  <p className="text-sm text-gray-500">85 empleados</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800">Asistencia Hoy</p>
+                  <p className="text-sm text-gray-500">92%</p>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setShowAllStaff(true)}
+              className="w-full mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg
+                       hover:bg-blue-100 transition-colors duration-200 text-sm font-medium"
+            >
+              Ver Detalles de Personal
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

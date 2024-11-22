@@ -210,17 +210,21 @@ export default function RRHHPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Ubicación</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Ubicación
+                </label>
                 <select
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   value={newEmployee.ubicacion}
-                  onChange={(e) => setNewEmployee({...newEmployee, ubicacion: e.target.value})}
+                  onChange={(e) => setNewEmployee({ ...newEmployee, ubicacion: e.target.value })}
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   required
                 >
                   <option value="">Seleccionar ubicación</option>
-                  <option value="Emergencias">Emergencias</option>
-                  <option value="Consulta">Consulta Externa</option>
-                  <option value="Quirofano">Quirófano</option>
+                  <option value="Limpieza General">Limpieza General</option>
+                  <option value="Almacén">Almacén</option>
+                  <option value="Área de Inyección">Área de Inyección</option>
+                  <option value="Mantenimiento">Mantenimiento</option>
+                  <option value="Control de Calidad">Control de Calidad</option>
                 </select>
               </div>
             </div>
