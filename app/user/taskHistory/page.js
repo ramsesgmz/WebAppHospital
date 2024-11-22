@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import UserNavbar from '../../components/UserNavbar'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
@@ -116,89 +115,86 @@ export default function TaskHistoryPage() {
     }
 
     return (
-        <>
-            <UserNavbar />
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
-                        <h1 className="text-3xl font-bold text-white">Gestión de Tareas</h1>
-                        <p className="mt-2 text-blue-100">
-                            Administra y supervisa todas las tareas de limpieza y mantenimiento
-                        </p>
-                    </div>
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
+                    <h1 className="text-3xl font-bold text-white">Gestión de Tareas</h1>
+                    <p className="mt-2 text-blue-100">
+                        Administra y supervisa todas las tareas de limpieza y mantenimiento
+                    </p>
+                </div>
 
-                    {/* Estadísticas con nuevo diseño */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="text-sm font-medium text-gray-500">Tareas Pendientes</div>
-                            <div className="mt-2 text-3xl font-semibold text-gray-900">
-                                {tasks.filter(t => t.status === 'pending').length}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="text-sm font-medium text-gray-500">En Progreso</div>
-                            <div className="mt-2 text-3xl font-semibold text-gray-900">
-                                {tasks.filter(t => t.status === 'in_progress').length}
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="text-sm font-medium text-gray-500">Completadas</div>
-                            <div className="mt-2 text-3xl font-semibold text-gray-900">
-                                {tasks.filter(t => t.status === 'completed').length}
-                            </div>
+                {/* Estadísticas con nuevo diseño */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <div className="text-sm font-medium text-gray-500">Tareas Pendientes</div>
+                        <div className="mt-2 text-3xl font-semibold text-gray-900">
+                            {tasks.filter(t => t.status === 'pending').length}
                         </div>
                     </div>
-
-                    {/* Lista de tareas con nuevo diseño */}
-                    <div className="px-8 pb-8">
-                        <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-                                <h3 className="text-lg font-medium text-gray-900">
-                                    Todas las tareas
-                                </h3>
-                            </div>
-                            <ul className="divide-y divide-gray-200">
-                                {tasks.map((task) => (
-                                    <li key={task.id} className="p-4 hover:bg-gray-50">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <span className={getStatusBadgeClass(task.status)}>
-                                                        {getStatusText(task.status)}
-                                                    </span>
-                                                    <span className="text-sm text-gray-500">
-                                                        {task.completedAt || task.startedAt || task.assignedAt}
-                                                    </span>
-                                                </div>
-                                                <p className="mt-2 text-lg font-medium text-gray-900">{task.area}</p>
-                                                <p className="mt-1 text-gray-500">{task.description}</p>
-                                            </div>
-                                            <div className="ml-4 flex gap-2">
-                                                {task.status === 'pending' && (
-                                                    <button
-                                                        onClick={() => handleStartTask(task.id)}
-                                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                                                    >
-                                                        Comenzar
-                                                    </button>
-                                                )}
-                                                {task.status === 'completed' && (
-                                                    <button
-                                                        onClick={() => setSelectedTask(task)}
-                                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                                                    >
-                                                        Ver Reporte
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <div className="text-sm font-medium text-gray-500">En Progreso</div>
+                        <div className="mt-2 text-3xl font-semibold text-gray-900">
+                            {tasks.filter(t => t.status === 'in_progress').length}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <div className="text-sm font-medium text-gray-500">Completadas</div>
+                        <div className="mt-2 text-3xl font-semibold text-gray-900">
+                            {tasks.filter(t => t.status === 'completed').length}
                         </div>
                     </div>
                 </div>
-            </main>
+
+                {/* Lista de tareas con nuevo diseño */}
+                <div className="px-8 pb-8">
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900">
+                                Todas las tareas
+                            </h3>
+                        </div>
+                        <ul className="divide-y divide-gray-200">
+                            {tasks.map((task) => (
+                                <li key={task.id} className="p-4 hover:bg-gray-50">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <span className={getStatusBadgeClass(task.status)}>
+                                                    {getStatusText(task.status)}
+                                                </span>
+                                                <span className="text-sm text-gray-500">
+                                                    {task.completedAt || task.startedAt || task.assignedAt}
+                                                </span>
+                                            </div>
+                                            <p className="mt-2 text-lg font-medium text-gray-900">{task.area}</p>
+                                            <p className="mt-1 text-gray-500">{task.description}</p>
+                                        </div>
+                                        <div className="ml-4 flex gap-2">
+                                            {task.status === 'pending' && (
+                                                <button
+                                                    onClick={() => handleStartTask(task.id)}
+                                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                                                >
+                                                    Comenzar
+                                                </button>
+                                            )}
+                                            {task.status === 'completed' && (
+                                                <button
+                                                    onClick={() => setSelectedTask(task)}
+                                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                                                >
+                                                    Ver Reporte
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
             {/* Modal del reporte aquí */}
             {selectedTask && selectedTask.report && (
@@ -261,6 +257,6 @@ export default function TaskHistoryPage() {
                     </div>
                 </div>
             )}
-        </>
+        </main>
     )
 }

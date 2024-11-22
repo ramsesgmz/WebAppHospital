@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import UserNavbar from '../../components/UserNavbar'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
@@ -118,7 +117,6 @@ export default function CurrentTaskPage() {
     if (isLoading) {
         return (
             <>
-                <UserNavbar />
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-center min-h-[60vh]">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
@@ -131,7 +129,6 @@ export default function CurrentTaskPage() {
     if (!currentTask && !isLoading) {
         return (
             <>
-                <UserNavbar />
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <h2 className="text-2xl font-semibold text-gray-900">No hay tarea en progreso</h2>
@@ -143,8 +140,37 @@ export default function CurrentTaskPage() {
     }
 
     return (
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
+                    <div className="flex justify-between items-start">
+                        <div className="text-white">
+                            <h3 className="text-3xl font-bold tracking-tight">{currentTask.area}</h3>
+                            <p className="mt-2 text-blue-100 text-lg">{currentTask.description}</p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="px-4 py-2 rounded-full text-sm font-semibold bg-red-500 text-white shadow-lg">
+                                Prioridad Alta
+                            </span>
+                            <span className="mt-2 text-blue-100">
+                                ID: {currentTask.id}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-8">
+                    <div className="space-y-8">
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-2xl shadow-lg border border-indigo-100">
+                                <div className="flex items-center space-x-4">
+                                    <div className="p-3 bg-indigo-100 rounded-xl">
+                                        <FaClock className="text-indigo-600 text-2xl" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-indigo-900">Hora de inicio</p>
+                                        <p className="text-2xl font-bold text-indigo-700">{currentTask.startTime}</p>
         <>
-            <UserNavbar />
             <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">

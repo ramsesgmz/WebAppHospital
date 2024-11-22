@@ -7,7 +7,10 @@ import { usePathname } from 'next/navigation';
 // Configuración de rutas por rol
 const NAV_ITEMS = {
   usuario: [
-    { label: 'Usuario', href: '/user/usuario' }
+    { label: 'Usuario', href: '/user/usuario' },
+    { label: 'Tarea Actual', href: '/user/currentTask' },
+    { label: 'Historial', href: '/user/taskHistory' },
+    { label: 'Reportes', href: '/user/reports' }
   ],
   admin: [
     { label: 'Dashboard', href: '/admin/dashboard' },

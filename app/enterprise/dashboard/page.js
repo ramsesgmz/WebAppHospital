@@ -8,6 +8,26 @@ import {
 import { FaClock, FaRegCalendarCheck } from 'react-icons/fa';
 import { getAreas, getPersonal } from '@/utils/initLocalStorage';
 
+// Datos de todo el personal
+const allStaff = [
+  { id: 1, nombre: 'Juan Pérez', area: 'Urgencias', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 2, nombre: 'María López', area: 'UCI', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+  { id: 3, nombre: 'Carlos Ruiz', area: 'Urgencias', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+  { id: 4, nombre: 'Ana García', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+  { id: 5, nombre: 'Pedro Sánchez', area: 'UCI', turno: 'Mañana', rol: 'Supervisor', estado: 'Activo' },
+  { id: 6, nombre: 'Laura Torres', area: 'Laboratorio', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
+  { id: 7, nombre: 'Miguel Ángel', area: 'Farmacia', turno: 'Noche', rol: 'Auxiliar', estado: 'Activo' },
+  { id: 8, nombre: 'Isabel Díaz', area: 'Pediatría', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 9, nombre: 'Roberto Martín', area: 'UCI', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
+  { id: 10, nombre: 'Carmen Vega', area: 'Laboratorio', turno: 'Noche', rol: 'Técnico', estado: 'Activo' },
+  { id: 11, nombre: 'Fernando Gil', area: 'Urgencias', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
+  { id: 12, nombre: 'Patricia López', area: 'Farmacia', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+  { id: 13, nombre: 'José Torres', area: 'Pediatría', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+  { id: 14, nombre: 'Lucía Martínez', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+  { id: 15, nombre: 'Alberto Ruiz', area: 'UCI', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
+  // ... puedes seguir agregando más personal según necesites
+];
+
 export default function EnterpriseOverviewPage() {
   const router = useRouter();
   const [selectedTurno, setSelectedTurno] = useState(null);
@@ -15,8 +35,24 @@ export default function EnterpriseOverviewPage() {
   const [selectedArea, setSelectedArea] = useState(null);
   const [showAreaModal, setShowAreaModal] = useState(false);
   const [showAllStaff, setShowAllStaff] = useState(false);
-  const [areasTareas, setAreasTareas] = useState(getAreas());
-  const [personal, setPersonal] = useState(getPersonal());
+  const [areasTareas, setAreasTareas] = useState([
+    {
+      id: 1,
+      nombre: 'Urgencias',
+      color: '#EF4444',
+      tareas: [
+        {
+          id: 1,
+          descripcion: 'Limpieza general',
+          asignado: 'Juan Pérez',
+          estado: 'pendiente',
+          prioridad: 'alta'
+        }
+      ]
+    },
+    // Puedes agregar más áreas según necesites
+  ]);
+  const [personal, setPersonal] = useState(allStaff);
 
   // Datos de áreas
   const areasData = [
@@ -124,26 +160,6 @@ export default function EnterpriseOverviewPage() {
       ultimoUso: '2024-02-17',
       estado: 'advertencia'
     }
-  ];
-
-  // Datos de todo el personal
-  const allStaff = [
-    { id: 1, nombre: 'Juan Pérez', area: 'Urgencias', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
-    { id: 2, nombre: 'María López', area: 'UCI', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
-    { id: 3, nombre: 'Carlos Ruiz', area: 'Urgencias', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
-    { id: 4, nombre: 'Ana García', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
-    { id: 5, nombre: 'Pedro Sánchez', area: 'UCI', turno: 'Mañana', rol: 'Supervisor', estado: 'Activo' },
-    { id: 6, nombre: 'Laura Torres', area: 'Laboratorio', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
-    { id: 7, nombre: 'Miguel Ángel', area: 'Farmacia', turno: 'Noche', rol: 'Auxiliar', estado: 'Activo' },
-    { id: 8, nombre: 'Isabel Díaz', area: 'Pediatría', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
-    { id: 9, nombre: 'Roberto Martín', area: 'UCI', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
-    { id: 10, nombre: 'Carmen Vega', area: 'Laboratorio', turno: 'Noche', rol: 'Técnico', estado: 'Activo' },
-    { id: 11, nombre: 'Fernando Gil', area: 'Urgencias', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
-    { id: 12, nombre: 'Patricia López', area: 'Farmacia', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
-    { id: 13, nombre: 'José Torres', area: 'Pediatría', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
-    { id: 14, nombre: 'Lucía Martínez', area: 'Quirófano', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
-    { id: 15, nombre: 'Alberto Ruiz', area: 'UCI', turno: 'Tarde', rol: 'Técnico', estado: 'Activo' },
-    // ... puedes seguir agregando más personal según necesites
   ];
 
   // Función para navegar al inventario completo

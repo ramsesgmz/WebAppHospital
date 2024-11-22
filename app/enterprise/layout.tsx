@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Navbar from '../shared/componentes/navbar'
-import ChatWidget from '@/app/shared/componentes/ChatWidget'
+import ChatWidget from '../shared/componentes/ChatWidget'
 
 export default function EnterpriseLayout({
   children,

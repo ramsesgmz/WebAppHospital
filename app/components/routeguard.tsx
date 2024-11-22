@@ -3,7 +3,13 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 const ALLOWED_ROUTES = {
-  usuario: ['/user', '/user/usuario'],
+  usuario: [
+    '/user', 
+    '/user/usuario',
+    '/user/currentTask',
+    '/user/taskHistory',
+    '/user/reports'
+  ],
   admin: [
     '/admin',
     '/admin/dashboard',
