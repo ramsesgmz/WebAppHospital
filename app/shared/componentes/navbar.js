@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 // Configuración de rutas por rol
 const NAV_ITEMS = {
@@ -28,7 +29,7 @@ const NAV_ITEMS = {
   ]
 };
 
-export default function Navbar() {
+export default function Navbar({ isEnterprise = false }) {
   const router = useRouter()
   const pathname = usePathname();
   const [userRole, setUserRole] = useState('');
@@ -53,15 +54,28 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
         <div className="flex items-center space-x-3 w-72">
           <div className="p-1.5 bg-white rounded-lg shadow-md">
-            <img
-              src="/logo.jpg"
-              alt="Hombres de Blanco"
-              className="h-9 w-9 object-cover"
-            />
+            {isEnterprise ? (
+              <Image
+                src="/marpes.jpeg"
+                alt="Marpesca Logo"
+                width={160}
+                height={55}
+                className="object-contain"
+                priority
+              />
+            ) : (
+              <img
+                src="/logo.jpg"
+                alt="Hombres de Blanco"
+                className="h-9 w-9 object-cover"
+              />
+            )}
           </div>
-          <h1 className="text-xl font-bold tracking-tight whitespace-nowrap">
-            Hombres de Blanco
-          </h1>
+          {!isEnterprise && (
+            <h1 className="text-xl font-bold tracking-tight whitespace-nowrap">
+              Hombres de Blanco
+            </h1>
+          )}
         </div>
 
         <nav className="hidden md:flex items-center space-x-3">

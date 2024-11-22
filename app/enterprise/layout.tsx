@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Navbar from '../shared/componentes/navbar'
 import ChatWidget from '../shared/componentes/ChatWidget'
+import Image from 'next/image';
 
 export default function EnterpriseLayout({
   children,
@@ -27,7 +28,7 @@ export default function EnterpriseLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar />
+      <Navbar isEnterprise={true} />
       <main className="flex-1">
         {children}
       </main>

@@ -29,11 +29,11 @@ const LoginPage = () => {
         isLoading: false
     })
 
-    const workArea = useRef({
-        lat: 8.993133054652601,
-        lng: -79.50287017589892,
+    const workArea = {
+        lat: 8.9741844,
+        lng: -79.5673200,
         radius: 100
-    }).current
+    }
 
     const simulateGPSPosition = useCallback(() => {
         if (!gpsSimulatorRef.current) {

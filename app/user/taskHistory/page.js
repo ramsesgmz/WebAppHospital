@@ -10,7 +10,7 @@ export default function TaskHistoryPage() {
     const [tasks, setTasks] = useState([
         {
             id: 1,
-            area: 'Sala de Emergencias',
+            area: 'Área de Inyección',
             description: 'Limpieza profunda y desinfección',
             status: 'pending',
             assignedAt: '2024-03-18 08:00',
@@ -18,7 +18,7 @@ export default function TaskHistoryPage() {
         },
         {
             id: 2,
-            area: 'Área de Pediatría',
+            area: 'Área de Producción',
             description: 'Sanitización general',
             status: 'pending',
             assignedAt: '2024-03-18 09:30',
@@ -26,7 +26,7 @@ export default function TaskHistoryPage() {
         },
         {
             id: 3,
-            area: 'Laboratorio Clínico',
+            area: 'Área de Almacén',
             description: 'Limpieza especializada de equipos',
             status: 'pending',
             assignedAt: '2024-03-18 10:00',
