@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { FaClock, FaRegCalendarCheck } from 'react-icons/fa';
+import { getAreas, getPersonal } from '@/utils/initLocalStorage';
 
 export default function EnterpriseOverviewPage() {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function EnterpriseOverviewPage() {
   const [selectedArea, setSelectedArea] = useState(null);
   const [showAreaModal, setShowAreaModal] = useState(false);
   const [showAllStaff, setShowAllStaff] = useState(false);
+  const [areasTareas, setAreasTareas] = useState(getAreas());
+  const [personal, setPersonal] = useState(getPersonal());
 
   // Datos de áreas
   const areasData = [
@@ -120,65 +123,6 @@ export default function EnterpriseOverviewPage() {
       area: 'General',
       ultimoUso: '2024-02-17',
       estado: 'advertencia'
-    }
-  ];
-
-  // Datos de tareas por área expandidos
-  const areasTareas = [
-    {
-      id: 1,
-      nombre: 'Urgencias',
-      color: '#EF4444',
-      tareas: [
-        { id: 1, descripcion: 'Limpieza General', estado: 'pendiente', prioridad: 'alta', asignado: 'Juan Pérez' },
-        { id: 2, descripcion: 'Desinfección Equipos', estado: 'en_proceso', prioridad: 'media', asignado: 'María López' },
-        { id: 3, descripcion: 'Revisión Material', estado: 'completada', prioridad: 'baja', asignado: 'Carlos Ruiz' }
-      ]
-    },
-    {
-      id: 2,
-      nombre: 'UCI',
-      color: '#F59E0B',
-      tareas: [
-        { id: 4, descripcion: 'Cambio de Turno', estado: 'pendiente', prioridad: 'alta', asignado: 'Ana García' },
-        { id: 5, descripcion: 'Limpieza Especial', estado: 'en_proceso', prioridad: 'alta', asignado: 'Pedro Sánchez' }
-      ]
-    },
-    {
-      id: 3,
-      nombre: 'Quirófano',
-      color: '#10B981',
-      tareas: [
-        { id: 6, descripcion: 'Esterilización', estado: 'en_proceso', prioridad: 'alta', asignado: 'Laura Martínez' },
-        { id: 7, descripcion: 'Inventario Instrumental', estado: 'pendiente', prioridad: 'media', asignado: 'Roberto Díaz' }
-      ]
-    },
-    {
-      id: 4,
-      nombre: 'Laboratorio',
-      color: '#6366F1',
-      tareas: [
-        { id: 8, descripcion: 'Calibración Equipos', estado: 'completada', prioridad: 'alta', asignado: 'Carmen Vega' },
-        { id: 9, descripcion: 'Control de Muestras', estado: 'en_proceso', prioridad: 'alta', asignado: 'Miguel Ángel' }
-      ]
-    },
-    {
-      id: 5,
-      nombre: 'Pediatría',
-      color: '#EC4899',
-      tareas: [
-        { id: 10, descripcion: 'Limpieza Área Infantil', estado: 'pendiente', prioridad: 'media', asignado: 'Isabel Ruiz' },
-        { id: 11, descripcion: 'Organización Juguetes', estado: 'completada', prioridad: 'baja', asignado: 'José Torres' }
-      ]
-    },
-    {
-      id: 6,
-      nombre: 'Farmacia',
-      color: '#8B5CF6',
-      tareas: [
-        { id: 12, descripcion: 'Inventario Medicamentos', estado: 'en_proceso', prioridad: 'alta', asignado: 'Patricia López' },
-        { id: 13, descripcion: 'Organización Almacén', estado: 'pendiente', prioridad: 'media', asignado: 'Fernando Gil' }
-      ]
     }
   ];
 

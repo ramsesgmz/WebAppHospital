@@ -1,8 +1,8 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Navbar from '@/app/shared/componentes/navbar'
-import ChatWidget from '@/app/shared/componentes/ChatWidget'
+import Navbar from '../shared/componentes/navbar'
+import ChatWidget from '../shared/componentes/ChatWidget'
 
 export default function AdminLayout({
   children,

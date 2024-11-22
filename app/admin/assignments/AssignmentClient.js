@@ -72,37 +72,19 @@ export default function AssignmentClient() {
   ];
 
   // Agregar después de availableUsers
-  const areas = [
-    {
-      id: 1,
-      nombre: "Área 1",
-      descripcion: "Área de Emergencias",
-      responsable: "Juan Pérez",
-      estado: "Activa",
-      personal: 5,
-      color: "blue"
-    },
-    {
-      id: 2,
-      nombre: "Área 2",
-      descripcion: "Área de Consultas",
-      responsable: "María López",
-      estado: "Activa",
-      personal: 3,
-      color: "green"
-    },
-    {
-      id: 3,
-      nombre: "Área 3",
-      descripcion: "Área de Laboratorio",
-      responsable: "Carlos Gómez",
-      estado: "Mantenimiento",
-      personal: 4,
-      color: "purple"
-    }
-  ];
+  const [areas, setAreas] = useState([]);
 
   // Datos de tareas por área (tomados de Enterprise)
+  const [areasTareas, setAreasTareas] = useState([]);
+
+  useEffect(() => {
+    const { areasData } = require('@/app/mocks/areasData');
+    setAreasTareas(areasData);
+  }, []);
+
+  // AGREGAR AQUÍ LAS NUEVAS FUNCIONES
+  const handleChange = (e) => {
+    const { name, value } = e.target;
   const [areasTareas, setAreasTareas] = useState([
     {
       id: 1,
@@ -526,25 +508,9 @@ export default function AssignmentClient() {
   // Componente de Turnos Mejorado
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Botón Ver Todo el Personal - Ahora en la parte superior */}
-      <div className="mb-8">
-        <button
-          onClick={() => setShowAllStaff(true)}
-          className="bg-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow
-                   text-gray-700 font-medium flex items-center space-x-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span>Ver Todo el Personal (98)</span>
-        </button>
-      </div>
-
-      {/* Grid de 2 columnas para los cuadros principales */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        {/* Cuadro de Turnos */}
-        <div className="bg-white shadow-lg rounded-xl p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Sección de Turnos */}
+        <div className="bg-white shadow-lg rounded-xl p-6 flex flex-col h-full">
           <h3 className="text-2xl font-semibold text-blue-600 mb-6">
             Turnos del Personal
           </h3>
@@ -649,7 +615,7 @@ export default function AssignmentClient() {
           )}
         </div>
 
-        {/* Formulario de Asignación actualizado */}
+        {/* Formulario de Asignación */}
         <div className="bg-white shadow-lg rounded-xl p-6 flex flex-col h-full">
           <h3 className="text-2xl font-semibold text-blue-600 mb-6">
             Nueva Asignación
@@ -686,11 +652,16 @@ export default function AssignmentClient() {
                 value={formData.task}
                 onChange={handleChange}
                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={!formData.area}
               >
                 <option value="">Seleccionar Tarea</option>
-                <option value="Limpieza">Limpieza</option>
-                <option value="Mantenimiento">Mantenimiento</option>
-                <option value="Supervisión">Supervisión</option>
+                {formData.area && areasTareas
+                  .find(area => area.nombre === formData.area)
+                  ?.tareas.map(tarea => (
+                    <option key={tarea.id} value={tarea.descripcion}>
+                      {tarea.descripcion}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -788,16 +759,15 @@ export default function AssignmentClient() {
         </div>
       </div>
 
-      {/* Modal de Detalle de Área */}
+      {/* Modales */}
       {showAreaModal && selectedArea && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[80vh] overflow-hidden">
-            {/* ... contenido del modal (igual que en Enterprise) ... */}
+            {/* ... contenido del modal de área ... */}
           </div>
         </div>
       )}
 
-      {/* Modal de Personal Total */}
       {showAllStaff && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">

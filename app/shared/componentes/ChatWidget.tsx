@@ -61,6 +61,19 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
     }
   ])
   const [unreadCount, setUnreadCount] = useState(3)
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const suggestions = [
+    { id: 1, title: 'Problemas con inventario', type: 'report' },
+    { id: 2, title: 'Horario de turnos', type: 'question' },
+    { id: 3, title: 'Acceso al sistema', type: 'other' }
+  ];
+
+  const handleSuggestionClick = (suggestion: { title: string, type: string }) => {
+    setMessageType(suggestion.type as 'report' | 'question' | 'other');
+    setSubject(suggestion.title);
+    setShowSuggestions(false);
+  };
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -176,6 +189,34 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
         <div className="bg-primary text-primary-content p-4 rounded-t-2xl">
           <div className="flex justify-between items-center">
             <h2 className="card-title text-primary-content">Mensajes Pendientes</h2>
+            {!isAdmin && (
+              <div className="relative mr-2">
+                <button 
+                  className="btn btn-circle btn-sm btn-ghost text-primary-content"
+                  onClick={() => setShowSuggestions(!showSuggestions)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                {showSuggestions && (
+                  <div className="absolute bottom-full right-0 mb-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <div className="p-2">
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion.id}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-700"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          {suggestion.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <button className="btn btn-circle btn-sm btn-ghost text-primary-content" onClick={() => setIsOpen(false)}>✕</button>
           </div>
         </div>
@@ -301,10 +342,41 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
         <div className="bg-primary text-primary-content p-4 rounded-t-2xl">
           <div className="flex justify-between items-center">
             <h2 className="card-title text-primary-content">Chat</h2>
-            <button className="btn btn-circle btn-sm btn-ghost text-primary-content" onClick={() => setIsOpen(false)}>✕</button>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <button 
+                  className="btn btn-circle btn-sm btn-ghost text-primary-content"
+                  onClick={() => setShowSuggestions(!showSuggestions)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                {showSuggestions && (
+                  <div className="absolute bottom-full right-0 mb-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <div className="p-2">
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion.id}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-700"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          {suggestion.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <button 
+                className="btn btn-circle btn-sm btn-ghost text-primary-content" 
+                onClick={() => setIsOpen(false)}
+              >✕</button>
+            </div>
           </div>
         </div>
-
+        
         <div className="max-h-[60vh] overflow-y-auto p-4">
           {messageType ? (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -387,10 +459,10 @@ export default function ChatWidget({ isAdmin = false, onNewMessage }: ChatWidget
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen ? (
-        isAdmin ? (
-          selectedMessage ? renderMessageDetail() : renderMessageList()
+        selectedMessage ? (
+          renderMessageDetail()
         ) : (
-          renderUserChat()
+          renderMessageList()
         )
       ) : (
         renderAdminBubble()

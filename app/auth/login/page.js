@@ -6,7 +6,10 @@ import dynamic from 'next/dynamic'
 import { toast } from 'react-hot-toast'
 import { calculateDistance } from './DynamicMap'
 
-const Map = dynamic(() => import('./DynamicMap'), { ssr: false, loading: () => <p>Cargando mapa...</p> })
+const Map = dynamic(() => import('./DynamicMap'), { 
+  ssr: false, 
+  loading: () => <div className="h-64 w-full bg-gray-100 rounded-lg flex items-center justify-center">Cargando mapa...</div>
+})
 
 const LoginPage = () => {
     const router = useRouter()
@@ -90,18 +93,18 @@ const LoginPage = () => {
                         isLoading: false
                     }))
                     localStorage.setItem('userRole', 'usuario')
-                    document.cookie = 'userRole=usuario; path=/';
+                    document.cookie = `userRole=usuario; path=/; max-age=86400; secure; samesite=strict`;
                 } else {
                     throw new Error('Debes estar dentro del área de trabajo para iniciar sesión')
                 }
             } else if (formState.username === 'admin' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'admin')
-                document.cookie = 'userRole=admin; path=/';
+                document.cookie = `userRole=admin; path=/; max-age=86400; secure; samesite=strict`;
                 router.push('/admin/dashboard')
                 toast.success('Bienvenido Administrador')
             } else if (formState.username === 'enterprise' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'enterprise')
-                document.cookie = 'userRole=enterprise; path=/';
+                document.cookie = `userRole=enterprise; path=/; max-age=86400; secure; samesite=strict`;
                 router.push('/enterprise/dashboard')
                 toast.success('Bienvenido Enterprise')
             }

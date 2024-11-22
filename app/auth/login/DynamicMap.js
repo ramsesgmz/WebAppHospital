@@ -5,6 +5,10 @@ import 'leaflet/dist/leaflet.css'
 import './leaflet-config'
 
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    if (typeof window === 'undefined') {
+        return 0;
+    }
+
     const R = 6371e3
     const φ1 = lat1 * Math.PI/180
     const φ2 = lat2 * Math.PI/180
@@ -20,6 +24,10 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
 }
 
 const DynamicMap = memo(({ userLocation, workArea }) => {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
     const mapInstanceRef = useRef(null)
     const markerRef = useRef(null)
     const circleRef = useRef(null)

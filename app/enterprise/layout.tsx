@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Navbar from '../shared/componentes/navbar'
+import ChatWidget from '@/app/shared/componentes/ChatWidget'
 
 export default function EnterpriseLayout({
   children,
@@ -13,8 +14,13 @@ export default function EnterpriseLayout({
   const pathname = usePathname()
 
   useEffect(() => {
-    const isAuthenticated = true
-    if (!isAuthenticated) {
+    const userRole = localStorage.getItem('userRole')
+    if (!userRole) {
+      router.push('/auth/login')
+      return
+    }
+    
+    if (userRole !== 'enterprise') {
       router.push('/auth/login')
     }
   }, [router])
@@ -25,6 +31,12 @@ export default function EnterpriseLayout({
       <main className="flex-1">
         {children}
       </main>
+      <ChatWidget 
+        isAdmin={true}
+        onNewMessage={(message) => {
+          console.log('Nuevo mensaje:', message)
+        }}
+      />
     </div>
   )
 }
