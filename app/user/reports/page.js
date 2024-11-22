@@ -16,24 +16,26 @@ export default function ReportsPage() {
             despues: null
         },
         fotoUnica: null,
-        modoFoto: 'multiple' // 'multiple' o 'unica'
+        modoFoto: 'multiple'
     })
 
     const areas = [
-        'Sala de Emergencias',
-        'Quirófano',
-        'UCI',
-        'Pediatría',
-        'Consulta Externa',
-        'Laboratorio'
+        'Área de Inyección',
+        'Área de Producción',
+        'Área de Almacén',
+        'Área de Empaque',
+        'Área de Control de Calidad',
+        'Área de Mantenimiento'
     ]
 
     const tiposContingencia = [
-        'Derrame de líquidos',
-        'Residuos biológicos',
-        'Equipo dañado',
-        'Falla en instalaciones',
-        'Accidente',
+        'Derrame de químicos',
+        'Falla de maquinaria',
+        'Contaminación de área',
+        'Falla en sistema de limpieza',
+        'Accidente laboral',
+        'Material defectuoso',
+        'Problema de sanitización',
         'Otro'
     ]
 
@@ -95,7 +97,7 @@ export default function ReportsPage() {
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-4">
-                    <h1 className="text-2xl font-bold text-white text-center">Reportes de Contingencia</h1>
+                    <h1 className="text-2xl font-bold text-white text-center">Reporte de Incidentes</h1>
                 </div>
 
                 <div className="p-6">

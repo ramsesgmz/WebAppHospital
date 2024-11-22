@@ -42,10 +42,8 @@ export default function TaskHistoryPage() {
                 setTasks(parsedTasks)
             } catch (error) {
                 console.error('Error parsing tasks:', error)
-                localStorage.setItem('tasks', JSON.stringify(tasks))
+                setTasks([])
             }
-        } else {
-            localStorage.setItem('tasks', JSON.stringify(tasks))
         }
     }, [])
 
@@ -114,16 +112,74 @@ export default function TaskHistoryPage() {
         window.location.href = '/user/currentTask'
     }
 
+    const handleReset = () => {
+        const initialTasks = [
+            {
+                id: 1,
+                area: 'Área de Inyección',
+                description: 'Limpieza profunda y desinfección',
+                status: 'pending',
+                assignedAt: '2024-03-18 08:00',
+                priority: 'alta'
+            },
+            {
+                id: 2,
+                area: 'Área de Producción',
+                description: 'Sanitización general',
+                status: 'pending',
+                assignedAt: '2024-03-18 09:30',
+                priority: 'alta'
+            },
+            {
+                id: 3,
+                area: 'Área de Almacén',
+                description: 'Limpieza especializada de equipos',
+                status: 'pending',
+                assignedAt: '2024-03-18 10:00',
+                priority: 'alta'
+            }
+        ];
+
+        setTasks(initialTasks);
+        localStorage.removeItem('tasks');
+        localStorage.removeItem('currentTask');
+        localStorage.removeItem('taskPhotos');
+        toast.success('Historial reiniciado correctamente');
+    };
+
     return (
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
-                    <h1 className="text-3xl font-bold text-white">Gestión de Tareas</h1>
-                    <p className="mt-2 text-blue-100">
-                        Administra y supervisa todas las tareas de limpieza y mantenimiento
-                    </p>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white">Gestión de Tareas</h1>
+                            <p className="mt-2 text-blue-100">
+                                Administra y supervisa todas las tareas de limpieza y mantenimiento
+                            </p>
+                        </div>
+                        <button
+                            onClick={handleReset}
+                            className="p-2 text-white hover:bg-blue-700 rounded-full transition-colors"
+                            title="Reiniciar historial"
+                        >
+                            <svg 
+                                className="w-6 h-6" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                            >
+                                <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    strokeWidth={2} 
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+                                />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-
+                
                 {/* Estadísticas con nuevo diseño */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
                     <div className="bg-white rounded-lg shadow p-6">

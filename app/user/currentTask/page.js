@@ -69,35 +69,56 @@ export default function CurrentTaskPage() {
     const handleSubmitReport = async () => {
         if (canSubmit) {
             try {
+                // Obtener las tareas actuales
                 const tasksString = localStorage.getItem('tasks')
-                if (tasksString) {
-                    const tasks = JSON.parse(tasksString)
-                    const updatedTasks = tasks.map(task => 
-                        task.id === currentTask.id 
-                            ? { 
-                                ...task, 
-                                status: 'completed', 
-                                completedAt: new Date().toLocaleString(),
-                                report: {
-                                    photos: photos,
-                                    checklist: currentTask.checklist.map(item => ({
-                                        task: item.task,
-                                        completed: item.completed
-                                    }))
-                                }
-                            } 
-                            : task
-                    )
-                    localStorage.setItem('tasks', JSON.stringify(updatedTasks))
-                }
+                const userAssignmentsString = localStorage.getItem('userAssignments')
                 
+                // Crear el objeto de reporte
+                const reportData = {
+                    id: currentTask.id,
+                    area: currentTask.area,
+                    description: currentTask.description,
+                    status: 'completed',
+                    assignedAt: currentTask.startTime,
+                    completedAt: new Date().toLocaleString(),
+                    priority: 'alta',
+                    report: {
+                        photos: photos,
+                        checklist: currentTask.checklist
+                    }
+                }
+
+                // Actualizar o crear el array de tareas en el historial
+                const existingTasks = tasksString ? JSON.parse(tasksString) : []
+                const updatedTasks = existingTasks.map(task => 
+                    task.id === currentTask.id ? reportData : task
+                )
+                
+                if (!existingTasks.some(task => task.id === currentTask.id)) {
+                    updatedTasks.push(reportData)
+                }
+
+                localStorage.setItem('tasks', JSON.stringify(updatedTasks))
+
+                // Actualizar userAssignments
+                if (userAssignmentsString) {
+                    const userAssignments = JSON.parse(userAssignmentsString)
+                    const updatedAssignments = userAssignments.map(assignment =>
+                        assignment.id === currentTask.id
+                            ? { ...assignment, status: 'Finalizada' }
+                            : assignment
+                    )
+                    localStorage.setItem('userAssignments', JSON.stringify(updatedAssignments))
+                }
+
+                // Limpiar el estado actual
                 localStorage.removeItem('currentTask')
                 localStorage.removeItem('taskPhotos')
                 toast.success('Reporte enviado correctamente')
                 router.push('/user/taskHistory')
             } catch (error) {
                 console.error('Error:', error)
-                router.push('/user/taskHistory')
+                toast.error('Error al enviar el reporte')
             }
         } else {
             toast.error('Complete todas las tareas y suba las fotos requeridas')
