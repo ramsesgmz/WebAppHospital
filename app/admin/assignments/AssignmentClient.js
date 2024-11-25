@@ -272,7 +272,7 @@ export default function AssignmentClient() {
   // Actualizar el componente TarjetaArea
   const TarjetaArea = ({ area }) => (
     <div className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow
-      border-l-4`} style={{ borderLeftColor: area.color }}>
+      border-l-4 flex flex-col h-[500px]`} style={{ borderLeftColor: area.color }}>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold" style={{ color: area.color }}>
           {area.nombre}
@@ -286,51 +286,54 @@ export default function AssignmentClient() {
         </span>
       </div>
       
-      <div className="space-y-3">
-        {area.tareas.map((tarea) => (
-          <div 
-            key={tarea.id}
-            className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors relative"
-          >
-            <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                <h5 className="font-medium text-gray-900">{tarea.descripcion}</h5>
-                <p className="text-sm text-gray-500">Asignado a: {tarea.asignado}</p>
-                <div className="flex flex-col space-y-1 text-xs text-gray-500">
-                  <div className="flex items-center space-x-2">
-                    <FaClock className="w-3 h-3" />
-                    <span>Inicio: {tarea.startTime ? 
-                      new Date(tarea.startTime).toLocaleString() : 
-                      'No iniciada'}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <FaRegCalendarCheck className="w-3 h-3" />
-                    <span>Finalización: {tarea.endTime ? 
-                      new Date(tarea.endTime).toLocaleString() : 
-                      'En progreso'}
-                    </span>
+      {/* Agregamos una altura máxima y scroll al contenedor de tareas */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="space-y-3">
+          {area.tareas.map((tarea) => (
+            <div 
+              key={tarea.id}
+              className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors relative"
+            >
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <h5 className="font-medium text-gray-900">{tarea.descripcion}</h5>
+                  <p className="text-sm text-gray-500">Asignado a: {tarea.asignado}</p>
+                  <div className="flex flex-col space-y-1 text-xs text-gray-500">
+                    <div className="flex items-center space-x-2">
+                      <FaClock className="w-3 h-3" />
+                      <span>Inicio: {tarea.startTime ? 
+                        new Date(tarea.startTime).toLocaleString() : 
+                        'No iniciada'}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FaRegCalendarCheck className="w-3 h-3" />
+                      <span>Finalización: {tarea.endTime ? 
+                        new Date(tarea.endTime).toLocaleString() : 
+                        'En progreso'}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                {/* Botón de eliminar */}
+                <button
+                  onClick={() => handleDeleteTask(area.id, tarea.id)}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-red-500 
+                             transition-colors duration-200"
+                  title="Eliminar tarea"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              {/* Botón de eliminar */}
-              <button
-                onClick={() => handleDeleteTask(area.id, tarea.id)}
-                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 
-                           transition-colors duration-200"
-                title="Eliminar tarea"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Barra de progreso */}
+      {/* La barra de progreso siempre estará al final */}
       <div className="mt-4 pt-4 border-t border-gray-100">
         <div className="flex justify-between text-sm mb-2">
           <span className="text-gray-500">Progreso</span>

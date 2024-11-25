@@ -489,6 +489,78 @@ export default function EnterpriseOverviewPage() {
     toast.success("Tarea eliminada correctamente");
   };
 
+  const TarjetaArea = ({ area }) => (
+    <div className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow
+      border-l-4 flex flex-col h-[500px]`} style={{ borderLeftColor: area.color }}>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold" style={{ color: area.color }}>
+          {area.nombre}
+        </h3>
+        <span className="text-sm font-medium px-3 py-1 rounded-full" 
+          style={{ 
+            backgroundColor: `${area.color}15`,
+            color: area.color 
+          }}>
+          {area.tareas.length} tareas
+        </span>
+      </div>
+      
+      {/* Contenedor con scroll */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="space-y-3">
+          {area.tareas.map((tarea) => (
+            <div 
+              key={tarea.id}
+              className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors relative"
+            >
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <h5 className="font-medium text-gray-900">{tarea.descripcion}</h5>
+                  <p className="text-sm text-gray-500">Asignado a: {tarea.asignado}</p>
+                  <div className="flex flex-col space-y-1 text-xs text-gray-500">
+                    <div className="flex items-center space-x-2">
+                      <FaClock className="w-3 h-3" />
+                      <span>Inicio: {tarea.startTime ? 
+                        new Date(tarea.startTime).toLocaleString() : 
+                        'No iniciada'}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FaRegCalendarCheck className="w-3 h-3" />
+                      <span>Finalización: {tarea.endTime ? 
+                        new Date(tarea.endTime).toLocaleString() : 
+                        'En progreso'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Barra de progreso fija en la parte inferior */}
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="flex justify-between text-sm mb-2">
+          <span className="text-gray-500">Progreso</span>
+          <span className="font-medium" style={{ color: area.color }}>
+            {area.tareas.filter(t => t.estado === 'completada').length}/{area.tareas.length}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="h-2 rounded-full transition-all duration-300"
+            style={{
+              width: `${(area.tareas.filter(t => t.estado === 'completada').length / area.tareas.length) * 100}%`,
+              backgroundColor: area.color
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Botón para ver todo el personal */}
@@ -706,98 +778,10 @@ export default function EnterpriseOverviewPage() {
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Tareas por Área</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {areasTareas.map((area) => (
-            <div
-              key={area.id}
-              className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow
-                border-l-4`} 
-              style={{ borderLeftColor: area.color }}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold" style={{ color: area.color }}>
-                  {area.nombre}
-                </h3>
-                <span className="text-sm font-medium px-3 py-1 rounded-full" 
-                  style={{ 
-                    backgroundColor: `${area.color}15`,
-                    color: area.color 
-                  }}>
-                  {area.tareas.length} tareas
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                {area.tareas.map((tarea) => (
-                  <div 
-                    key={tarea.id}
-                    className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors relative"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-2">
-                        <h5 className="font-medium text-gray-900">{tarea.descripcion}</h5>
-                        <p className="text-sm text-gray-500">Asignado a: {tarea.asignado}</p>
-                        <div className="flex flex-col space-y-1 text-xs text-gray-500">
-                          <div className="flex items-center space-x-2">
-                            <FaClock className="w-3 h-3" />
-                            <span>Inicio: {tarea.startTime ? 
-                              new Date(tarea.startTime).toLocaleString() : 
-                              'No iniciada'}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <FaRegCalendarCheck className="w-3 h-3" />
-                            <span>Finalización: {tarea.endTime ? 
-                              new Date(tarea.endTime).toLocaleString() : 
-                              'En progreso'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteTask(area.id, tarea.id)}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 
-                                 transition-colors duration-200"
-                        title="Eliminar tarea"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Progreso</span>
-                  <span className="font-medium" style={{ color: area.color }}>
-                    {area.tareas.filter(t => t.estado === 'completada').length}/{area.tareas.length}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${(area.tareas.filter(t => t.estado === 'completada').length / area.tareas.length) * 100}%`,
-                      backgroundColor: area.color
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
+            <TarjetaArea key={area.id} area={area} />
           ))}
         </div>
       </div>
-
-      {/* Actualizar el botón de inventario */}
-      <button 
-        onClick={() => router.push('/shared/inventory')}
-        className="mt-6 w-full bg-blue-50 text-blue-600 py-2 px-4 rounded-lg
-                 hover:bg-blue-100 transition-colors duration-200 text-sm font-medium"
-      >
-        Ver Inventario Completo
-      </button>
 
       {/* Modal de Detalle de Turno */}
       {showTurnoModal && selectedTurno && (
@@ -934,58 +918,6 @@ export default function EnterpriseOverviewPage() {
         </div>
       )}
       {showAreaModal && <AreaDetalleModal />}
-
-      {/* Cuadro de RRHH */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Recursos Humanos</h3>
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-              98 empleados
-            </span>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800">Personal Activo</p>
-                  <p className="text-sm text-gray-500">85 empleados</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800">Asistencia Hoy</p>
-                  <p className="text-sm text-gray-500">92%</p>
-                </div>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => setShowAllStaff(true)}
-              className="w-full mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg
-                       hover:bg-blue-100 transition-colors duration-200 text-sm font-medium"
-            >
-              Ver Detalles de Personal
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

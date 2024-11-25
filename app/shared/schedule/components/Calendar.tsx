@@ -117,26 +117,20 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
   // Función para renderizar las tareas en una celda
   const renderCellTasks = (date: Date) => {
     const dayTasks = getTasksForDate(date)
-    const MAX_VISIBLE_TASKS = 2
     
     if (dayTasks.length === 0) return null
 
     return (
       <div className="space-y-1 mt-1">
-        {dayTasks.slice(0, MAX_VISIBLE_TASKS).map(task => (
-          <button
+        {dayTasks.map(task => (
+          <div
             key={task.id}
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedTask(task)
-              setShowTaskDetails(true)
-            }}
-            className={`w-full text-left text-xs p-1.5 rounded-md truncate transition-colors ${
+            className={`w-full text-xs p-1.5 rounded-md truncate ${
               task.status === 'completed'
-                ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                ? 'bg-green-100 text-green-800'
                 : task.status === 'cancelled'
-                ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                ? 'bg-red-100 text-red-800'
+                : 'bg-gray-100 text-gray-800'
             }`}
           >
             <div className="flex items-center gap-1">
@@ -144,20 +138,8 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
               <span className="font-medium">{task.startTime}</span>
             </div>
             <div className="truncate">{task.title}</div>
-          </button>
+          </div>
         ))}
-        
-        {dayTasks.length > MAX_VISIBLE_TASKS && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedDayTasks({ date, tasks: dayTasks })
-            }}
-            className="w-full text-xs text-blue-600 hover:text-blue-800 font-medium py-1"
-          >
-            Ver {dayTasks.length - MAX_VISIBLE_TASKS} más...
-          </button>
-        )}
       </div>
     )
   }
@@ -271,7 +253,14 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
                     ? 'ring-2 ring-inset ring-blue-500'
                     : ''
                 }`}
-                onClick={() => onAddTask(formatDate(date))}
+                onClick={() => {
+                  const dayTasks = getTasksForDate(date)
+                  if (dayTasks.length > 0) {
+                    setSelectedDayTasks({ date, tasks: dayTasks })
+                  } else {
+                    onAddTask(formatDate(date))
+                  }
+                }}
               >
                 <span className="text-sm font-medium">
                   {date.getDate()}
@@ -356,7 +345,14 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
         {daysInMonth.map((day, index) => (
           <div
             key={index}
-            onClick={() => onAddTask(formatDate(day.date))}
+            onClick={() => {
+              const dayTasks = getTasksForDate(day.date)
+              if (dayTasks.length > 0) {
+                setSelectedDayTasks({ date: day.date, tasks: dayTasks })
+              } else {
+                onAddTask(formatDate(day.date))
+              }
+            }}
             className={`
               bg-white p-2 relative overflow-hidden
               ${day.isCurrentMonth ? '' : 'bg-gray-50'}
@@ -376,70 +372,6 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
           </div>
         ))}
       </div>
-
-      {showTaskDetails && selectedTask && (
-        <div className="w-full lg:w-80 bg-white rounded-lg shadow-lg p-4 lg:p-6 border border-gray-100 
-                      flex-shrink-0 overflow-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Detalles de la Tarea</h3>
-            <button
-              onClick={() => setShowTaskDetails(false)}
-              className="p-1 hover:bg-gray-100 rounded-full text-gray-500"
-            >
-              ×
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-gray-500">Fecha y Hora</p>
-              <p className="text-gray-900">{selectedTask.date} ({selectedTask.startTime} - {selectedTask.endTime})</p>
-            </div>
-            
-            <div>
-              <p className="text-sm text-gray-500">Área</p>
-              <p className="text-gray-900">{selectedTask.area}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Asignado a</p>
-              <div className="flex flex-wrap gap-1">
-                {selectedTask.assignedTo.map((person, index) => (
-                  <span key={index} className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
-                    {person}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Descripción</p>
-              <p className="text-sm text-gray-900">{selectedTask.description}</p>
-            </div>
-
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={() => {
-                  onTaskClick(selectedTask);
-                  setShowTaskDetails(false);
-                }}
-                className="btn btn-sm btn-primary"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => {
-                  onDeleteTask(selectedTask.id);
-                  setShowTaskDetails(false);
-                }}
-                className="btn btn-sm btn-error"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {selectedDayTasks && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
@@ -467,36 +399,63 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
                 {selectedDayTasks.tasks.map(task => (
                   <div
                     key={task.id}
-                    onClick={() => {
-                      setSelectedTask(task)
-                      setShowTaskDetails(true)
-                      setSelectedDayTasks(null)
-                    }}
-                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                    className={`p-4 rounded-lg border transition-colors ${
                       task.status === 'completed'
-                        ? 'bg-green-50 border-green-200 hover:bg-green-100'
+                        ? 'bg-green-50 border-green-200'
                         : task.status === 'cancelled'
-                        ? 'bg-red-50 border-red-200 hover:bg-red-100'
-                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                        ? 'bg-red-50 border-red-200'
+                        : 'bg-white border-gray-200'
                     }`}
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium text-gray-900">{task.title}</h4>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {task.startTime} - {task.endTime}
-                        </p>
+                    <div className="flex flex-col space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{task.title}</h4>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {task.startTime} - {task.endTime}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {task.assignedTo.map((person, index) => (
+                              <span key={index} className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
+                                {person}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          task.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : task.status === 'cancelled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {task.status === 'completed' ? 'Completado' : 
+                           task.status === 'cancelled' ? 'Cancelado' : 'Pendiente'}
+                        </span>
                       </div>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        task.status === 'completed'
-                          ? 'bg-green-100 text-green-800'
-                          : task.status === 'cancelled'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {task.status === 'completed' ? 'Completado' : 
-                         task.status === 'cancelled' ? 'Cancelado' : 'Pendiente'}
-                      </span>
+                      <div className="flex justify-end gap-2 mt-2">
+                        <button
+                          onClick={() => {
+                            onTaskClick(task);
+                            setSelectedDayTasks(null);
+                          }}
+                          className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 
+                                   transition-colors duration-200"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => {
+                            onDeleteTask(task.id);
+                            setSelectedDayTasks(null);
+                          }}
+                          className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 
+                                   transition-colors duration-200"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
