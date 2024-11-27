@@ -1,6 +1,9 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Script from 'next/script'
+import { AuthProvider } from '@/src/contexts/AuthContext'
+import { NotificationProvider } from '@/src/contexts/NotificationContext'
+import NotificationBell from '@/src/components/notifications/NotificationBell'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,9 +42,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div id="app">
-          {children}
-        </div>
+        <AuthProvider>
+          <NotificationProvider>
+            <div id="app">
+              <NotificationBell />
+              {children}
+            </div>
+          </NotificationProvider>
+        </AuthProvider>
       </body>
     </html>
   );

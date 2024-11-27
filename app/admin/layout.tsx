@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import ChatWidget from '../components/ChatWidget'
+import { supabase } from '@/src/lib/supabase'
 
 export default function AdminLayout({
   children,
@@ -13,10 +14,13 @@ export default function AdminLayout({
   const pathname = usePathname()
 
   useEffect(() => {
-    const isAuthenticated = true
-    if (!isAuthenticated) {
-      router.push('/auth/login')
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push('/auth/login')
+      }
     }
+    checkAuth()
   }, [router])
 
   const navigation = [
