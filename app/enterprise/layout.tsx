@@ -33,7 +33,7 @@ export default function EnterpriseLayout({
         {children}
       </main>
       <ChatWidget 
-        isAdmin={true}
+        isEnterprise={true}
         onNewMessage={(message) => {
           console.log('Nuevo mensaje:', message)
         }}

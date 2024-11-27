@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import InventoryModal from './components/InventoryModal'
 
 interface InventoryItem {
@@ -31,6 +31,30 @@ interface RestockRecord {
   date: string
   supplier: string
 }
+
+interface InventoryFormData {
+  name: string
+  category: string
+  quantity: number
+  unit: string
+  minStock: number
+  location: string
+  estimatedDuration: number
+}
+
+interface UsageFormData {
+  operationQuantity: number
+  date: string
+  user: string
+}
+
+interface RestockFormData {
+  operationQuantity: number
+  date: string
+  supplier: string
+}
+
+type ModalFormData = InventoryFormData | UsageFormData | RestockFormData
 
 // Agregar aquí los datos mock
 const MOCK_ITEMS: InventoryItem[] = [
@@ -111,65 +135,179 @@ export default function InventoryPage() {
     direction: 'asc' | 'desc';
   }>({ key: 'name', direction: 'asc' });
 
+  // Estado para filtros
+  const [filters, setFilters] = useState({
+    category: 'all',
+    status: 'all'
+  })
+
   // Inicializar items con un array vacío
   const [items, setItems] = useState<InventoryItem[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | undefined>()
+  const [search, setSearch] = useState('')
+  const [modalMode, setModalMode] = useState<'edit' | 'usage' | 'restock'>('edit')
+
+  // Estado para alertas
+  const [showAlerts, setShowAlerts] = useState(true)
+
+  // Obtener items con stock bajo
+  const lowStockItems = useMemo(() => {
+    return items.filter(item => item.quantity <= item.minStock)
+  }, [items])
 
   // Cargar datos en un useEffect
   useEffect(() => {
     const savedItems = localStorage.getItem('inventoryItems')
-    setItems(savedItems ? JSON.parse(savedItems) : MOCK_ITEMS)
+    if (savedItems) {
+      try {
+        const parsedItems = JSON.parse(savedItems)
+        setItems(parsedItems)
+      } catch (error) {
+        console.error('Error parsing saved items:', error)
+        setItems(MOCK_ITEMS)
+      }
+    } else {
+      setItems(MOCK_ITEMS)
+    }
   }, [])
 
-  // Función para ordenar items
-  const sortedItems = [...items].sort((a, b) => {
-    if (sortConfig.key === 'status') {
-      const statusOrder = { available: 0, low: 1, out_of_stock: 2 }
-      const comparison = statusOrder[a.status] - statusOrder[b.status]
-      return sortConfig.direction === 'asc' ? comparison : -comparison
+  // Función para actualizar items y localStorage
+  const updateItems = (newItems: InventoryItem[]) => {
+    setItems(newItems)
+    try {
+      localStorage.setItem('inventoryItems', JSON.stringify(newItems))
+    } catch (error) {
+      console.error('Error saving items:', error)
+    }
+  }
+
+  // Filtrar y ordenar items
+  const filteredAndSortedItems = useMemo(() => {
+    let result = [...items]
+
+    // Aplicar filtros
+    if (filters.category !== 'all') {
+      result = result.filter(item => item.category === filters.category)
+    }
+    if (filters.status !== 'all') {
+      result = result.filter(item => item.status === filters.status)
     }
 
-    if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1
-    if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1
-    return 0
-  })
+    // Aplicar búsqueda
+    if (search) {
+      const searchLower = search.toLowerCase()
+      result = result.filter(item =>
+        item.name.toLowerCase().includes(searchLower) ||
+        item.location.toLowerCase().includes(searchLower) ||
+        getCategoryLabel(item.category).toLowerCase().includes(searchLower)
+      )
+    }
 
-  // Función para cambiar el ordenamiento
-  const requestSort = (key: keyof InventoryItem) => {
-    setSortConfig(current => ({
-      key,
-      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
+    // Ordenar
+    return result.sort((a, b) => {
+      if (sortConfig.key === 'status') {
+        const statusOrder = { available: 0, low: 1, out_of_stock: 2 }
+        const comparison = statusOrder[a.status] - statusOrder[b.status]
+        return sortConfig.direction === 'asc' ? comparison : -comparison
+      }
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | undefined>()
-  const [search, setSearch] = useState('')
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
+      if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1
+      if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1
+      return 0
     })
-  }
+  }, [items, sortConfig, filters, search])
+
+  // Estadísticas generales
+  const stats = useMemo(() => {
+    const total = items.length
+    const lowStock = items.filter(item => item.status === 'low').length
+    const locations = new Set(items.map(item => item.location)).size
+
+    return { total, lowStock, locations }
+  }, [items])
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Alertas de stock bajo */}
+      {showAlerts && lowStockItems.length > 0 && (
+        <div className="bg-yellow-50 border-b border-yellow-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 flex items-center">
+                <span className="flex p-1">
+                  ⚠️
+                </span>
+                <div className="ml-2 font-medium text-yellow-800 text-sm">
+                  <span className="md:hidden">Stock crítico en {lowStockItems.length} items</span>
+                  <span className="hidden md:inline">
+                    Hay {lowStockItems.length} {lowStockItems.length === 1 ? 'item' : 'items'} con stock crítico
+                  </span>
+                </div>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => setShowAlerts(false)}
+                  className="flex p-1 rounded-md hover:bg-yellow-100"
+                >
+                  <span className="sr-only">Cerrar</span>
+                  <svg className="h-4 w-4 text-yellow-800" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            {/* Lista detallada de items con stock bajo */}
+            <div className="mt-1 space-y-1">
+              {lowStockItems.map(item => (
+                <div key={item.id} className="text-xs text-yellow-800 flex justify-between items-center">
+                  <span>{item.name}: {item.quantity} {item.unit} (Crítico: {item.minStock})</span>
+                  <button
+                    onClick={() => {
+                      setSelectedItem(item)
+                      setModalMode('restock')
+                      setIsModalOpen(true)
+                    }}
+                    className="ml-2 px-2 py-0.5 text-xs font-medium text-yellow-800 hover:bg-yellow-100 rounded"
+                  >
+                    Reponer
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header con estadísticas */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             <h1 className="text-3xl font-bold text-gray-900">Gestión de Inventario</h1>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-blue-600">Total Items</h3>
+                <p className="text-2xl font-bold text-blue-900">{stats.total}</p>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-yellow-600">Items en Estado Crítico</h3>
+                <p className="text-2xl font-bold text-yellow-900">{stats.lowStock}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-green-600">Ubicaciones</h3>
+                <p className="text-2xl font-bold text-green-900">{stats.locations}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border-l-4 border-blue-500">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          {/* Barra de herramientas */}
           <div className="p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-              <h1 className="text-2xl font-bold text-gray-800">Gestión de Inventario</h1>
-              
-              <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="relative flex-1 min-w-[300px]">
                   <input
                     type="text"
@@ -202,6 +340,7 @@ export default function InventoryPage() {
                            transition-colors duration-200"
                   onClick={() => {
                     setSelectedItem(undefined)
+                    setModalMode('edit')
                     setIsModalOpen(true)
                   }}
                 >
@@ -211,9 +350,35 @@ export default function InventoryPage() {
                   <span>Nuevo Item</span>
                 </button>
               </div>
+
+              {/* Filtros */}
+              <div className="flex items-center gap-4">
+                <select
+                  className="select select-bordered"
+                  value={filters.category}
+                  onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                >
+                  <option value="all">Todas las categorías</option>
+                  <option value="cleaning">Limpieza</option>
+                  <option value="safety">Seguridad</option>
+                  <option value="tools">Herramientas</option>
+                </select>
+
+                <select
+                  className="select select-bordered"
+                  value={filters.status}
+                  onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                >
+                  <option value="all">Todos los estados</option>
+                  <option value="available">Disponible</option>
+                  <option value="low">Bajo stock</option>
+                  <option value="out_of_stock">Sin stock</option>
+                </select>
+              </div>
             </div>
           </div>
 
+          {/* Tabla */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -229,7 +394,10 @@ export default function InventoryPage() {
                   ].map(({ key, label }) => (
                     <th
                       key={key}
-                      onClick={() => requestSort(key as keyof InventoryItem)}
+                      onClick={() => setSortConfig(current => ({
+                        key: key as keyof InventoryItem,
+                        direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+                      }))}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group"
                     >
                       <div className="flex items-center gap-2">
@@ -248,74 +416,109 @@ export default function InventoryPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedItems
-                  .filter(item => 
-                    item.name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.location.toLowerCase().includes(search.toLowerCase()) ||
-                    getCategoryLabel(item.category).toLowerCase().includes(search.toLowerCase())
-                  )
-                  .map(item => (
-                    <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {getCategoryLabel(item.category)}
+                {filteredAndSortedItems.map(item => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {getCategoryLabel(item.category)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <span className={`mr-2 h-2 w-2 rounded-full ${
+                          item.quantity > item.minStock ? 'bg-green-400' :
+                          item.quantity === 0 ? 'bg-red-400' : 'bg-yellow-400'
+                        }`}></span>
+                        <span className="text-sm text-gray-500">
+                          {item.quantity} {item.unit}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.quantity} {item.unit}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.minStock}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.location}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          item.status === 'available' ? 'bg-green-100 text-green-800' :
-                          item.status === 'low' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {item.status === 'available' ? '✓ Disponible' :
-                           item.status === 'low' ? '⚠️ Bajo Stock' :
-                           '✕ Sin Stock'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(item.lastUpdated)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.minStock} {item.unit}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.location}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        item.status === 'available' ? 'bg-green-100 text-green-800' :
+                        item.status === 'low' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {item.status === 'available' ? '✓ Disponible' :
+                         item.status === 'low' ? '⚠️ Bajo Stock' :
+                         ' Sin Stock'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(item.lastUpdated).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end gap-2">
+                        {/* Botón combinado de Uso/Reposición */}
                         <button
-                          className="text-indigo-600 hover:text-indigo-900 mr-4"
+                          className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
                           onClick={() => {
                             setSelectedItem(item)
+                            setModalMode('usage')
                             setIsModalOpen(true)
                           }}
+                          title="Gestionar Stock"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M4 7h16M4 12h16m-7-5v10" />
                           </svg>
                         </button>
+
+                        {/* Botón de Editar */}
                         <button
-                          className="text-red-600 hover:text-red-900"
+                          className="text-indigo-600 hover:text-indigo-900 p-1 hover:bg-indigo-50 rounded"
+                          onClick={() => {
+                            setSelectedItem(item)
+                            setModalMode('edit')
+                            setIsModalOpen(true)
+                          }}
+                          title="Editar"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+
+                        {/* Botón de Eliminar */}
+                        <button
+                          className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
                           onClick={() => {
                             if (confirm('¿Estás seguro de eliminar este item?')) {
-                              setItems(items.filter(i => i.id !== item.id))
+                              const newItems = items.filter(i => i.id !== item.id)
+                              updateItems(newItems)
                             }
                           }}
+                          title="Eliminar"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
-                      </td>
-                    </tr>
-                  ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -324,36 +527,56 @@ export default function InventoryPage() {
 
       <InventoryModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false)
+          setModalMode('edit')
+        }}
         onSubmit={(data) => {
-          if (selectedItem) {
-            setItems(items.map(item => 
-              item.id === selectedItem.id 
-                ? { 
-                    ...selectedItem,
-                    ...data,
-                    status: data.quantity > data.minStock ? 'available' : 
-                           data.quantity === 0 ? 'out_of_stock' : 'low',
-                    lastUpdated: new Date().toISOString()
-                  } 
-                : item
-            ))
+          if (modalMode === 'usage' && selectedItem) {
+            const updatedItem = data as InventoryItem
+            const newItems = items.map(item => 
+              item.id === selectedItem.id ? updatedItem : item
+            )
+            updateItems(newItems)
+          } else if (modalMode === 'restock' && selectedItem) {
+            const updatedItem = data as InventoryItem
+            const newItems = items.map(item => 
+              item.id === selectedItem.id ? updatedItem : item
+            )
+            updateItems(newItems)
+          } else if (selectedItem) {
+            const formData = data as InventoryFormData
+            const updatedItem: InventoryItem = {
+              ...selectedItem,
+              ...formData,
+              status: formData.quantity > formData.minStock ? 'available' : 
+                     formData.quantity === 0 ? 'out_of_stock' : 'low',
+              lastUpdated: new Date().toISOString()
+            }
+            const newItems = items.map(item => 
+              item.id === selectedItem.id ? updatedItem : item
+            )
+            updateItems(newItems)
           } else {
+            const formData = data as InventoryFormData
             const newItem: InventoryItem = {
-              ...data,
+              ...formData,
               id: Date.now().toString(),
-              status: data.quantity > data.minStock ? 'available' : 
-                     data.quantity === 0 ? 'out_of_stock' : 'low',
+              quantity: 0,
+              status: 'out_of_stock',
               lastUpdated: new Date().toISOString(),
               lastUsed: new Date().toISOString(),
               usageHistory: [],
-              restockHistory: []
+              restockHistory: [],
+              estimatedDuration: formData.estimatedDuration || 30
             }
-            setItems([newItem, ...items])
+            updateItems([newItem, ...items])
           }
           setIsModalOpen(false)
+          setModalMode('edit')
         }}
         item={selectedItem}
+        mode={modalMode}
       />
     </div>
   )
