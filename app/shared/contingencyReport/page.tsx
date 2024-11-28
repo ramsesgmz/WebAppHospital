@@ -275,90 +275,109 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header mejorado */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Reportes de Contingencia</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              Reportes de Contingencia
+            </h1>
+            <p className="mt-2 text-gray-600">Sistema de gestión y seguimiento de incidentes</p>
+          </div>
           
-          {/* Selector de período */}
-          <div className="flex items-center space-x-4">
+          {/* Selector de período con diseño mejorado */}
+          <div className="mt-4 md:mt-0">
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
-              className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="bg-white border-2 border-blue-100 rounded-xl px-6 py-3 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-200 hover:border-blue-200 cursor-pointer
+                        shadow-sm hover:shadow-md"
             >
-              <option value="dia">Hoy</option>
-              <option value="semana">Esta Semana</option>
-              <option value="mes">Este Mes</option>
+              <option value="dia">Reportes de Hoy</option>
+              <option value="semana">Reportes de la Semana</option>
+              <option value="mes">Reportes del Mes</option>
             </select>
           </div>
         </div>
 
-        {/* Nuevas tarjetas de estadísticas */}
+        {/* Tarjetas de estadísticas con animación y mejor diseño */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Tarjeta de Total de Reportes */}
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border-l-4 border-blue-500">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h2 className="text-sm font-medium text-gray-600">Total Reportes</h2>
-                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-xs text-blue-600 mt-1">
-                  {timeFilter === 'dia' ? 'Hoy' : 
-                   timeFilter === 'semana' ? 'Esta Semana' : 
-                   'Este Mes'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tarjeta de Reportes Pendientes */}
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border-l-4 border-yellow-500">
-            <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-full hover:bg-yellow-200 transition-colors">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h2 className="text-sm font-medium text-gray-600">Pendientes</h2>
-                <p className="text-3xl font-bold text-gray-900">{stats.pendientes}</p>
-                <p className="text-xs text-yellow-600 mt-1">Requieren atención</p>
+          {/* Total de Reportes */}
+          <div className="transform hover:scale-105 transition-all duration-300">
+            <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg p-6 border-l-4 border-blue-500">
+              <div className="flex items-center">
+                <div className="p-3 bg-blue-100 rounded-xl hover:bg-blue-200 transition-colors">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-sm font-medium text-gray-600">Total Reportes</h2>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                    {stats.total}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1 font-medium">
+                    {timeFilter === 'dia' ? 'Hoy' : 
+                     timeFilter === 'semana' ? 'Esta Semana' : 
+                     'Este Mes'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Tarjeta de Reportes Resueltos */}
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border-l-4 border-green-500">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-full hover:bg-green-200 transition-colors">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          {/* Reportes Pendientes */}
+          <div className="transform hover:scale-105 transition-all duration-300">
+            <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg p-6 border-l-4 border-yellow-500">
+              <div className="flex items-center">
+                <div className="p-3 bg-yellow-100 rounded-xl hover:bg-yellow-200 transition-colors">
+                  <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-sm font-medium text-gray-600">Pendientes</h2>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-800 bg-clip-text text-transparent">
+                    {stats.pendientes}
+                  </p>
+                  <p className="text-xs text-yellow-600 mt-1 font-medium">Requieren atención</p>
+                </div>
               </div>
-              <div className="ml-4">
-                <h2 className="text-sm font-medium text-gray-600">Resueltos</h2>
-                <p className="text-3xl font-bold text-gray-900">{stats.resueltos}</p>
-                <p className="text-xs text-green-600 mt-1">Completados</p>
+            </div>
+          </div>
+
+          {/* Reportes Resueltos */}
+          <div className="transform hover:scale-105 transition-all duration-300">
+            <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg p-6 border-l-4 border-green-500">
+              <div className="flex items-center">
+                <div className="p-3 bg-green-100 rounded-xl hover:bg-green-200 transition-colors">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-sm font-medium text-gray-600">Resueltos</h2>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                    {stats.resueltos}
+                  </p>
+                  <p className="text-xs text-green-600 mt-1 font-medium">Completados</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Contenedor principal para tabla y formulario */}
+        {/* Contenedor principal con diseño mejorado */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Tabla de Reportes (lado izquierdo) */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+          {/* Tabla de Reportes */}
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
+            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 via-white to-blue-50">
               <h2 className="text-xl font-semibold text-gray-900">Reportes Realizados</h2>
               <p className="mt-1 text-sm text-gray-500">Historial de contingencias reportadas</p>
             </div>
@@ -483,24 +502,27 @@ export default function ReportsPage() {
             )}
           </div>
 
-          {/* Formulario de Creación (lado derecho) */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+          {/* Formulario con diseño mejorado */}
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
+            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 via-white to-blue-50">
               <h2 className="text-xl font-semibold text-gray-900">Crear Nuevo Reporte</h2>
               <p className="mt-1 text-sm text-gray-500">Complete el formulario para registrar un nuevo reporte</p>
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Campos del formulario con diseño mejorado */}
               <div className="grid grid-cols-1 gap-6">
                 {/* Área */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Área
                   </label>
                   <select
                     value={selectedArea}
                     onChange={(e) => setSelectedArea(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
+                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
+                             group-hover:border-blue-200"
                     required
                   >
                     <option value="">Seleccione un área</option>
@@ -513,14 +535,16 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Tipo de Contingencia */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tipo de Contingencia
                   </label>
                   <select
                     value={contingencyType}
                     onChange={(e) => setContingencyType(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
+                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
+                             group-hover:border-blue-200"
                     required
                   >
                     <option value="">Seleccione un tipo</option>
@@ -531,34 +555,33 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Descripción */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Descripción
                   </label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={4}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
+                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
+                             group-hover:border-blue-200"
                     required
                   />
                 </div>
 
                 {/* Archivos */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Archivos Adjuntos
                   </label>
                   <input
                     type="file"
                     multiple
                     onChange={handleFileChange}
-                    className="mt-1 block w-full text-sm text-gray-500
-                              file:mr-4 file:py-2 file:px-4
-                              file:rounded-full file:border-0
-                              file:text-sm file:font-semibold
-                              file:bg-blue-50 file:text-blue-700
-                              hover:file:bg-blue-100"
+                    className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
+                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
+                             group-hover:border-blue-200"
                   />
                 </div>
 
@@ -578,27 +601,41 @@ export default function ReportsPage() {
                 )}
               </div>
 
+              {/* Botón de envío mejorado */}
               <div className="flex justify-end">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`px-4 py-2 bg-blue-600 text-white rounded-md
-                             hover:bg-blue-700 focus:outline-none focus:ring-2
-                             focus:ring-blue-500 focus:ring-offset-2 
-                             transition-colors flex items-center shadow-md
-                             ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl
+                             hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2
+                             focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200
+                             transform hover:scale-105 shadow-md hover:shadow-lg
+                             disabled:opacity-50 disabled:cursor-not-allowed
+                             flex items-center space-x-2`}
                 >
-                  {isLoading ? 'Enviando...' : 'Enviar Reporte'}
+                  {isLoading ? (
+                    <>
+                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                      <span>Enviando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Enviar Reporte</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
 
-        {/* Modal mejorado */}
+        {/* Modal con diseño mejorado */}
         {showModal && selectedReport && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4 transform transition-all duration-300 scale-100">
               <div className="flex justify-between items-start mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">Detalles del Reporte</h3>
                 <button

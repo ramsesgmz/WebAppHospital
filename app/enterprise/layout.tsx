@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Navbar from '../shared/componentes/navbar'
 import ChatWidget from '../shared/componentes/ChatWidget'
-import Image from 'next/image';
 
 export default function EnterpriseLayout({
   children,
@@ -16,21 +15,18 @@ export default function EnterpriseLayout({
 
   useEffect(() => {
     const userRole = localStorage.getItem('userRole')
-    if (!userRole) {
-      router.push('/auth/login')
-      return
-    }
-    
-    if (userRole !== 'enterprise') {
+    if (!userRole || userRole !== 'enterprise') {
       router.push('/auth/login')
     }
   }, [router])
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50">
       <Navbar isEnterprise={true} />
-      <main className="flex-1">
-        {children}
+      <main className="flex-1 container mx-auto px-4 py-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          {children}
+        </div>
       </main>
       <ChatWidget 
         isEnterprise={true}

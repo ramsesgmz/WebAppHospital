@@ -13,21 +13,18 @@ export default function AdminLayout({
 
   useEffect(() => {
     const userRole = localStorage.getItem('userRole')
-    if (!userRole) {
-      router.push('/auth/login')
-      return
-    }
-    
-    if (userRole !== 'admin') {
+    if (!userRole || userRole !== 'admin') {
       router.push('/auth/login')
     }
   }, [router])
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-blue-50">
       <Navbar />
-      <main className="flex-1 p-6">
-        {children}
+      <main className="flex-1 container mx-auto px-4 py-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-6">
+          {children}
+        </div>
       </main>
       <ChatWidget 
         isAdmin={true}

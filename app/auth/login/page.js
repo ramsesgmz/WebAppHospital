@@ -123,36 +123,42 @@ const LoginPage = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 transform transition-all duration-300 hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)]">
                 <div className="text-center mb-8">
-                    <div className="mb-6">
+                    <div className="mb-6 transform transition-transform duration-300 hover:scale-105">
                         <Image
                             src="/logo.jpg"
                             alt="Hombres de Blanco"
                             width={120}
                             height={120}
-                            className="mx-auto"
+                            className="mx-auto rounded-xl shadow-md"
                             style={{ objectFit: 'contain' }}
                         />
                     </div>
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900">Bienvenido</h2>
-                    <p className="mt-1 text-sm text-gray-600">Ingresa tus credenciales para continuar</p>
+                    <h2 className="mt-4 text-2xl font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                        Bienvenido
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-600">Ingresa tus credenciales para continuar</p>
                 </div>
+
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                    <div className="group">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                             Usuario
                         </label>
                         <input
                             type="text"
                             value={formState.username}
                             onChange={(e) => setFormState(prev => ({ ...prev, username: e.target.value }))}
-                            className="mt-1 block w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                            className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 
+                                     focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
+                                     group-hover:border-blue-200 shadow-sm"
                             required
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
+
+                    <div className="group">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                             Contraseña
                         </label>
                         <div className="relative">
@@ -160,45 +166,76 @@ const LoginPage = () => {
                                 type={formState.showPassword ? 'text' : 'password'}
                                 value={formState.password}
                                 onChange={(e) => setFormState(prev => ({ ...prev, password: e.target.value }))}
-                                className="mt-1 block w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                                className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 
+                                         focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
+                                         group-hover:border-blue-200 shadow-sm pr-12"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setFormState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-sm font-medium text-blue-600 
+                                         hover:text-blue-800 transition-colors duration-200"
                             >
                                 {formState.showPassword ? 'Ocultar' : 'Mostrar'}
                             </button>
                         </div>
                     </div>
+
                     {locationState.error && (
-                        <div className="text-red-600 text-sm">{locationState.error}</div>
+                        <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                            {locationState.error}
+                        </div>
                     )}
+
                     <button
                         type="submit"
                         disabled={locationState.isLoading}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent 
+                                 rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r 
+                                 from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 
+                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
+                                 disabled:opacity-50 transition-all duration-200 transform hover:scale-[1.02]
+                                 disabled:cursor-not-allowed"
                     >
-                        {locationState.isLoading ? 'Cargando...' : 'Iniciar Sesión'}
+                        {locationState.isLoading ? (
+                            <>
+                                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                                Cargando...
+                            </>
+                        ) : (
+                            'Iniciar Sesión'
+                        )}
                     </button>
                 </form>
-                <div className="mt-4 text-center">
-                    <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+
+                <div className="mt-6 text-center">
+                    <a href="#" className="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200
+                                        hover:underline">
                         ¿Olvidaste tu contraseña?
                     </a>
                 </div>
+
                 {locationState.showMap && (
-                    <div className="mt-6">
-                        <Map 
-                            userLocation={locationState.userLocation} 
-                            workArea={workArea}
-                        />
+                    <div className="mt-6 space-y-4">
+                        <div className="rounded-xl overflow-hidden shadow-lg">
+                            <Map 
+                                userLocation={locationState.userLocation} 
+                                workArea={workArea}
+                            />
+                        </div>
                         <button
                             onClick={handleMapConfirmation}
-                            className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            className="w-full flex justify-center items-center py-3 px-4 rounded-xl 
+                                     shadow-sm text-sm font-medium text-white bg-gradient-to-r 
+                                     from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 
+                                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 
+                                     transition-all duration-200 transform hover:scale-[1.02]"
                         >
-                            Confirmar y Continuar
+                            <span>Confirmar y Continuar</span>
+                            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
                         </button>
                     </div>
                 )}

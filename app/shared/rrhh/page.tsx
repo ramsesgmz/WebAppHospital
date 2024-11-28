@@ -536,184 +536,193 @@ export default function RRHHPage() {
   };
 
   return (
-    <div className="p-8">
-      {/* Encabezado y Filtros */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Recursos Humanos</h1>
-        
-        <div className="flex items-center space-x-4">
-          <select
-            value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm hover:border-blue-500 transition-colors"
-          >
-            <option value="">Todos los departamentos</option>
-            <option value="Emergencias">Emergencias</option>
-            <option value="Consulta">Consulta Externa</option>
-            <option value="Quirofano">Quirófano</option>
-          </select>
+    <div className="p-6 space-y-6">
+      {/* Header con gradiente y sombra suave */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-sm p-6 text-white">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Recursos Humanos</h1>
+            <p className="text-blue-100 mt-1">Gestión de personal y turnos</p>
+          </div>
+          <div className="flex gap-4">
+            <select
+              value={departmentFilter}
+              onChange={(e) => setDepartmentFilter(e.target.value)}
+              className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+              style={{ color: 'white' }}
+            >
+              <option value="" className="text-gray-900">Todos los departamentos</option>
+              <option value="Emergencias" className="text-gray-900">Emergencias</option>
+              <option value="Consulta" className="text-gray-900">Consulta Externa</option>
+              <option value="Quirofano" className="text-gray-900">Quirófano</option>
+            </select>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm hover:border-blue-500 transition-colors"
-          >
-            <option value="">Todos los estados</option>
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+              style={{ color: 'white' }}
+            >
+              <option value="" className="text-gray-900">Todos los estados</option>
+              <option value="Activo" className="text-gray-900">Activo</option>
+              <option value="Inactivo" className="text-gray-900">Inactivo</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Tarjetas de estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Total Personal */}
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border-l-4 border-blue-500">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-full">
+      {/* Cards de estadísticas con diseño mejorado */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+          <div className="p-6 flex items-center justify-between border-b border-gray-100">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <div className="ml-4">
-                <h2 className="text-sm font-medium text-gray-600">Total Personal</h2>
-                <p className="text-3xl font-bold text-gray-900">{stats.totalEmployees}</p>
-                <p className="text-xs text-blue-600 mt-1">Personal registrado</p>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Total Personal</h2>
+                <p className="text-3xl font-bold text-blue-600">{stats.totalEmployees}</p>
               </div>
             </div>
             <button 
-              onClick={() => setShowAddModal(true)} 
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
             >
-              Crear Usuario
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Crear Usuario</span>
             </button>
           </div>
         </div>
 
-        {/* Gestión de Turnos */}
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border-l-4 border-green-500">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-full">
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+          <div className="p-6 flex items-center justify-between border-b border-gray-100">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-green-100 rounded-lg">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <div className="ml-4">
-                <h2 className="text-sm font-medium text-gray-600">Turnos Activos</h2>
-                <p className="text-3xl font-bold text-gray-900">{stats.shiftsToday}</p>
-                <p className="text-xs text-green-600 mt-1">Turnos del día</p>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Turnos Activos</h2>
+                <p className="text-3xl font-bold text-green-600">{stats.shiftsToday}</p>
               </div>
             </div>
             <button 
               onClick={() => setShowTurnosModal(true)}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
             >
-              Gestionar Turnos
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Gestionar Turnos</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Contenedor de tablas en grid */}
+      {/* Grid de tablas mejorado */}
       <div className="grid grid-cols-3 gap-6">
-        {/* Tabla Principal */}
-        <div className="col-span-2 bg-white rounded-xl shadow-sm">
-          <div className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Registrado</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Personal
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Cargo
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Departamento
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acciones
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {employees
-                    .filter(emp => emp.rol === 'usuario')
-                    .map((employee) => (
-                      <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span className="text-gray-500 font-medium">
-                                  {employee.nombre.charAt(0)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{employee.nombre}</div>
-                              <div className="text-sm text-gray-500">ID: {employee.id}</div>
+        {/* Tabla Principal con diseño mejorado */}
+        <div className="col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Personal Registrado</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Personal
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Cargo
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Departamento
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Estado
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {employees
+                  .filter(emp => emp.rol === 'usuario')
+                  .map((employee) => (
+                    <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-500 font-medium">
+                                {employee.nombre.charAt(0)}
+                              </span>
                             </div>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {employee.cargo}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {employee.departamento}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            ${employee.estado === 'Activo' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'}`}>
-                            {employee.estado}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button 
-                            onClick={() => handleEditEmployee(employee)}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteEmployee(employee.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{employee.nombre}</div>
+                            <div className="text-sm text-gray-500">ID: {employee.id}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {employee.cargo}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {employee.departamento}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                          ${employee.estado === 'Activo' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'}`}>
+                          {employee.estado}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button 
+                          onClick={() => handleEditEmployee(employee)}
+                          className="text-blue-600 hover:text-blue-900 mr-4"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteEmployee(employee.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Cuadro de Usuarios Especiales */}
-        <div className="bg-white rounded-xl shadow-sm">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Usuarios Especiales</h3>
+        {/* Panel de Usuarios Especiales con diseño mejorado */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Usuarios Especiales</h3>
           </div>
           <div className="p-6">
             <div className="space-y-4">
               {employees
                 .filter(emp => emp.rol === 'admin' || emp.rol === 'enterprise')
                 .map(employee => (
-                  <div key={employee.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={employee.id} 
+                    className="group p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-12 w-12">
                         <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
@@ -754,8 +763,8 @@ export default function RRHHPage() {
         </div>
       </div>
 
-      {/* Paginación con estilo moderno */}
-      <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
+      {/* Paginación con diseño mejorado */}
+      <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
         <div className="flex-1 flex justify-between sm:hidden">
           <button
             onClick={() => setPage(prev => Math.max(1, prev - 1))}
@@ -806,6 +815,7 @@ export default function RRHHPage() {
         </div>
       </div>
 
+      {/* Modales con diseño mejorado */}
       {showAddModal && <AddEmployeeModal />}
       {showEditModal && <EditEmployeeModal />}
       {showTurnosModal && <TurnosModal />}
