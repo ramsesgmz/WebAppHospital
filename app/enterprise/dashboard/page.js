@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { FaClock, FaRegCalendarCheck } from 'react-icons/fa';
 import { getAreas, getPersonal } from '@/utils/initLocalStorage';
+import { demoTasks, getTaskStats } from '../../mocks/taskData';
 
 // Datos de todo el personal
 const allStaff = [
@@ -560,6 +561,92 @@ export default function EnterpriseOverviewPage() {
       </div>
     </div>
   );
+
+  const TaskList = () => {
+    const stats = getTaskStats();
+    
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Estado de Tareas</h2>
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-blue-800">Total Tareas</h3>
+            <p className="text-2xl font-bold text-blue-600">{stats.total}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-green-800">Completadas</h3>
+            <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-yellow-800">En Proceso</h3>
+            <p className="text-2xl font-bold text-yellow-600">{stats.inProgress}</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-purple-800">Tasa de Completado</h3>
+            <p className="text-2xl font-bold text-purple-600">{stats.completionRate}%</p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarea</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Área</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progreso</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {demoTasks.map((task) => (
+                <tr key={task.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{task.titulo}</div>
+                    <div className="text-sm text-gray-500">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        ${task.prioridad === 'Alta' ? 'bg-red-100 text-red-800' : 
+                          task.prioridad === 'Media' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-green-100 text-green-800'}`}>
+                        {task.prioridad}
+                      </span>
+                      <span className="mx-2">•</span>
+                      {task.responsable}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {task.area}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                      ${task.estado === 'Completado' ? 'bg-green-100 text-green-800' : 
+                        task.estado === 'En Proceso' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'}`}>
+                      {task.estado}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`h-2.5 rounded-full ${
+                          task.progreso === 100 ? 'bg-green-600' : 
+                          task.progreso > 50 ? 'bg-yellow-600' : 
+                          'bg-blue-600'
+                        }`}
+                        style={{ width: `${task.progreso}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {task.progreso}% completado
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
@@ -18,6 +18,8 @@ export default function ReportsPage() {
         fotoUnica: null,
         modoFoto: 'multiple'
     })
+
+    const [showSuccess, setShowSuccess] = useState(false)
 
     const areas = [
         'Área de Inyección',
@@ -82,7 +84,11 @@ export default function ReportsPage() {
         }
 
         // Aquí iría la lógica para enviar el reporte
-        toast.success('Reporte enviado correctamente')
+        setShowSuccess(true)
+        setTimeout(() => {
+            setShowSuccess(false)
+        }, 3000)
+
         setReportData({
             area: '',
             tipoContingencia: '',
@@ -95,6 +101,29 @@ export default function ReportsPage() {
 
     return (
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            {showSuccess && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg p-6 flex flex-col items-center transform animate-success">
+                        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                            <svg 
+                                className="w-10 h-10 text-green-500" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                            >
+                                <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    strokeWidth="2" 
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">¡Reporte Enviado!</h2>
+                        <p className="text-gray-600">Tu reporte ha sido enviado correctamente</p>
+                    </div>
+                </div>
+            )}
             <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-4">
                     <h1 className="text-2xl font-bold text-white text-center">Reporte de Incidentes</h1>

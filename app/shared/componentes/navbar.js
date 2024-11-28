@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { COMPANY_LOGO } from '../../config/brandConfig';
 
 // Configuración de rutas por rol
 const NAV_ITEMS = {
@@ -56,7 +57,7 @@ export default function Navbar({ isEnterprise = false }) {
           <div className="p-1.5 bg-white rounded-lg shadow-md">
             {isEnterprise ? (
               <Image
-                src="/marpes.jpeg"
+                src={COMPANY_LOGO}
                 alt="Marpesca Logo"
                 width={160}
                 height={55}
@@ -64,10 +65,13 @@ export default function Navbar({ isEnterprise = false }) {
                 priority
               />
             ) : (
-              <img
+              <Image
                 src="/logo.jpg"
-                alt="Hombres de Blanco"
-                className="h-9 w-9 object-cover"
+                alt="Logo Marpes"
+                width={36}
+                height={36}
+                className="object-contain"
+                priority
               />
             )}
           </div>
