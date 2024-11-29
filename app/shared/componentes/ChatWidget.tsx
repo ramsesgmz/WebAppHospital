@@ -222,12 +222,13 @@ export default function ChatWidget({ isAdmin = false, isEnterprise = false, onNe
               <div className="flex items-center gap-3">
                 <div className="avatar placeholder">
                   <div className="bg-primary text-primary-content rounded-full w-10 shadow-md">
-                    <span>AD</span>
+                    <span>{isEnterprise ? 'AD' : isAdmin ? 'EN' : 'CF'}</span>
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-primary mb-1">
-                    {msg.type === 'report' ? '🚨' : msg.type === 'question' ? '❓' : '💬'} Admin
+                    {msg.type === 'report' ? '🚨' : msg.type === 'question' ? '❓' : '💬'} 
+                    {isEnterprise ? 'Admin' : isAdmin ? 'Enterprise' : 'Cliente Final'}
                   </div>
                   <div className="font-medium truncate">{msg.subject || 'Sin asunto'}</div>
                   <p className="text-sm opacity-70 truncate">{msg.message}</p>
@@ -281,11 +282,13 @@ export default function ChatWidget({ isAdmin = false, isEnterprise = false, onNe
           <div className="chat chat-start">
             <div className="chat-image avatar placeholder">
               <div className="bg-primary text-primary-content rounded-full w-10 shadow-md">
-                <span>AD</span>
+                <span>{isEnterprise ? 'AD' : isAdmin ? 'EN' : 'CF'}</span>
               </div>
             </div>
             <div className="chat-bubble bg-base-200 text-gray-800 shadow-md">
-              <div className="font-bold text-primary mb-1">Admin</div>
+              <div className="font-bold text-primary mb-1">
+                {isEnterprise ? 'Admin' : isAdmin ? 'Enterprise' : 'Cliente Final'}
+              </div>
               {selectedMessage?.context && (
                 <div className="bg-base-300/50 p-3 rounded-lg mb-3 text-sm">
                   <span className="font-semibold">Contexto:</span> {selectedMessage.context}
@@ -303,7 +306,7 @@ export default function ChatWidget({ isAdmin = false, isEnterprise = false, onNe
                 </div>
               </div>
               <div className="chat-bubble bg-primary text-primary-content shadow-md">
-                <div className="font-bold mb-1">Administrador</div>
+                <div className="font-bold mb-1">{isEnterprise ? 'Admin' : 'Enterprise'}</div>
                 <p className="text-lg">{response.message}</p>
               </div>
             </div>
