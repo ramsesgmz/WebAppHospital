@@ -586,6 +586,23 @@ export default function InventoryModal({ isOpen, onClose, onSubmit, item, mode }
                 required
               />
             </div>
+
+            {/* Agregar los botones de acción al final */}
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-ghost"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+              >
+                {item ? 'Guardar Cambios' : 'Crear Item'}
+              </button>
+            </div>
           </div>
         );
     }

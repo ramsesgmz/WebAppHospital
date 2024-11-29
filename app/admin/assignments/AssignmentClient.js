@@ -6,6 +6,9 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-hot-toast';
 import { areasData } from '../../mocks/areasData';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { getTareas, setTareas } from '@/utils/initLocalStorage';
 
 export default function AssignmentClient() {
   // Definición de horarios de turnos
@@ -92,7 +95,7 @@ export default function AssignmentClient() {
       // Crear nuevas tareas para cada tarea del área
       areaTareas.forEach(tarea => {
         const nuevaTarea = {
-          id: Date.now() + Math.random(), // Generar ID único
+          id: Date.now() + Math.random(),
           descripcion: tarea.descripcion,
           asignado: formData.user,
           prioridad: tarea.prioridad || "media",
@@ -103,15 +106,22 @@ export default function AssignmentClient() {
         };
 
         // Actualizar areasTareas
-        setAreasTareas(prev => prev.map(area => {
-          if (area.nombre === formData.area) {
-            return {
-              ...area,
-              tareas: [...area.tareas, nuevaTarea]
-            };
-          }
-          return area;
-        }));
+        setAreasTareas(prev => {
+          const newAreasTareas = prev.map(area => {
+            if (area.nombre === formData.area) {
+              return {
+                ...area,
+                tareas: [...area.tareas, nuevaTarea]
+              };
+            }
+            return area;
+          });
+          
+          // Guardar en localStorage
+          setTareas(newAreasTareas);
+          
+          return newAreasTareas;
+        });
       });
 
       // Limpiar el formulario
@@ -301,16 +311,18 @@ export default function AssignmentClient() {
                   <div className="flex flex-col space-y-1 text-xs text-gray-500">
                     <div className="flex items-center space-x-2">
                       <FaClock className="w-3 h-3" />
-                      <span>Inicio: {tarea.startTime ? 
-                        new Date(tarea.startTime).toLocaleString() : 
-                        'No iniciada'}
+                      <span>
+                        Inicio: {tarea.startTime ? 
+                          format(new Date(tarea.startTime), 'dd/MM/yyyy HH:mm', { locale: es }) : 
+                          'No iniciada'}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <FaRegCalendarCheck className="w-3 h-3" />
-                      <span>Finalización: {tarea.endTime ? 
-                        new Date(tarea.endTime).toLocaleString() : 
-                        'En progreso'}
+                      <span>
+                        Finalización: {tarea.endTime ? 
+                          format(new Date(tarea.endTime), 'dd/MM/yyyy HH:mm', { locale: es }) : 
+                          'En progreso'}
                       </span>
                     </div>
                   </div>

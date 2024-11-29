@@ -1,219 +1,240 @@
 export const areasData = [
-    {
-      id: 1,
-      nombre: "INYECCIÓN",
-      color: "#EF4444",
-      tareas: [
-        {
-          id: 1,
-          descripcion: "LIMPIAR LAS MESAS DE ACERO INOXIDABLE CON CEPILLO Y PAÑO MICROFIBRA Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 2,
-          descripcion: "LIMPIAR LAS MÁQUINAS CON CEPILLO Y PAÑO MICROFIBRA Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        }
-      ]
-    },
-    {
-      id: 2,
-      nombre: "BIOSEGURIDAD",
-      color: "#F59E0B",
-      tareas: [
-        {
-          id: 3,
-          descripcion: "LIMPIAR LOS LAVAMANOS CON PAÑO MICROFIBRA Y CEPILLO",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 4,
-          descripcion: "RECOGER LOS RESIDUOS CON RECOGEDOR",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 5,
-          descripcion: "RESTREGAR EL PISO CON ESCOBA, DESENGRASANTE Y MÁQUINA ROTATIVA",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 6,
-          descripcion: "RETIRAR EL DESENGRASANTE CON AGUA UTILIZANDO MANGUERA",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 7,
-          descripcion: "REALIZAR PROCESO DE NEBULIZACIÓN",
-          prioridad: "alta",
-          estado: "pendiente"
-        }
-      ]
-    },
-    {
-      id: 3,
-      nombre: "CUARTO FRÍO",
-      color: "#3B82F6",
-      tareas: [
-        {
-          id: 8,
-          descripcion: "LIMPIAR PAREDES CON PAÑO DE MICROFIBRA HÚMEDO",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 9,
-          descripcion: "LIMPIAR PAREDES CON CEPILLO Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 10,
-          descripcion: "LIMPIAR LA BASE DE ACERO INOXIDABLE CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 11,
-          descripcion: "BARRER EL PISO CON ESCOBA",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 12,
-          descripcion: "RECOGER LOS RESIDUOS CON RECOGEDOR",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 13,
-          descripcion: "RESTREGAR EL PISO CON ESCOBA, DESENGRASANTE Y MÁQUINA ROTATIVA",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 14,
-          descripcion: "RETIRAR EL DESENGRASANTE CON AGUA UTILIZANDO MANGUERA",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 15,
-          descripcion: "REALIZAR PROCESO DE NEBULIZACIÓN",
-          prioridad: "alta",
-          estado: "pendiente"
-        }
-      ]
-    },
-    {
-      id: 4,
-      nombre: "PRODUCCIÓN",
-      color: "#10B981",
-      tareas: [
-        {
-          id: 16,
-          descripcion: "LIMPIAR PAREDES CON PAÑO DE MICROFIBRA HÚMEDO",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 17,
-          descripcion: "LIMPIAR PAREDES CON CEPILLO Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 18,
-          descripcion: "LIMPIAR LAS MESAS DE ACERO INOXIDABLE CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 19,
-          descripcion: "LIMPIAR LAS MÁQUINAS CON CEPILLO, PAÑO MICROFIBRA Y DESENGRASANTE",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 20,
-          descripcion: "DESCONTAMINAR CON LUZ UV Y OZONO DE AMBIENTE Y SUPERFICIE",
-          prioridad: "alta",
-          estado: "pendiente"
-        }
-      ]
-    },
-    {
-      id: 5,
-      nombre: "TECHO, PAREDES Y PISO. TRAMPA DE GRASA",
-      color: "#6366F1",
-      tareas: [
-        {
-          id: 21,
-          descripcion: "RETIRAR TELARAÑAS CON ESCOBA",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 22,
-          descripcion: "LIMPIAR PAREDES CON CEPILLO Y DESENGRASANTE Y RETIRARLO CON AGUA UTILIZANDO MANGUERA",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 23,
-          descripcion: "REALIZAR LIMPIEZA DE TRAMPA DE GRASA UTILIZANDO RECOGEDOR, BALDE Y BOLSAS PARA LOS DESECHOS",
-          prioridad: "alta",
-          estado: "pendiente"
-        }
-      ]
-    },
-    {
-      id: 6,
-      nombre: "CANALETAS Y REJILLAS",
-      color: "#8B5CF6",
-      tareas: [
-        {
-          id: 24,
-          descripcion: "LIMPIAR LAS CANALETAS Y REJILLAS CON ESCOBA, DESENGRASANTE Y RETIRARLO CON AGUA UTILIZANDO MANGUERA",
-          prioridad: "alta",
-          estado: "pendiente"
-        }
-      ]
-    },
-    {
-      id: 7,
-      nombre: "ÁREA EXTERNA. PERIMETRALES",
-      color: "#EC4899",
-      tareas: [
-        {
-          id: 25,
-          descripcion: "LIMPIAR LAS CANALETAS Y REJILLAS CON ESCOBA, DESENGRASANTE Y RETIRARLO CON AGUA UTILIZANDO MANGUERA",
-          prioridad: "alta",
-          estado: "pendiente"
-        },
-        {
-          id: 26,
-          descripcion: "BARRER EL PISO CON ESCOBA",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 27,
-          descripcion: "RECOGER LOS RESIDUOS CON RECOGEDOR",
-          prioridad: "media",
-          estado: "pendiente"
-        },
-        {
-          id: 28,
-          descripcion: "LAVAR EL PISO UTILIZANDO MANGUERA",
-          prioridad: "media",
-          estado: "pendiente"
-        }
-      ]
-    }
-  ];
+  {
+    id: 1,
+    nombre: "Bioseguridad",
+    color: "#FF6B6B",
+    tareas: [
+      {
+        id: 101,
+        descripcion: "Desinfección de trajes y EPP",
+        asignado: "Juan Pérez",
+        estado: "completada",
+        prioridad: "alta",
+        startTime: "2024-11-28T08:15:00",
+        endTime: "2024-11-28T09:30:00"
+      },
+      {
+        id: 102,
+        descripcion: "Limpieza de duchas de descontaminación",
+        asignado: "Ana Martínez",
+        estado: "en_progreso",
+        prioridad: "alta",
+        startTime: "2024-11-29T10:00:00",
+        endTime: null
+      },
+      {
+        id: 103,
+        descripcion: "Reposición de materiales de bioseguridad",
+        asignado: "Pedro Sánchez",
+        estado: "pendiente",
+        prioridad: "media",
+        startTime: null,
+        endTime: null
+      }
+    ]
+  },
+  {
+    id: 2,
+    nombre: "Inyección",
+    color: "#4ECDC4",
+    tareas: [
+      {
+        id: 201,
+        descripcion: "Limpieza de máquinas inyectoras",
+        asignado: "María López",
+        estado: "completada",
+        prioridad: "alta",
+        startTime: "2024-11-28T07:00:00",
+        endTime: "2024-11-28T08:45:00"
+      },
+      {
+        id: 202,
+        descripcion: "Desinfección de moldes",
+        asignado: "Carlos Gómez",
+        estado: "en_progreso",
+        prioridad: "alta",
+        startTime: "2024-11-29T09:30:00",
+        endTime: null
+      },
+      {
+        id: 203,
+        descripcion: "Limpieza de área de enfriamiento",
+        asignado: "Laura Torres",
+        estado: "completada",
+        prioridad: "alta",
+        startTime: "2024-11-29T06:00:00",
+        endTime: "2024-11-29T07:30:00"
+      }
+    ]
+  },
+  {
+    id: 3,
+    nombre: "Cuarto Frío",
+    color: "#45B7D1",
+    tareas: [
+      {
+        id: 301,
+        descripcion: "Limpieza de estanterías refrigeradas",
+        asignado: "Isabel Díaz",
+        estado: "en_progreso",
+        prioridad: "alta",
+        startTime: "2024-11-29T08:00:00",
+        endTime: null
+      },
+      {
+        id: 302,
+        descripcion: "Desinfección de superficies frías",
+        asignado: "Roberto Martín",
+        estado: "pendiente",
+        prioridad: "alta",
+        startTime: null,
+        endTime: null
+      },
+      {
+        id: 303,
+        descripcion: "Limpieza de sistemas de refrigeración",
+        asignado: "Carmen Vega",
+        estado: "completada",
+        prioridad: "media",
+        startTime: "2024-11-28T07:15:00",
+        endTime: "2024-11-28T09:00:00"
+      }
+    ]
+  },
+  {
+    id: 4,
+    nombre: "Producción",
+    color: "#96CEB4",
+    tareas: [
+      {
+        id: 401,
+        descripcion: "Limpieza de líneas de producción",
+        asignado: "Miguel Ángel",
+        estado: "completada",
+        prioridad: "alta",
+        startTime: "2024-11-27T06:30:00",
+        endTime: "2024-11-27T08:00:00"
+      },
+      {
+        id: 402,
+        descripcion: "Desinfección de equipos de envasado",
+        asignado: "Patricia López",
+        estado: "en_progreso",
+        prioridad: "alta",
+        startTime: "2024-11-29T09:00:00",
+        endTime: null
+      },
+      {
+        id: 403,
+        descripcion: "Limpieza de bandas transportadoras",
+        asignado: "Fernando Gil",
+        estado: "pendiente",
+        prioridad: "media",
+        startTime: null,
+        endTime: null
+      }
+    ]
+  },
+  {
+    id: 5,
+    nombre: "Techos, Paredes y Pisos",
+    color: "#FFB347",
+    tareas: [
+      {
+        id: 501,
+        descripcion: "Limpieza profunda de techos",
+        asignado: "Laura Torres",
+        estado: "completada",
+        prioridad: "media",
+        startTime: "2024-11-28T07:30:00",
+        endTime: "2024-11-28T09:00:00"
+      },
+      {
+        id: 502,
+        descripcion: "Desinfección de paredes",
+        asignado: "Ana Martínez",
+        estado: "en_progreso",
+        prioridad: "alta",
+        startTime: "2024-11-29T09:15:00",
+        endTime: null
+      },
+      {
+        id: 503,
+        descripcion: "Limpieza y sellado de pisos",
+        asignado: "Pedro Sánchez",
+        estado: "pendiente",
+        prioridad: "alta",
+        startTime: null,
+        endTime: null
+      }
+    ]
+  },
+  {
+    id: 6,
+    nombre: "Canaletas y Rejillas",
+    color: "#A7C7E7",
+    tareas: [
+      {
+        id: 601,
+        descripcion: "Limpieza de canaletas principales",
+        asignado: "Carlos Gómez",
+        estado: "completada",
+        prioridad: "alta",
+        startTime: "2024-11-28T06:00:00",
+        endTime: "2024-11-28T08:30:00"
+      },
+      {
+        id: 602,
+        descripcion: "Desinfección de rejillas",
+        asignado: "Isabel Díaz",
+        estado: "en_progreso",
+        prioridad: "media",
+        startTime: "2024-11-29T08:45:00",
+        endTime: null
+      },
+      {
+        id: 603,
+        descripcion: "Mantenimiento de drenajes",
+        asignado: "María López",
+        estado: "completada",
+        prioridad: "alta",
+        startTime: "2024-11-29T07:00:00",
+        endTime: "2024-11-29T07:30:00"
+      }
+    ]
+  },
+  {
+    id: 7,
+    nombre: "Área Externa",
+    color: "#98D8AA",
+    tareas: [
+      {
+        id: 701,
+        descripcion: "Limpieza de áreas verdes",
+        asignado: "Roberto Martín",
+        estado: "completada",
+        prioridad: "media",
+        startTime: "2024-11-28T06:30:00",
+        endTime: "2024-11-28T08:00:00"
+      },
+      {
+        id: 702,
+        descripcion: "Limpieza de estacionamiento",
+        asignado: "Carmen Vega",
+        estado: "en_progreso",
+        prioridad: "baja",
+        startTime: "2024-11-29T08:15:00",
+        endTime: null
+      },
+      {
+        id: 703,
+        descripcion: "Mantenimiento de aceras y accesos",
+        asignado: "Miguel Ángel",
+        estado: "pendiente",
+        prioridad: "media",
+        startTime: null,
+        endTime: null
+      }
+    ]
+  }
+];

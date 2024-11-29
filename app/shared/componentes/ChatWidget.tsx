@@ -222,12 +222,12 @@ export default function ChatWidget({ isAdmin = false, isEnterprise = false, onNe
               <div className="flex items-center gap-3">
                 <div className="avatar placeholder">
                   <div className="bg-primary text-primary-content rounded-full w-10 shadow-md">
-                    <span>CF</span>
+                    <span>AD</span>
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-primary mb-1">
-                    {msg.type === 'report' ? '🚨' : msg.type === 'question' ? '❓' : '💬'} Cliente Final
+                    {msg.type === 'report' ? '🚨' : msg.type === 'question' ? '❓' : '💬'} Admin
                   </div>
                   <div className="font-medium truncate">{msg.subject || 'Sin asunto'}</div>
                   <p className="text-sm opacity-70 truncate">{msg.message}</p>
@@ -281,11 +281,11 @@ export default function ChatWidget({ isAdmin = false, isEnterprise = false, onNe
           <div className="chat chat-start">
             <div className="chat-image avatar placeholder">
               <div className="bg-primary text-primary-content rounded-full w-10 shadow-md">
-                <span>CF</span>
+                <span>AD</span>
               </div>
             </div>
             <div className="chat-bubble bg-base-200 text-gray-800 shadow-md">
-              <div className="font-bold text-primary mb-1">Cliente Final</div>
+              <div className="font-bold text-primary mb-1">Admin</div>
               {selectedMessage?.context && (
                 <div className="bg-base-300/50 p-3 rounded-lg mb-3 text-sm">
                   <span className="font-semibold">Contexto:</span> {selectedMessage.context}

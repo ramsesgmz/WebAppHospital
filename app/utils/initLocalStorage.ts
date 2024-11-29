@@ -23,3 +23,17 @@ export const getAreas = (): Area[] => {
 export const setAreas = (areas: Area[]) => {
   localStorage.setItem('areas', JSON.stringify(areas));
 };
+
+export const getTareas = () => {
+  if (typeof window !== 'undefined') {
+    const tareas = localStorage.getItem('tareas');
+    return tareas ? JSON.parse(tareas) : null;
+  }
+  return null;
+};
+
+export const setTareas = (tareas) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('tareas', JSON.stringify(tareas));
+  }
+};

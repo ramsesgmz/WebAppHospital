@@ -43,7 +43,7 @@ export default function ReportsPage() {
     {
       id: 1,
       fecha: '2024-03-15',
-      area: 'Área de Emergencias',
+      area: 'Producción',
       tipo: 'Tubería rota',
       descripcion: 'Fuga en el baño principal',
       estado: 'Pendiente',
@@ -526,11 +526,13 @@ export default function ReportsPage() {
                     required
                   >
                     <option value="">Seleccione un área</option>
-                    <option value="Área de Limpieza General">Área de Limpieza General</option>
-                    <option value="Área de Almacén">Área de Almacén</option>
-                    <option value="Área de Mantenimiento">Área de Mantenimiento</option>
-                    <option value="Área de Inyección">Área de Inyección</option>
-                    <option value="Área de Control de Calidad">Área de Control de Calidad</option>
+                    <option value="Bioseguridad">Bioseguridad</option>
+                    <option value="Inyección">Inyección</option>
+                    <option value="Cuarto Frío">Cuarto Frío</option>
+                    <option value="Producción">Producción</option>
+                    <option value="Techos, Paredes y Pisos">Techos, Paredes y Pisos</option>
+                    <option value="Canaletas y Rejillas">Canaletas y Rejillas</option>
+                    <option value="Área Externa">Área Externa</option>
                   </select>
                 </div>
 

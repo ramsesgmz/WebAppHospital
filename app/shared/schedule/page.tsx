@@ -19,12 +19,12 @@ interface ScheduledTask {
 const MOCK_TASKS: ScheduledTask[] = [
   {
     id: '1',
-    title: 'Limpieza profunda área mariscos',
+    title: 'Limpieza profunda de equipos',
     description: 'Se realizará una limpieza profunda incluyendo equipos y superficies',
     date: '2024-05-15',
     startTime: '10:00',
     endTime: '11:00',
-    area: 'Mariscos B',
+    area: 'Producción',
     shift: 'A',
     status: 'pending',
     assignedTo: ['Juan Pérez', 'María García']
@@ -44,13 +44,15 @@ export default function SchedulePage() {
     { id: '3', name: 'Carlos López' }
   ]
 
-  // Mock areas - Esto después vendrá de tu base de datos
+  // Mock areas - Actualizado con las nuevas áreas industriales
   const MOCK_AREAS = [
-    { id: '1', name: 'Mariscos A' },
-    { id: '2', name: 'Mariscos B' },
-    { id: '3', name: 'Cocina Principal' },
-    { id: '4', name: 'Almacén' },
-    { id: '5', name: 'Área de Limpieza' }
+    { id: '1', name: 'Bioseguridad' },
+    { id: '2', name: 'Inyección' },
+    { id: '3', name: 'Cuarto Frío' },
+    { id: '4', name: 'Producción' },
+    { id: '5', name: 'Techos, Paredes y Pisos' },
+    { id: '6', name: 'Canaletas y Rejillas' },
+    { id: '7', name: 'Área Externa' }
   ]
 
   useEffect(() => {

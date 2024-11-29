@@ -227,8 +227,26 @@ export default function InventoryPage() {
     return { total, lowStock, locations }
   }, [items])
 
+  // Estado para controlar el modal de creación
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Header con botón de crear */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Inventario</h1>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                   transition-colors duration-200 flex items-center gap-2"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Agregar Item
+        </button>
+      </div>
+
       {/* Alertas de stock bajo */}
       {showAlerts && lowStockItems.length > 0 && (
         <div className="bg-yellow-50 border-b border-yellow-200">
@@ -578,6 +596,107 @@ export default function InventoryPage() {
         item={selectedItem}
         mode={modalMode}
       />
+
+      {/* Modal de creación */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Agregar Nuevo Item
+                </h3>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateItem} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre del Item
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Cantidad
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Unidad de Medida
+                  </label>
+                  <select
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                    required
+                  >
+                    <option value="">Seleccionar unidad</option>
+                    <option value="unidades">Unidades</option>
+                    <option value="litros">Litros</option>
+                    <option value="kilogramos">Kilogramos</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stock Mínimo
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 
+                             rounded-lg hover:bg-gray-200"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 
+                             rounded-lg hover:bg-blue-700"
+                  >
+                    Crear Item
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
+// Función para manejar la creación de items
+const handleCreateItem = (e: React.FormEvent) => {
+  e.preventDefault();
+  // Aquí iría la lógica para crear el item
+  setShowCreateModal(false);
+  toast.success('Item creado exitosamente');
+};

@@ -1,31 +1,31 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { FaClock, FaRegCalendarCheck } from 'react-icons/fa';
-import { getAreas, getPersonal } from '@/utils/initLocalStorage';
+import { getAreas, getPersonal, getTareas } from '@/utils/initLocalStorage';
 import { demoTasks, getTaskStats } from '../../mocks/taskData';
 
 // Datos de todo el personal
 const allStaff = [
-  { id: 1, nombre: 'Juan Pérez', area: 'Área de Producción', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
-  { id: 2, nombre: 'María López', area: 'Área de Almacenes', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
-  { id: 3, nombre: 'Carlos Ruiz', area: 'Área de Producción', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
-  { id: 4, nombre: 'Ana García', area: 'Área de Oficinas', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
-  { id: 5, nombre: 'Pedro Sánchez', area: 'Área de Almacenes', turno: 'Mañana', rol: 'Supervisor', estado: 'Activo' },
-  { id: 6, nombre: 'Laura Torres', area: 'Área de Comedor', turno: 'Tarde', rol: 'Limpieza General', estado: 'Activo' },
-  { id: 7, nombre: 'Miguel Ángel', area: 'Área de Vestidores', turno: 'Noche', rol: 'Auxiliar', estado: 'Activo' },
-  { id: 8, nombre: 'Isabel Díaz', area: 'Área de Producción', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
-  { id: 9, nombre: 'Roberto Martín', area: 'Área de Almacenes', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
-  { id: 10, nombre: 'Carmen Vega', area: 'Área de Comedor', turno: 'Noche', rol: 'Limpieza General', estado: 'Activo' },
-  { id: 11, nombre: 'Fernando Gil', area: 'Área de Producción', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
-  { id: 12, nombre: 'Patricia López', area: 'Área de Vestidores', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
-  { id: 13, nombre: 'José Torres', area: 'Área de Producción', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
-  { id: 14, nombre: 'Lucía Martínez', area: 'Área de Oficinas', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
-  { id: 15, nombre: 'Alberto Ruiz', area: 'Área de Almacenes', turno: 'Tarde', rol: 'Limpieza General', estado: 'Activo' }
+  { id: 1, nombre: 'Juan Pérez', area: 'Bioseguridad', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 2, nombre: 'María López', area: 'Inyección', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+  { id: 3, nombre: 'Carlos Ruiz', area: 'Cuarto Frío', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+  { id: 4, nombre: 'Ana García', area: 'Producción', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+  { id: 5, nombre: 'Pedro Sánchez', area: 'Techos, Paredes y Pisos', turno: 'Mañana', rol: 'Supervisor', estado: 'Activo' },
+  { id: 6, nombre: 'Laura Torres', area: 'Canaletas y Rejillas', turno: 'Tarde', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 7, nombre: 'Miguel Ángel', area: 'Área Externa', turno: 'Noche', rol: 'Auxiliar', estado: 'Activo' },
+  { id: 8, nombre: 'Isabel Díaz', area: 'Bioseguridad', turno: 'Mañana', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 9, nombre: 'Roberto Martín', area: 'Inyección', turno: 'Tarde', rol: 'Especialista', estado: 'Inactivo' },
+  { id: 10, nombre: 'Carmen Vega', area: 'Cuarto Frío', turno: 'Noche', rol: 'Limpieza General', estado: 'Activo' },
+  { id: 11, nombre: 'Fernando Gil', area: 'Producción', turno: 'Mañana', rol: 'Auxiliar', estado: 'Activo' },
+  { id: 12, nombre: 'Patricia López', area: 'Techos, Paredes y Pisos', turno: 'Tarde', rol: 'Supervisor', estado: 'Activo' },
+  { id: 13, nombre: 'José Torres', area: 'Canaletas y Rejillas', turno: 'Noche', rol: 'Limpieza General', estado: 'Inactivo' },
+  { id: 14, nombre: 'Lucía Martínez', area: 'Área Externa', turno: 'Mañana', rol: 'Especialista', estado: 'Activo' },
+  { id: 15, nombre: 'Alberto Ruiz', area: 'Bioseguridad', turno: 'Tarde', rol: 'Limpieza General', estado: 'Activo' }
 ];
 
 const personalTotal = [
@@ -44,157 +44,260 @@ export default function EnterpriseOverviewPage() {
   const [selectedArea, setSelectedArea] = useState(null);
   const [showAreaModal, setShowAreaModal] = useState(false);
   const [showAllStaff, setShowAllStaff] = useState(false);
-  const [areasTareas, setAreasTareas] = useState([
-    {
-      id: 1,
-      nombre: 'Área de Producción',
-      color: '#EF4444',
-      tareas: [
-        {
-          id: 1,
-          descripcion: 'Limpieza profunda de maquinaria con desengrasante industrial',
-          asignado: 'Juan Pérez',
-          estado: 'pendiente',
-          prioridad: 'alta'
-        },
-        {
-          id: 2,
-          descripcion: 'Desinfección de superficies de trabajo',
-          asignado: 'María López',
-          estado: 'en_progreso',
-          prioridad: 'alta'
-        },
-        {
-          id: 3,
-          descripcion: 'Barrido y trapeado de pisos',
-          asignado: 'Carlos Ruiz',
-          estado: 'pendiente',
-          prioridad: 'media'
-        }
-      ]
-    },
-    {
-      id: 2,
-      nombre: 'Área de Almacenes',
-      color: '#F59E0B',
-      tareas: [
-        {
-          id: 4,
-          descripcion: 'Limpieza de estanterías y racks',
-          asignado: 'Ana García',
-          estado: 'pendiente',
-          prioridad: 'media'
-        },
-        {
-          id: 5,
-          descripcion: 'Desinfección de áreas de alto tráfico',
-          asignado: 'Pedro Sánchez',
-          estado: 'completada',
-          prioridad: 'alta'
-        },
-        {
-          id: 6,
-          descripcion: 'Limpieza de zona de carga y descarga',
-          asignado: 'Laura Torres',
-          estado: 'pendiente',
-          prioridad: 'alta'
-        }
-      ]
-    },
-    {
-      id: 3,
-      nombre: 'Área de Oficinas',
-      color: '#3B82F6',
-      tareas: [
-        {
-          id: 7,
-          descripcion: 'Limpieza de escritorios y equipos',
-          asignado: 'Miguel Ángel',
-          estado: 'pendiente',
-          prioridad: 'media'
-        },
-        {
-          id: 8,
-          descripcion: 'Aspirado de alfombras',
-          asignado: 'Isabel Díaz',
-          estado: 'pendiente',
-          prioridad: 'baja'
-        },
-        {
-          id: 9,
-          descripcion: 'Desinfección de áreas comunes',
-          asignado: 'Roberto Martín',
-          estado: 'en_progreso',
-          prioridad: 'alta'
-        }
-      ]
-    },
-    {
-      id: 4,
-      nombre: 'Área de Comedor',
-      color: '#10B981',
-      tareas: [
-        {
-          id: 10,
-          descripcion: 'Limpieza y desinfección de mesas',
-          asignado: 'Carmen Vega',
-          estado: 'pendiente',
-          prioridad: 'alta'
-        },
-        {
-          id: 11,
-          descripcion: 'Trapeado con desinfectante',
-          asignado: 'Fernando Gil',
-          estado: 'pendiente',
-          prioridad: 'alta'
-        },
-        {
-          id: 12,
-          descripcion: 'Limpieza de microondas y electrodomésticos',
-          asignado: 'Patricia López',
-          estado: 'completada',
-          prioridad: 'media'
-        }
-      ]
-    },
-    {
-      id: 5,
-      nombre: 'Área de Vestidores',
-      color: '#6366F1',
-      tareas: [
-        {
-          id: 13,
-          descripcion: 'Desinfección de lockers',
-          asignado: 'José Torres',
-          estado: 'pendiente',
-          prioridad: 'alta'
-        },
-        {
-          id: 14,
-          descripcion: 'Limpieza de duchas y sanitarios',
-          asignado: 'Lucía Martínez',
-          estado: 'en_progreso',
-          prioridad: 'alta'
-        },
-        {
-          id: 15,
-          descripcion: 'Reposición de jabón y papel',
-          asignado: 'Alberto Ruiz',
-          estado: 'pendiente',
-          prioridad: 'media'
-        }
-      ]
-    }
-  ]);
+  const [areasTareas, setAreasTareas] = useState(() => {
+    const savedTareas = getTareas();
+    return savedTareas || [
+      {
+        id: 1,
+        nombre: 'Bioseguridad',
+        color: '#FF6B6B',
+        tareas: [
+          {
+            id: 1,
+            descripcion: 'Desinfección de trajes y EPP',
+            asignado: 'Juan Pérez',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-28T08:15:00",
+            endTime: "2024-11-28T09:30:00"
+          },
+          {
+            id: 2,
+            descripcion: 'Limpieza de duchas de descontaminación',
+            asignado: 'María López',
+            estado: 'en_progreso',
+            prioridad: 'alta',
+            startTime: "2024-11-29T10:00:00",
+            endTime: null
+          },
+          {
+            id: 3,
+            descripcion: 'Reposición de materiales de bioseguridad',
+            asignado: 'Carlos Ruiz',
+            estado: 'pendiente',
+            prioridad: 'media',
+            startTime: null,
+            endTime: null
+          }
+        ]
+      },
+      {
+        id: 2,
+        nombre: 'Inyección',
+        color: '#4ECDC4',
+        tareas: [
+          {
+            id: 4,
+            descripcion: 'Limpieza de máquinas inyectoras',
+            asignado: 'Ana García',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-28T07:00:00",
+            endTime: "2024-11-28T08:45:00"
+          },
+          {
+            id: 5,
+            descripcion: 'Desinfección de moldes',
+            asignado: 'Pedro Sánchez',
+            estado: 'en_progreso',
+            prioridad: 'alta',
+            startTime: "2024-11-29T09:30:00",
+            endTime: null
+          },
+          {
+            id: 6,
+            descripcion: 'Limpieza de área de enfriamiento',
+            asignado: 'Laura Torres',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-29T06:00:00",
+            endTime: "2024-11-29T07:30:00"
+          }
+        ]
+      },
+      {
+        id: 3,
+        nombre: 'Cuarto Frío',
+        color: '#45B7D1',
+        tareas: [
+          {
+            id: 7,
+            descripcion: 'Limpieza de estanterías refrigeradas',
+            asignado: 'Miguel Ángel',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-27T06:30:00",
+            endTime: "2024-11-27T08:00:00"
+          },
+          {
+            id: 8,
+            descripcion: 'Desinfección de superficies frías',
+            asignado: 'Isabel Díaz',
+            estado: 'en_progreso',
+            prioridad: 'alta',
+            startTime: "2024-11-29T08:00:00",
+            endTime: null
+          },
+          {
+            id: 9,
+            descripcion: 'Limpieza de sistemas de refrigeración',
+            asignado: 'Roberto Martín',
+            estado: 'pendiente',
+            prioridad: 'alta',
+            startTime: null,
+            endTime: null
+          }
+        ]
+      },
+      {
+        id: 4,
+        nombre: 'Producción',
+        color: '#96CEB4',
+        tareas: [
+          {
+            id: 10,
+            descripcion: 'Limpieza de líneas de producción',
+            asignado: 'Carmen Vega',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-28T06:30:00",
+            endTime: "2024-11-28T08:00:00"
+          },
+          {
+            id: 11,
+            descripcion: 'Desinfección de equipos de envasado',
+            asignado: 'Fernando Gil',
+            estado: 'en_progreso',
+            prioridad: 'alta',
+            startTime: "2024-11-29T09:00:00",
+            endTime: null
+          },
+          {
+            id: 12,
+            descripcion: 'Limpieza de bandas transportadoras',
+            asignado: 'Patricia López',
+            estado: 'pendiente',
+            prioridad: 'media',
+            startTime: null,
+            endTime: null
+          }
+        ]
+      },
+      {
+        id: 5,
+        nombre: 'Techos, Paredes y Pisos',
+        color: '#FFB347',
+        tareas: [
+          {
+            id: 13,
+            descripcion: 'Limpieza profunda de techos',
+            asignado: 'José Torres',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-28T07:30:00",
+            endTime: "2024-11-28T09:00:00"
+          },
+          {
+            id: 14,
+            descripcion: 'Desinfección de paredes',
+            asignado: 'Lucía Martínez',
+            estado: 'en_progreso',
+            prioridad: 'alta',
+            startTime: "2024-11-29T09:15:00",
+            endTime: null
+          },
+          {
+            id: 15,
+            descripcion: 'Limpieza y sellado de pisos',
+            asignado: 'Alberto Ruiz',
+            estado: 'pendiente',
+            prioridad: 'alta',
+            startTime: null,
+            endTime: null
+          }
+        ]
+      },
+      {
+        id: 6,
+        nombre: 'Canaletas y Rejillas',
+        color: '#A7C7E7',
+        tareas: [
+          {
+            id: 16,
+            descripcion: 'Limpieza de canaletas principales',
+            asignado: 'Juan Pérez',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-28T06:00:00",
+            endTime: "2024-11-28T08:30:00"
+          },
+          {
+            id: 17,
+            descripcion: 'Desinfección de rejillas',
+            asignado: 'María López',
+            estado: 'en_progreso',
+            prioridad: 'media',
+            startTime: "2024-11-29T08:45:00",
+            endTime: null
+          },
+          {
+            id: 18,
+            descripcion: 'Mantenimiento de drenajes',
+            asignado: 'Carlos Ruiz',
+            estado: 'completada',
+            prioridad: 'alta',
+            startTime: "2024-11-29T07:00:00",
+            endTime: "2024-11-29T07:30:00"
+          }
+        ]
+      },
+      {
+        id: 7,
+        nombre: 'Área Externa',
+        color: '#98D8AA',
+        tareas: [
+          {
+            id: 19,
+            descripcion: 'Limpieza de áreas verdes',
+            asignado: 'Ana García',
+            estado: 'completada',
+            prioridad: 'media',
+            startTime: "2024-11-28T06:30:00",
+            endTime: "2024-11-28T08:00:00"
+          },
+          {
+            id: 20,
+            descripcion: 'Limpieza de estacionamiento',
+            asignado: 'Pedro Sánchez',
+            estado: 'en_progreso',
+            prioridad: 'baja',
+            startTime: "2024-11-29T08:15:00",
+            endTime: null
+          },
+          {
+            id: 21,
+            descripcion: 'Mantenimiento de aceras y accesos',
+            asignado: 'Laura Torres',
+            estado: 'pendiente',
+            prioridad: 'media',
+            startTime: null,
+            endTime: null
+          }
+        ]
+      }
+    ];
+  });
   const [personal, setPersonal] = useState(allStaff);
 
   // Datos de áreas
   const areasData = [
-    { nombre: 'Área de Producción', personal: 8, color: '#EF4444' },
-    { nombre: 'Área de Almacenes', personal: 6, color: '#F59E0B' },
-    { nombre: 'Área de Oficinas', personal: 10, color: '#3B82F6' },
-    { nombre: 'Área de Comedor', personal: 4, color: '#10B981' },
-    { nombre: 'Área de Vestidores', personal: 7, color: '#6366F1' }
+    { nombre: 'Bioseguridad', personal: 8, color: '#FF6B6B' },
+    { nombre: 'Inyección', personal: 6, color: '#4ECDC4' },
+    { nombre: 'Cuarto Frío', personal: 5, color: '#45B7D1' },
+    { nombre: 'Producción', personal: 10, color: '#96CEB4' },
+    { nombre: 'Techos, Paredes y Pisos', personal: 7, color: '#FFB347' },
+    { nombre: 'Canaletas y Rejillas', personal: 4, color: '#A7C7E7' },
+    { nombre: 'Área Externa', personal: 5, color: '#98D8AA' }
   ];
 
   // Datos de turnos
@@ -647,6 +750,18 @@ export default function EnterpriseOverviewPage() {
       </div>
     );
   };
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedTareas = getTareas();
+      if (updatedTareas) {
+        setAreasTareas(updatedTareas);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
