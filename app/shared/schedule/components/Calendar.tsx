@@ -117,30 +117,36 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
   // Función para renderizar las tareas en una celda
   const renderCellTasks = (date: Date) => {
     const dayTasks = getTasksForDate(date)
-    
     if (dayTasks.length === 0) return null
 
     return (
-      <div className="space-y-1 mt-1">
-        {dayTasks.map(task => (
-          <div
-            key={task.id}
-            className={`w-full text-xs p-1.5 rounded-md truncate ${
-              task.status === 'completed'
-                ? 'bg-green-100 text-green-800'
-                : task.status === 'cancelled'
-                ? 'bg-red-100 text-red-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}
-          >
-            <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-current opacity-60" />
-              <span className="font-medium">{task.startTime}</span>
-            </div>
-            <div className="truncate">{task.title}</div>
-          </div>
-        ))}
-      </div>
+        <div className="space-y-1">
+            {dayTasks.map(task => (
+                <div
+                    key={task.id}
+                    className={`
+                        p-2 rounded-lg text-xs font-medium shadow-sm
+                        transition-all duration-200 hover:shadow-md
+                        ${task.status === 'completed'
+                            ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                            : task.status === 'cancelled'
+                            ? 'bg-red-50 text-red-700 hover:bg-red-100'
+                            : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                        }
+                    `}
+                >
+                    <div className="flex items-center gap-2">
+                        <span className={`h-2 w-2 rounded-full ${
+                            task.status === 'completed' ? 'bg-green-500' :
+                            task.status === 'cancelled' ? 'bg-red-500' :
+                            'bg-blue-500'
+                        }`} />
+                        <span>{task.startTime}</span>
+                    </div>
+                    <p className="mt-1 truncate">{task.title}</p>
+                </div>
+            ))}
+        </div>
     )
   }
 
@@ -224,74 +230,116 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
 
       default:
         return (
-          <div className="grid grid-cols-7 flex-1">
-            {/* Cabecera mejorada con los días de la semana */}
-            <div className="col-span-7 grid grid-cols-7 bg-gray-50 border-b">
-              {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, index) => (
+          <div className="h-full flex flex-col bg-white">
+            {/* Header del calendario */}
+            <div className="p-4 border-b">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setCurrentDate(new Date())}
+                    className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                  >
+                    Hoy
+                  </button>
+                  <div className="flex items-center gap-3">
+                    <select
+                      value={currentDate.getMonth()}
+                      onChange={handleMonthChange}
+                      className="text-lg font-semibold text-gray-700 bg-transparent 
+                               focus:outline-none cursor-pointer hover:text-blue-600 
+                               transition-colors"
+                    >
+                      {/* ... meses ... */}
+                    </select>
+                    <select
+                      value={currentDate.getFullYear()}
+                      onChange={handleYearChange}
+                      className="text-lg font-semibold text-gray-700 bg-transparent 
+                               focus:outline-none cursor-pointer hover:text-blue-600 
+                               transition-colors"
+                    >
+                      {/* ... años ... */}
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => onAddTask(formatDate(new Date()))}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg 
+                           hover:bg-blue-700 transition-all duration-200 flex items-center gap-2
+                           shadow-sm hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nueva Tarea
+                </button>
+              </div>
+            </div>
+
+            {/* Días de la semana */}
+            <div className="grid grid-cols-7 border-b">
+              {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, i) => (
                 <div 
                   key={day} 
-                  className={`py-3 text-sm font-semibold text-center
-                    ${index === 0 || index === 6 ? 'text-blue-600' : 'text-gray-600'}
-                    ${index !== 6 ? 'border-r border-gray-200' : ''}
-                  `}
+                  className={`py-3 text-sm font-medium text-center
+                    ${i === 0 || i === 6 ? 'text-blue-600' : 'text-gray-600'}`}
                 >
                   {day}
                 </div>
               ))}
             </div>
 
-            {/* Días del mes */}
-            {daysInMonth.map(({ date, isCurrentMonth }, index) => (
-              <div
-                key={index}
-                className={`min-h-[100px] p-3 border-b border-r transition-colors ${
-                  isCurrentMonth 
-                    ? 'bg-white hover:bg-gray-50'
-                    : 'bg-gray-50/50 text-gray-400'
-                } ${
-                  formatDate(date) === formatDate(new Date())
-                    ? 'ring-2 ring-inset ring-blue-500'
-                    : ''
-                }`}
-                onClick={() => {
-                  const dayTasks = getTasksForDate(date)
-                  if (dayTasks.length > 0) {
-                    setSelectedDayTasks({ date, tasks: dayTasks })
-                  } else {
-                    onAddTask(formatDate(date))
-                  }
-                }}
-              >
-                <span className="text-sm font-medium">
-                  {date.getDate()}
-                </span>
-                {renderCellTasks(date)}
-              </div>
-            ))}
+            {/* Grid de días */}
+            <div className="flex-1 grid grid-cols-7">
+              {daysInMonth.map((day, index) => (
+                <div
+                  key={index}
+                  className={`
+                    min-h-[100px] p-2 border-b border-r bg-white
+                    ${!day.isCurrentMonth ? 'bg-white' : 'bg-white'}
+                    ${day.isWeekend ? 'bg-white' : ''}
+                    hover:bg-gray-50 transition-colors
+                    ${formatDate(day.date) === formatDate(new Date()) ? 
+                      'ring-1 ring-inset ring-blue-500' : ''}
+                  `}
+                >
+                  <span className={`text-sm font-medium
+                    ${!day.isCurrentMonth ? 'text-gray-400' : 
+                      day.isWeekend ? 'text-gray-600' : 'text-gray-900'}
+                  `}>
+                    {day.date.getDate()}
+                  </span>
+                  <div className="mt-1 space-y-1">
+                    {renderCellTasks(day.date)}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )
     }
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header section */}
-      <div className="p-2 border-b">
-        <div className="flex justify-between items-center gap-2">
-          <div className="flex items-center gap-2">
+    <div className="h-full flex flex-col bg-white">
+      {/* Header del calendario */}
+      <div className="p-4 border-b">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setCurrentDate(new Date())}
-              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 
-                       rounded-lg border border-gray-200 shadow-sm transition-all duration-200"
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
             >
               Hoy
             </button>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-3">
               <select
                 value={currentDate.getMonth()}
                 onChange={handleMonthChange}
-                className="text-sm font-semibold text-gray-900 px-2 py-1.5 bg-white rounded-lg 
-                         shadow-sm border border-gray-100/50 hover:shadow-md transition-all duration-200"
+                className="text-sm font-medium text-gray-700 px-2 py-1.5 
+                         hover:text-blue-600 rounded-md transition-colors
+                         focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 {[
                   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -304,8 +352,9 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
               <select
                 value={currentDate.getFullYear()}
                 onChange={handleYearChange}
-                className="text-sm font-semibold text-gray-900 px-2 py-1.5 bg-white rounded-lg 
-                         shadow-sm border border-gray-100/50 hover:shadow-md transition-all duration-200"
+                className="text-sm font-medium text-gray-700 px-2 py-1.5 
+                         hover:text-blue-600 rounded-md transition-colors
+                         focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 {Array.from({ length: 10 }, (_, i) => 2024 + i).map(year => (
                   <option key={year} value={year}>{year}</option>
@@ -316,8 +365,8 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
 
           <button
             onClick={() => onAddTask(formatDate(new Date()))}
-            className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 
-                     transition-colors duration-200 flex items-center gap-1"
+            className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50
+                     rounded-md transition-all duration-200 flex items-center gap-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -327,46 +376,40 @@ export default function Calendar({ tasks, onTaskClick, onAddTask, onDeleteTask }
         </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="flex-1 grid grid-cols-7 gap-px bg-gray-200 p-px">
-        {/* Weekday headers */}
-        {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, index) => (
+      {/* Días de la semana */}
+      <div className="grid grid-cols-7 border-b">
+        {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, i) => (
           <div 
             key={day} 
-            className={`bg-gray-50 p-2 text-sm font-semibold text-center
-              ${index === 0 || index === 6 ? 'text-blue-600' : 'text-gray-600'}
-            `}
+            className={`py-3 text-sm font-medium text-center
+              ${i === 0 || i === 6 ? 'text-blue-600' : 'text-gray-600'}`}
           >
             {day}
           </div>
         ))}
+      </div>
 
-        {/* Calendar days */}
+      {/* Grid de días */}
+      <div className="flex-1 grid grid-cols-7">
         {daysInMonth.map((day, index) => (
           <div
             key={index}
-            onClick={() => {
-              const dayTasks = getTasksForDate(day.date)
-              if (dayTasks.length > 0) {
-                setSelectedDayTasks({ date: day.date, tasks: dayTasks })
-              } else {
-                onAddTask(formatDate(day.date))
-              }
-            }}
             className={`
-              bg-white p-2 relative overflow-hidden
-              ${day.isCurrentMonth ? '' : 'bg-gray-50'}
-              ${day.isWeekend ? 'bg-gray-50/50' : ''}
-              hover:bg-gray-50 transition-colors cursor-pointer
-              flex flex-col h-[calc((100vh-8rem)/6)]
+              min-h-[100px] p-2 border-b border-r bg-white
+              ${!day.isCurrentMonth ? 'bg-white' : 'bg-white'}
+              ${day.isWeekend ? 'bg-white' : ''}
+              hover:bg-gray-50 transition-colors
+              ${formatDate(day.date) === formatDate(new Date()) ? 
+                'ring-1 ring-inset ring-blue-500' : ''}
             `}
           >
-            <div className="text-sm">
-              <span className={`font-medium ${!day.isCurrentMonth ? 'text-gray-400' : 'text-gray-900'}`}>
-                {day.date.getDate()}
-              </span>
-            </div>
-            <div className="flex-1 overflow-y-auto">
+            <span className={`text-sm font-medium
+              ${!day.isCurrentMonth ? 'text-gray-400' : 
+                day.isWeekend ? 'text-gray-600' : 'text-gray-900'}
+            `}>
+              {day.date.getDate()}
+            </span>
+            <div className="mt-1 space-y-1">
               {renderCellTasks(day.date)}
             </div>
           </div>

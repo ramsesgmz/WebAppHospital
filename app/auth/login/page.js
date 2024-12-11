@@ -5,6 +5,8 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { toast } from 'react-hot-toast'
 import { calculateDistance } from './DynamicMap'
+import { FaUser, FaLock } from 'react-icons/fa'
+import { BsBuilding } from 'react-icons/bs'
 
 const Map = dynamic(() => import('./DynamicMap'), { 
   ssr: false, 
@@ -30,22 +32,17 @@ const LoginPage = () => {
     })
 
     const workArea = {
-        lat: 8.9741844,
-        lng: -79.5673200,
-        radius: 100
+        lat: 9.0000000,
+        lng: -79.5000000,
+        radius: 10000
     }
 
     const simulateGPSPosition = useCallback(() => {
-        if (!gpsSimulatorRef.current) {
-            gpsSimulatorRef.current = {
-                latitude: workArea.lat + (Math.random() - 0.5) * 0.001,
-                longitude: workArea.lng + (Math.random() - 0.5) * 0.001
-            }
-        }
+        // Simular una posición muy cercana al centro del área de trabajo
         return {
             coords: {
-                latitude: gpsSimulatorRef.current.latitude,
-                longitude: gpsSimulatorRef.current.longitude
+                latitude: workArea.lat + 0.0001,  // Muy cerca del punto central
+                longitude: workArea.lng + 0.0001   // Muy cerca del punto central
             }
         }
     }, [workArea])
@@ -63,56 +60,50 @@ const LoginPage = () => {
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
-        setLocationState(prev => ({ ...prev, error: '', isLoading: true }))
 
         try {
             if (formState.username === 'usuario' && formState.password === '123456') {
-                // Simular obtención de ubicación
-                const position = await new Promise((resolve) => {
-                    resolve(simulateGPSPosition())
-                })
-
-                const userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                }
-
-                const distance = calculateDistance(
-                    userLocation.lat,
-                    userLocation.lng,
-                    workArea.lat,
-                    workArea.lng
-                )
-
-                if (distance <= workArea.radius) {
-                    setLocationState(prev => ({
-                        ...prev,
-                        userLocation,
-                        showMap: true,
-                        showConfirmation: true,
-                        isLoading: false
-                    }))
-                    localStorage.setItem('userRole', 'usuario')
-                    document.cookie = `userRole=usuario; path=/; max-age=86400; secure; samesite=strict`;
-                } else {
-                    throw new Error('Debes estar dentro del área de trabajo para iniciar sesión')
-                }
-            } else if (formState.username === 'admin' && formState.password === '123456') {
+                // 1. Primero guardamos las credenciales
+                localStorage.setItem('userRole', 'usuario')
+                localStorage.setItem('isAuthenticated', 'true')
+                
+                // 2. Establecemos las cookies
+                document.cookie = `userRole=usuario; path=/; max-age=86400; secure; samesite=strict`;
+                document.cookie = `isAuthenticated=true; path=/; max-age=86400; secure; samesite=strict`;
+                
+                // 3. Esperamos a que se establezcan los datos
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // 4. Redirigimos usando replace en lugar de push
+                router.replace('/user/usuario')
+                
+                // 5. Mostramos el mensaje de éxito
+                toast.success('Bienvenido Usuario')
+            } 
+            else if (formState.username === 'admin' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'admin')
+                localStorage.setItem('isAuthenticated', 'true')
                 document.cookie = `userRole=admin; path=/; max-age=86400; secure; samesite=strict`;
+                document.cookie = `isAuthenticated=true; path=/; max-age=86400; secure; samesite=strict`;
                 router.push('/admin/dashboard')
                 toast.success('Bienvenido Administrador')
-            } else if (formState.username === 'enterprise' && formState.password === '123456') {
+            } 
+            else if (formState.username === 'enterprise' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'enterprise')
+                localStorage.setItem('isAuthenticated', 'true')
                 document.cookie = `userRole=enterprise; path=/; max-age=86400; secure; samesite=strict`;
+                document.cookie = `isAuthenticated=true; path=/; max-age=86400; secure; samesite=strict`;
                 router.push('/enterprise/dashboard')
                 toast.success('Bienvenido Enterprise')
             }
+            else {
+                throw new Error('Usuario o contraseña incorrectos')
+            }
         } catch (error) {
-            console.error(error)
-            setLocationState(prev => ({ ...prev, error: error.message, isLoading: false }))
+            console.error('Error en login:', error)
+            toast.error(error.message || 'Error al iniciar sesión')
         }
-    }, [formState, router, simulateGPSPosition, workArea])
+    }, [formState, router])
 
     const handleMapConfirmation = useCallback(() => {
         if (locationState.showConfirmation) {
@@ -122,123 +113,127 @@ const LoginPage = () => {
     }, [locationState.showConfirmation, router])
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 transform transition-all duration-300 hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)]">
-                <div className="text-center mb-8">
-                    <div className="mb-6 transform transition-transform duration-300 hover:scale-105">
-                        <Image
-                            src="/logo.jpg"
-                            alt="Hombres de Blanco"
-                            width={120}
-                            height={120}
-                            className="mx-auto rounded-xl shadow-md"
-                            style={{ objectFit: 'contain' }}
-                        />
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
+             style={{
+                 background: 'linear-gradient(150deg, #2563eb 0%, #1e40af 100%)'
+             }}>
+            {/* Ondas decorativas unificadas */}
+            <div className="absolute inset-0 overflow-hidden">
+                <svg className="absolute bottom-0 w-full h-[80vh] opacity-10" 
+                     viewBox="0 0 1440 320" 
+                     preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style={{ stopColor: 'rgba(255,255,255,0.3)' }} />
+                            <stop offset="50%" style={{ stopColor: 'rgba(255,255,255,0.2)' }} />
+                            <stop offset="100%" style={{ stopColor: 'rgba(255,255,255,0.3)' }} />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gradient)" 
+                          d="M0,160L48,165.3C96,171,192,181,288,197.3C384,213,480,235,576,218.7C672,203,768,149,864,149.3C960,149,1056,203,1152,202.7C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+                    </path>
+                </svg>
+            </div>
+
+            {/* Contenido principal */}
+            <div className="relative w-full max-w-2xl">
+                {/* Panel azul de fondo */}
+                <div className="absolute inset-0 bg-blue-600/90 
+                              rounded-3xl shadow-xl">
+                    <div className="p-12 text-white">
+                        <h1 className="text-3xl font-bold mb-4">
+                            Sistema de gestión y control de servicios
+                        </h1>
+                        <div className="flex items-center text-white space-x-2">
+                            <BsBuilding className="w-5 h-5" />
+                            <span>Gestión profesional de servicios</span>
+                        </div>
                     </div>
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                        Bienvenido
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-600">Ingresa tus credenciales para continuar</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Usuario
-                        </label>
-                        <input
-                            type="text"
-                            value={formState.username}
-                            onChange={(e) => setFormState(prev => ({ ...prev, username: e.target.value }))}
-                            className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 
-                                     focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
-                                     group-hover:border-blue-200 shadow-sm"
-                            required
-                        />
-                    </div>
+                {/* Panel celeste claro degradado */}
+                <div className="absolute -inset-4 bg-gradient-to-br from-blue-100 to-blue-200
+                              rounded-3xl shadow-lg">
+                </div>
 
-                    <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Contraseña
-                        </label>
-                        <div className="relative">
-                            <input
-                                type={formState.showPassword ? 'text' : 'password'}
-                                value={formState.password}
-                                onChange={(e) => setFormState(prev => ({ ...prev, password: e.target.value }))}
-                                className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 
-                                         focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
-                                         group-hover:border-blue-200 shadow-sm pr-12"
-                                required
+                {/* Panel blanco principal */}
+                <div className="relative bg-white rounded-3xl shadow-2xl p-12">
+                    <div className="w-full max-w-lg mx-auto">
+                        <div className="mb-10">
+                            <Image
+                                src="/logo.jpg"
+                                alt="Hombres de Blanco"
+                                width={140}
+                                height={140}
+                                className="mx-auto"
+                                priority
                             />
+                        </div>
+
+                        <h2 className="text-3xl font-bold text-blue-700 mb-3 text-center">
+                            Bienvenido a
+                            <br />
+                            <span className="text-4xl mt-2 block font-extrabold text-blue-800">
+                                HOMBRES DE BLANCO
+                            </span>
+                        </h2>
+                        <p className="text-gray-500 text-center mb-10">
+                            Ingresa tus credenciales para continuar
+                        </p>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="relative">
+                                <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500 text-lg" />
+                                <input
+                                    type="text"
+                                    value={formState.username}
+                                    onChange={(e) => setFormState(prev => ({ ...prev, username: e.target.value }))}
+                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-base
+                                             focus:border-blue-500 focus:ring-1 focus:ring-blue-200
+                                             transition-all duration-200"
+                                    placeholder="usuario"
+                                    required
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500 text-lg" />
+                                <input
+                                    type={formState.showPassword ? 'text' : 'password'}
+                                    value={formState.password}
+                                    onChange={(e) => setFormState(prev => ({ ...prev, password: e.target.value }))}
+                                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-base
+                                             focus:border-blue-500 focus:ring-1 focus:ring-blue-200
+                                             transition-all duration-200"
+                                    placeholder="••••••"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setFormState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-500 text-sm
+                                             hover:text-blue-700 transition-colors duration-200"
+                                >
+                                    {formState.showPassword ? "Ocultar" : "Mostrar"}
+                                </button>
+                            </div>
+
                             <button
-                                type="button"
-                                onClick={() => setFormState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
-                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-sm font-medium text-blue-600 
-                                         hover:text-blue-800 transition-colors duration-200"
+                                type="submit"
+                                className="w-full py-4 bg-blue-500 text-white rounded-lg text-lg font-semibold
+                                         hover:bg-blue-600 transition-colors duration-200"
                             >
-                                {formState.showPassword ? 'Ocultar' : 'Mostrar'}
+                                Iniciar Sesión
                             </button>
+                        </form>
+
+                        <div className="mt-8 text-center">
+                            <a href="#" className="text-blue-500 text-sm hover:underline">
+                                ¿Olvidaste tu contraseña?
+                            </a>
                         </div>
                     </div>
-
-                    {locationState.error && (
-                        <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                            {locationState.error}
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={locationState.isLoading}
-                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent 
-                                 rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r 
-                                 from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 
-                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-                                 disabled:opacity-50 transition-all duration-200 transform hover:scale-[1.02]
-                                 disabled:cursor-not-allowed"
-                    >
-                        {locationState.isLoading ? (
-                            <>
-                                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
-                                Cargando...
-                            </>
-                        ) : (
-                            'Iniciar Sesión'
-                        )}
-                    </button>
-                </form>
-
-                <div className="mt-6 text-center">
-                    <a href="#" className="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200
-                                        hover:underline">
-                        ¿Olvidaste tu contraseña?
-                    </a>
                 </div>
-
-                {locationState.showMap && (
-                    <div className="mt-6 space-y-4">
-                        <div className="rounded-xl overflow-hidden shadow-lg">
-                            <Map 
-                                userLocation={locationState.userLocation} 
-                                workArea={workArea}
-                            />
-                        </div>
-                        <button
-                            onClick={handleMapConfirmation}
-                            className="w-full flex justify-center items-center py-3 px-4 rounded-xl 
-                                     shadow-sm text-sm font-medium text-white bg-gradient-to-r 
-                                     from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 
-                                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 
-                                     transition-all duration-200 transform hover:scale-[1.02]"
-                        >
-                            <span>Confirmar y Continuar</span>
-                            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     )

@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
+import { FaTasks, FaClock, FaCheckCircle, FaTools, FaSpinner } from 'react-icons/fa';
+import { MdPendingActions, MdOutlineCleaningServices } from 'react-icons/md';
 
 export default function TaskHistoryPage() {
     const router = useRouter()
@@ -150,11 +152,15 @@ export default function TaskHistoryPage() {
     return (
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
+                <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 px-8 py-6">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Gestión de Tareas</h1>
-                            <p className="mt-2 text-blue-100">
+                            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                                <FaTasks className="text-blue-200" />
+                                Gestión de Tareas
+                            </h1>
+                            <p className="mt-2 text-blue-100 flex items-center gap-2">
+                                <MdOutlineCleaningServices />
                                 Administra y supervisa todas las tareas de limpieza y mantenimiento
                             </p>
                         </div>
@@ -180,46 +186,62 @@ export default function TaskHistoryPage() {
                     </div>
                 </div>
                 
-                {/* Estadísticas con nuevo diseño */}
+                {/* Estadísticas mejoradas */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">Tareas Pendientes</div>
-                        <div className="mt-2 text-3xl font-semibold text-gray-900">
+                    <div className="bg-gradient-to-br from-yellow-50 to-white rounded-xl shadow-lg p-6 border border-yellow-100">
+                        <div className="flex items-center gap-2 text-yellow-600">
+                            <MdPendingActions className="text-2xl" />
+                            <div className="text-sm font-medium">Tareas Pendientes</div>
+                        </div>
+                        <div className="mt-2 text-3xl font-bold text-yellow-700">
                             {tasks.filter(t => t.status === 'pending').length}
                         </div>
                     </div>
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">En Progreso</div>
-                        <div className="mt-2 text-3xl font-semibold text-gray-900">
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-lg p-6 border border-blue-100">
+                        <div className="flex items-center gap-2 text-blue-600">
+                            <FaSpinner className="text-2xl" />
+                            <div className="text-sm font-medium">En Progreso</div>
+                        </div>
+                        <div className="mt-2 text-3xl font-bold text-blue-700">
                             {tasks.filter(t => t.status === 'in_progress').length}
                         </div>
                     </div>
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">Completadas</div>
-                        <div className="mt-2 text-3xl font-semibold text-gray-900">
+                    
+                    <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-lg p-6 border border-green-100">
+                        <div className="flex items-center gap-2 text-green-600">
+                            <FaCheckCircle className="text-2xl" />
+                            <div className="text-sm font-medium">Completadas</div>
+                        </div>
+                        <div className="mt-2 text-3xl font-bold text-green-700">
                             {tasks.filter(t => t.status === 'completed').length}
                         </div>
                     </div>
                 </div>
 
-                {/* Lista de tareas con nuevo diseño */}
+                {/* Lista de tareas mejorada */}
                 <div className="px-8 pb-8">
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">
+                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div className="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                                <FaTasks className="text-blue-600" />
                                 Todas las tareas
                             </h3>
                         </div>
                         <ul className="divide-y divide-gray-200">
                             {tasks.map((task) => (
-                                <li key={task.id} className="p-4 hover:bg-gray-50">
+                                <li key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <span className={getStatusBadgeClass(task.status)}>
+                                            <div className="flex items-center gap-3">
+                                                <span className={`${getStatusBadgeClass(task.status)} flex items-center gap-1`}>
+                                                    {task.status === 'pending' && <FaClock />}
+                                                    {task.status === 'in_progress' && <FaSpinner className="animate-spin" />}
+                                                    {task.status === 'completed' && <FaCheckCircle />}
                                                     {getStatusText(task.status)}
                                                 </span>
-                                                <span className="text-sm text-gray-500">
+                                                <span className="text-sm text-gray-500 flex items-center gap-1">
+                                                    <FaTools className="text-gray-400" />
                                                     {task.completedAt || task.startedAt || task.assignedAt}
                                                 </span>
                                             </div>
@@ -230,8 +252,10 @@ export default function TaskHistoryPage() {
                                             {task.status === 'pending' && (
                                                 <button
                                                     onClick={() => handleStartTask(task.id)}
-                                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 
+                                                             text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md"
                                                 >
+                                                    <FaSpinner />
                                                     Comenzar
                                                 </button>
                                             )}
