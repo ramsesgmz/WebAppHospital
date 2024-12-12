@@ -141,7 +141,7 @@ export default function UserPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className='bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 shadow-md rounded-lg p-4 mb-6'>
+      <div className='bg-gradient-to-r from-blue-600 to-blue-800 shadow-md rounded-lg p-4 mb-6'>
         <div className='flex justify-between items-center'>
           <h1 className='text-2xl font-bold text-white flex items-center gap-2'>
             <svg 
@@ -161,7 +161,7 @@ export default function UserPage() {
           </h1>
           <button
             onClick={handleReset}
-            className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-gray-100"
+            className="p-2 text-white/70 hover:text-white transition-colors rounded-full hover:bg-white/10"
             title="Reiniciar tareas"
           >
             <svg 
