@@ -113,7 +113,7 @@ const LoginPage = () => {
     }, [locationState.showConfirmation, router])
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
+        <div className="min-h-screen flex flex-col justify-between relative overflow-hidden"
              style={{
                  background: 'linear-gradient(150deg, #2563eb 0%, #1e40af 100%)'
              }}>
@@ -136,7 +136,7 @@ const LoginPage = () => {
             </div>
 
             {/* Contenido principal */}
-            <div className="relative w-full max-w-2xl">
+            <div className="relative w-full max-w-2xl mx-auto my-auto">
                 {/* Panel azul de fondo */}
                 <div className="absolute inset-0 bg-blue-600/90 
                               rounded-3xl shadow-xl">
@@ -235,6 +235,16 @@ const LoginPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Footer */}
+            <footer className="w-full py-4 text-center mt-auto">
+                <p className="text-sm font-light text-white/80 tracking-wide">
+                    <span className="font-medium">FacilityManager</span>
+                    <span className="font-light">Pro</span>
+                    <span className="mx-1">©</span>
+                    <span>2024</span>
+                </p>
+            </footer>
         </div>
     )
 }
