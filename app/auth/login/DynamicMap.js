@@ -1,14 +1,10 @@
 'use client'
-import { useEffect, useRef, memo, useMemo } from 'react'
+import { useEffect, useRef, memo } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './leaflet-config'
 
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    if (typeof window === 'undefined') {
-        return 0;
-    }
-
     const R = 6371e3
     const φ1 = lat1 * Math.PI/180
     const φ2 = lat2 * Math.PI/180
@@ -24,29 +20,26 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
 }
 
 const DynamicMap = memo(({ userLocation, workArea }) => {
-    if (typeof window === 'undefined') {
-        return null;
-    }
-
     const mapInstanceRef = useRef(null)
     const markerRef = useRef(null)
     const circleRef = useRef(null)
 
-    const distance = useMemo(() => calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        workArea.lat,
-        workArea.lng
-    ), [userLocation, workArea])
-
     useEffect(() => {
+        // Asegurarnos de que estamos en el cliente
+        if (typeof window === 'undefined') return;
+
+        // Cargar el CSS de Leaflet
+        import('leaflet/dist/leaflet.css')
+
         if (!mapInstanceRef.current) {
             mapInstanceRef.current = L.map('map-container').setView(
                 [userLocation.lat, userLocation.lng],
                 16
             )
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstanceRef.current)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(mapInstanceRef.current)
             
             markerRef.current = L.marker([userLocation.lat, userLocation.lng]).addTo(mapInstanceRef.current)
             circleRef.current = L.circle([workArea.lat, workArea.lng], {
@@ -70,6 +63,13 @@ const DynamicMap = memo(({ userLocation, workArea }) => {
         }
     }, [userLocation, workArea])
 
+    const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        workArea.lat,
+        workArea.lng
+    )
+
     return (
         <div className="space-y-4">
             <div className={`text-center p-2 rounded ${distance <= workArea.radius ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -77,7 +77,7 @@ const DynamicMap = memo(({ userLocation, workArea }) => {
                     ? '✅ Estás dentro del área de trabajo'
                     : `❌ Estás a ${Math.round(distance)}m del área permitida`}
             </div>
-            <div id="map-container" className="h-[300px] w-full" />
+            <div id="map-container" className="h-[300px] w-full rounded-lg" />
         </div>
     )
 })

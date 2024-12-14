@@ -66,6 +66,24 @@ const LoginPage = () => {
         setLocationState(prev => ({ ...prev, error: '', isLoading: true }))
 
         try {
+            // Primero verificamos si es admin principal
+            if (formState.username === 'admin_principal' && formState.password === 'admin123') {
+                try {
+                    localStorage.setItem('adminPrincipal', 'true');
+                    localStorage.setItem('userRole', 'admin');
+                    localStorage.setItem('adminId', '1');
+                    document.cookie = `userRole=admin; path=/; max-age=86400; secure; samesite=strict`;
+                    document.cookie = `adminPrincipal=true; path=/; max-age=86400; secure; samesite=strict`;
+                    toast.success('Bienvenido Administrador Principal');
+                    await router.push('/admin/dashboard');
+                    return;
+                } catch (error) {
+                    console.error('Error en redirección:', error);
+                    throw new Error('Error al iniciar sesión como admin principal');
+                }
+            }
+
+            // Resto de las validaciones existentes
             if (formState.username === 'usuario' && formState.password === '123456') {
                 // Simular obtención de ubicación
                 const position = await new Promise((resolve) => {
@@ -98,19 +116,26 @@ const LoginPage = () => {
                     throw new Error('Debes estar dentro del área de trabajo para iniciar sesión')
                 }
             } else if (formState.username === 'admin' && formState.password === '123456') {
-                localStorage.setItem('userRole', 'admin')
+                localStorage.removeItem('adminPrincipal');
+                localStorage.setItem('userRole', 'admin');
+                localStorage.setItem('adminId', '3');
                 document.cookie = `userRole=admin; path=/; max-age=86400; secure; samesite=strict`;
-                router.push('/admin/dashboard')
-                toast.success('Bienvenido Administrador')
+                await router.push('/admin/dashboard');
+                toast.success('Bienvenido Administrador');
             } else if (formState.username === 'enterprise' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'enterprise')
                 document.cookie = `userRole=enterprise; path=/; max-age=86400; secure; samesite=strict`;
-                router.push('/enterprise/dashboard')
+                await router.push('/enterprise/dashboard')
                 toast.success('Bienvenido Enterprise')
+            } else {
+                throw new Error('Credenciales incorrectas')
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error en login:', error)
             setLocationState(prev => ({ ...prev, error: error.message, isLoading: false }))
+            toast.error(error.message || 'Error al iniciar sesión')
+        } finally {
+            setLocationState(prev => ({ ...prev, isLoading: false }))
         }
     }, [formState, router, simulateGPSPosition, workArea])
 

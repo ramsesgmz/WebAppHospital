@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -15,7 +15,13 @@ import { useRouter } from 'next/navigation';
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('dia');
   const [hoveredArea, setHoveredArea] = useState(null);
+  const [isAdminPrincipal, setIsAdminPrincipal] = useState(false);
   const router = useRouter();
+  
+  useEffect(() => {
+    const adminPrincipal = localStorage.getItem('adminPrincipal');
+    setIsAdminPrincipal(!!adminPrincipal);
+  }, []);
   
   // Estadísticas generales del sistema
   const stats = {
