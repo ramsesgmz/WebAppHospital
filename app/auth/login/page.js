@@ -5,7 +5,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { toast } from 'react-hot-toast'
 import { calculateDistance } from './DynamicMap'
-import { FaUser, FaLock } from 'react-icons/fa'
+import { FaUser, FaLock, FaSpinner } from 'react-icons/fa'
 import { BsBuilding } from 'react-icons/bs'
 
 const Map = dynamic(() => import('./DynamicMap'), { 
@@ -58,8 +58,11 @@ const LoginPage = () => {
         localStorage.removeItem('userRole')
     }, [])
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
+        setIsLoading(true)
 
         try {
             if (formState.username === 'usuario' && formState.password === '123456') {
@@ -102,6 +105,8 @@ const LoginPage = () => {
         } catch (error) {
             console.error('Error en login:', error)
             toast.error(error.message || 'Error al iniciar sesión')
+        } finally {
+            setIsLoading(false)
         }
     }, [formState, router])
 
@@ -220,10 +225,19 @@ const LoginPage = () => {
 
                             <button
                                 type="submit"
+                                disabled={isLoading}
                                 className="w-full py-4 bg-blue-500 text-white rounded-lg text-lg font-semibold
-                                         hover:bg-blue-600 transition-colors duration-200"
+                                         hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center
+                                         disabled:bg-blue-400 disabled:cursor-not-allowed"
                             >
-                                Iniciar Sesión
+                                {isLoading ? (
+                                    <>
+                                        <FaSpinner className="animate-spin mr-2" />
+                                        Cargando...
+                                    </>
+                                ) : (
+                                    'Iniciar Sesión'
+                                )}
                             </button>
                         </form>
 
