@@ -9,6 +9,10 @@ import { areasData } from '../../mocks/areasData';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getTareas, setTareas } from '@/utils/initLocalStorage';
+import { UserSelect } from './components/UserSelect';
+import { AreaSelect } from './components/AreaSelect';
+import { DateSelect } from './components/DateSelect';
+import { DurationButtons } from './components/DurationButtons';
 
 export default function AssignmentClient() {
   // Definición de horarios de turnos
@@ -223,46 +227,11 @@ export default function AssignmentClient() {
   };
 
   // Agregar estado para el botón toggle de duración
-  const [selectedDuration, setSelectedDuration] = useState(null);
+  const [selectedDuration, setSelectedDuration] = useState('daily');
 
   // Función para manejar la selección de duración
   const handleDurationSelect = (duration) => {
-    if (selectedDuration === duration) {
-      setSelectedDuration(null);
-      setFormData(prev => ({
-        ...prev,
-        duration: '',
-        startTime: null,
-        endTime: null
-      }));
-      return;
-    }
-
     setSelectedDuration(duration);
-    const startDate = formData.date;
-    let endDate = new Date(startDate);
-    
-    switch(duration) {
-      case 'daily':
-        endDate.setDate(startDate.getDate() + 1);
-        break;
-      case 'week':
-        endDate.setDate(startDate.getDate() + 7);
-        break;
-      case 'biweekly':
-        endDate.setDate(startDate.getDate() + 15);
-        break;
-      case 'month':
-        endDate.setMonth(startDate.getMonth() + 1);
-        break;
-    }
-    
-    setFormData(prev => ({
-      ...prev,
-      duration,
-      startTime: startDate,
-      endTime: endDate
-    }));
   };
 
   // Agregar función para eliminar tarea
@@ -506,107 +475,43 @@ export default function AssignmentClient() {
           </h3>
           
           <form className="flex flex-col flex-grow space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Usuario
-              </label>
-              <select
-                name="user"
-                value={formData.user}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Seleccionar Usuario</option>
-                {personalTotal
-                  .filter(empleado => empleado.estado === 'Activo')
-                  .map(empleado => (
-                    <option key={empleado.id} value={empleado.nombre}>
-                      {empleado.nombre}
-                    </option>
-                  ))}
-              </select>
-            </div>
+            <UserSelect 
+              value={formData.user}
+              onChange={handleChange}
+              users={personalTotal}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Área
-              </label>
-              <select
-                name="area"
-                value={formData.area}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Seleccionar Área</option>
-                {areasTareas.map(area => (
-                  <option key={area.id} value={area.nombre}>
-                    {area.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <AreaSelect 
+              value={formData.area}
+              onChange={handleChange}
+              areas={areasTareas}
+            />
 
-            {/* Campo de fecha con botones de duración */}
             <div className="space-y-4 flex-grow">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha de Asignación
-                </label>
-                <div className="space-y-3">
-                  <div className="relative">
-                    <DatePicker
-                      selected={formData.date}
-                      onChange={(date) => setFormData(prev => ({ ...prev, date }))}
-                      dateFormat="dd/MM/yyyy"
-                      minDate={new Date()}
-                      className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                      placeholderText="Seleccionar fecha"
-                    />
-                    <FaCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  </div>
-                  
-                  {/* Botones de duración */}
-                  <div className="flex space-x-2">
-                    {[
-                      { id: 'daily', label: 'Diario' },
-                      { id: 'week', label: 'Semanal' },
-                      { id: 'biweekly', label: 'Quincenal' },
-                      { id: 'month', label: 'Mensual' }
-                    ].map(duration => (
-                      <button
-                        key={duration.id}
-                        type="button"
-                        onClick={() => handleDurationSelect(duration.id)}
-                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200
-                          ${selectedDuration === duration.id
-                            ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                      >
-                        {duration.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <DateSelect 
+                selected={formData.date}
+                onChange={(date) => setFormData(prev => ({ ...prev, date }))}
+              />
+
+              <DurationButtons 
+                selectedDuration={selectedDuration}
+                onSelect={handleDurationSelect}
+              />
             </div>
 
-            {/* Botón de Asignar alineado */}
-            <div className="pt-4 mt-auto" style={{ marginTop: 'auto' }}>
-              <button
-                type="button"
-                onClick={handleAssign}
-                disabled={!formData.user || !formData.area || !formData.date}
-                className={`
-                  w-full py-3 rounded-xl text-lg font-semibold shadow-md 
-                  transition-all duration-200
-                  ${(formData.user && formData.area && formData.date)
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                    : 'bg-gray-300 cursor-not-allowed text-gray-500'}
-                `}
-              >
-                Asignar
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={!formData.user || !formData.area || !formData.date}
+              className={`
+                w-full py-3 rounded-xl text-lg font-semibold shadow-md 
+                transition-all duration-200
+                ${(formData.user && formData.area && formData.date)
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-gray-300 cursor-not-allowed text-gray-500'}
+              `}
+            >
+              Asignar
+            </button>
           </form>
         </div>
       </div>

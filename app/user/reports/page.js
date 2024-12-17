@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
+import { FaExclamationTriangle, FaCamera, FaUpload, FaCheckCircle } from 'react-icons/fa'
+import { MdDescription, MdLocationOn } from 'react-icons/md'
+import { BiPhotoAlbum } from 'react-icons/bi'
 
 export default function ReportsPage() {
     const router = useRouter()
@@ -100,7 +103,7 @@ export default function ReportsPage() {
     }
 
     return (
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-gray-50">
             {showSuccess && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg p-6 flex flex-col items-center transform animate-success">
@@ -125,23 +128,33 @@ export default function ReportsPage() {
                 </div>
             )}
             <div className="bg-white shadow-2xl rounded-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-4">
-                    <h1 className="text-2xl font-bold text-white text-center">Reporte de Incidentes</h1>
+                <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
+                    <h1 className="text-3xl font-bold text-white text-center flex items-center justify-center gap-3">
+                        <FaExclamationTriangle className="text-yellow-300" />
+                        Reporte de Incidentes
+                    </h1>
                 </div>
 
-                <div className="p-6">
+                <div className="p-8">
                     <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Sección de información básica */}
-                            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-4">Información del Incidente</h2>
-                                <div className="space-y-4">
+                            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                                    <MdDescription className="text-blue-600 text-2xl" />
+                                    Información del Incidente
+                                </h2>
+                                <div className="space-y-5">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                            <MdLocationOn className="text-blue-500" />
+                                            Área
+                                        </label>
                                         <select
                                             value={reportData.area}
                                             onChange={(e) => setReportData(prev => ({ ...prev, area: e.target.value }))}
-                                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
+                                                     hover:border-blue-400 transition-colors"
                                         >
                                             <option value="">Seleccione un área</option>
                                             {areas.map(area => (
@@ -151,11 +164,15 @@ export default function ReportsPage() {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Contingencia</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                            <FaExclamationTriangle className="text-orange-500" />
+                                            Tipo de Contingencia
+                                        </label>
                                         <select
                                             value={reportData.tipoContingencia}
                                             onChange={(e) => setReportData(prev => ({ ...prev, tipoContingencia: e.target.value }))}
-                                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                                     hover:border-blue-400 transition-colors"
                                         >
                                             <option value="">Seleccione el tipo</option>
                                             {tiposContingencia.map(tipo => (
@@ -178,27 +195,37 @@ export default function ReportsPage() {
                             </div>
 
                             {/* Sección de fotos */}
-                            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-4">Evidencia Fotográfica</h2>
+                            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                                    <BiPhotoAlbum className="text-blue-600 text-2xl" />
+                                    Evidencia Fotográfica
+                                </h2>
+                                
                                 <div className="space-y-4">
-                                    <div className="flex items-center space-x-4">
-                                        <label className="inline-flex items-center">
+                                    <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+                                        <label className="inline-flex items-center hover:text-blue-600 transition-colors cursor-pointer">
                                             <input
                                                 type="radio"
                                                 checked={reportData.modoFoto === 'multiple'}
                                                 onChange={() => setReportData(prev => ({ ...prev, modoFoto: 'multiple' }))}
-                                                className="text-red-600 focus:ring-red-500"
+                                                className="text-blue-600 focus:ring-blue-500"
                                             />
-                                            <span className="ml-2">Fotos antes/durante/después</span>
+                                            <span className="ml-2 flex items-center gap-2">
+                                                <FaCamera className="text-blue-500" />
+                                                Fotos antes/durante/después
+                                            </span>
                                         </label>
-                                        <label className="inline-flex items-center">
+                                        <label className="inline-flex items-center hover:text-blue-600 transition-colors cursor-pointer">
                                             <input
                                                 type="radio"
                                                 checked={reportData.modoFoto === 'unica'}
                                                 onChange={() => setReportData(prev => ({ ...prev, modoFoto: 'unica' }))}
-                                                className="text-red-600 focus:ring-red-500"
+                                                className="text-blue-600 focus:ring-blue-500"
                                             />
-                                            <span className="ml-2">Foto única del estado actual</span>
+                                            <span className="ml-2 flex items-center gap-2">
+                                                <FaCamera className="text-blue-500" />
+                                                Foto única del estado actual
+                                            </span>
                                         </label>
                                     </div>
 
@@ -206,10 +233,11 @@ export default function ReportsPage() {
                                         <div className="grid grid-cols-3 gap-4">
                                             {['antes', 'durante', 'despues'].map((stage) => (
                                                 <div key={stage} className="space-y-2">
-                                                    <p className="text-sm font-medium text-gray-700 capitalize">
+                                                    <p className="text-sm font-medium text-gray-700 capitalize flex items-center gap-2">
+                                                        <FaCamera className="text-blue-500" />
                                                         {stage === 'despues' ? 'después' : stage}
                                                     </p>
-                                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                                                    <div className="border-2 border-dashed border-blue-200 rounded-lg p-4 hover:border-blue-400 transition-colors">
                                                         {reportData.fotos[stage] ? (
                                                             <div className="relative h-48">
                                                                 <Image
@@ -275,8 +303,12 @@ export default function ReportsPage() {
                         <div className="mt-8 flex justify-center">
                             <button
                                 type="submit"
-                                className="px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+                                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-lg 
+                                         font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 
+                                         transition-all duration-200 shadow-lg
+                                         flex items-center gap-2"
                             >
+                                <FaCheckCircle className="text-xl" />
                                 Enviar Reporte
                             </button>
                         </div>

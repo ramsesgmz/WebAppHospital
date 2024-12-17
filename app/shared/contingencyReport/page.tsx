@@ -376,153 +376,139 @@ export default function ReportsPage() {
         {/* Contenedor principal con diseño mejorado */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Tabla de Reportes */}
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 via-white to-blue-50">
-              <h2 className="text-xl font-semibold text-gray-900">Reportes Realizados</h2>
-              <p className="mt-1 text-sm text-gray-500">Historial de contingencias reportadas</p>
-            </div>
-            
-            {isLoading ? (
-              <div className="flex justify-center items-center p-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              </div>
-            ) : (
-              <div className="overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="w-[20%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Fecha
-                      </th>
-                      <th className="w-[35%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Área
-                      </th>
-                      <th className="w-[20%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        ¿Contingencia?
-                      </th>
-                      <th className="w-[25%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Estado
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {reportes.map((reporte, idx) => (
-                      <tr 
-                        key={reporte.id} 
-                        onClick={() => handleViewFiles(reporte)}
-                        className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} 
-                                   hover:bg-blue-50 cursor-pointer transition-colors`}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {reporte.fecha}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 overflow-hidden text-ellipsis">
-                            {reporte.area}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                            ${reporte.esContingencia ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                            {reporte.esContingencia ? 'Sí' : 'No'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUpdateStatus(reporte.id, reporte.estado === 'Pendiente' ? 'Resuelto' : 'Pendiente');
-                              }}
-                              className={`px-3 py-1 text-xs rounded-full ${
-                                reporte.estado === 'Pendiente'
-                                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                                  : 'bg-green-100 text-green-800 hover:bg-green-200'
-                              }`}
-                            >
-                              {reporte.estado}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewFiles(reporte);
-                              }}
-                              className="text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              Ver
-                            </button>
-                            <button
-                              onClick={(e) => handleDeleteReport(e, reporte.id)}
-                              className="text-red-600 hover:text-red-800 text-sm flex items-center"
-                              title="Eliminar reporte"
-                            >
-                              <svg 
-                                className="w-4 h-4" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                              >
-                                <path 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round" 
-                                  strokeWidth="2" 
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Paginación */}
-                <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
-                  <div className="flex-1 flex justify-between sm:hidden">
-                    <button
-                      onClick={() => setPage(prev => Math.max(prev - 1, 1))}
-                      disabled={page === 1}
-                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {/* Encabezado mejorado */}
+            <div className="bg-white p-6 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-50 rounded-lg">
+                    <svg 
+                      className="w-6 h-6 text-blue-500" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
                     >
-                      Anterior
-                    </button>
-                    <button
-                      onClick={() => setPage(prev => prev + 1)}
-                      disabled={page === totalPages}
-                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      Siguiente
-                    </button>
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth="2" 
+                        d="M12 4v16m6-8H6"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-blue-600">Crear Nuevo Reporte</h3>
+                    <p className="text-gray-500 text-sm">Complete el formulario para registrar un nuevo reporte</p>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span>Fecha</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span>Área</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>¿Contingencia?</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Estado</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reportes.map((reporte) => (
+                    <tr 
+                      key={reporte.id}
+                      className="hover:bg-blue-50 transition-colors duration-150 ease-in-out cursor-pointer"
+                      onClick={() => handleViewFiles(reporte)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{reporte.fecha}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{reporte.area}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                          ${reporte.esContingencia 
+                            ? 'bg-red-100 text-red-800' 
+                            : 'bg-yellow-100 text-yellow-800'}`}
+                        >
+                          {reporte.esContingencia ? 'Sí' : 'No'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                          ${reporte.estado === 'Pendiente'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-green-100 text-green-800'}`}
+                        >
+                          {reporte.estado}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Formulario con diseño mejorado */}
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 via-white to-blue-50">
-              <h2 className="text-xl font-semibold text-gray-900">Crear Nuevo Reporte</h2>
-              <p className="mt-1 text-sm text-gray-500">Complete el formulario para registrar un nuevo reporte</p>
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            {/* Encabezado mejorado */}
+            <div className="bg-white p-6 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-blue-600">Crear Nuevo Reporte</h3>
+                  <p className="text-gray-500 text-sm">Complete el formulario para registrar un nuevo reporte</p>
+                </div>
+              </div>
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              {/* Campos del formulario con diseño mejorado */}
               <div className="grid grid-cols-1 gap-6">
                 {/* Área */}
                 <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Área
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span>Área</span>
                   </label>
                   <select
                     value={selectedArea}
                     onChange={(e) => setSelectedArea(e.target.value)}
                     className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
-                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
-                             group-hover:border-blue-200"
+                             focus:border-red-500 focus:ring-red-500 transition-all duration-200
+                             group-hover:border-red-200"
                     required
                   >
                     <option value="">Seleccione un área</option>
@@ -538,15 +524,19 @@ export default function ReportsPage() {
 
                 {/* Tipo de Contingencia */}
                 <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tipo de Contingencia
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                    <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Tipo de Contingencia</span>
                   </label>
                   <select
                     value={contingencyType}
                     onChange={(e) => setContingencyType(e.target.value)}
                     className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
-                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
-                             group-hover:border-blue-200"
+                             focus:border-yellow-500 focus:ring-yellow-500 transition-all duration-200
+                             group-hover:border-yellow-200"
                     required
                   >
                     <option value="">Seleccione un tipo</option>
@@ -558,8 +548,12 @@ export default function ReportsPage() {
 
                 {/* Descripción */}
                 <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descripción
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                    <span>Descripción</span>
                   </label>
                   <textarea
                     value={description}
@@ -574,33 +568,22 @@ export default function ReportsPage() {
 
                 {/* Archivos */}
                 <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Archivos Adjuntos
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span>Archivos Adjuntos</span>
                   </label>
                   <input
                     type="file"
                     multiple
                     onChange={handleFileChange}
                     className="block w-full rounded-xl border-2 border-gray-200 shadow-sm 
-                             focus:border-blue-500 focus:ring-blue-500 transition-all duration-200
-                             group-hover:border-blue-200"
+                             focus:border-green-500 focus:ring-green-500 transition-all duration-200
+                             group-hover:border-green-200"
                   />
                 </div>
-
-                {/* Preview de archivos */}
-                {previewUrls.length > 0 && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {previewUrls.map((url, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={url}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-lg"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Botón de envío mejorado */}

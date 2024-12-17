@@ -37,6 +37,58 @@ const personalTotal = [
   { id: 16, nombre: 'usuario', area: 'Administración', estado: 'Activo', rol: 'Administrativo' }
 ];
 
+// Agregar la función para exportar datos antes del componente principal
+const exportEnterpriseData = (format) => {
+  // Recolectar todos los datos del enterprise
+  const enterpriseData = {
+    personal: allStaff,
+    areas: areasData,
+    turnos: turnosData,
+    inventario: inventarioCritico,
+    tareas: areasTareas,
+  };
+
+  // Simular la descarga según el formato
+  let fileContent;
+  let mimeType;
+  let fileExtension;
+
+  switch (format) {
+    case 'json':
+      fileContent = JSON.stringify(enterpriseData, null, 2);
+      mimeType = 'application/json';
+      fileExtension = 'json';
+      break;
+    case 'csv':
+      // Simplificado para el ejemplo - se necesitaría una función real de conversión a CSV
+      fileContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(JSON.stringify(enterpriseData));
+      mimeType = 'text/csv';
+      fileExtension = 'csv';
+      break;
+    case 'excel':
+      // Simplificado - se necesitaría una biblioteca real para exportar a Excel
+      fileContent = JSON.stringify(enterpriseData);
+      mimeType = 'application/vnd.ms-excel';
+      fileExtension = 'xlsx';
+      break;
+    default:
+      fileContent = JSON.stringify(enterpriseData);
+      mimeType = 'application/json';
+      fileExtension = 'json';
+  }
+
+  // Crear el blob y descargar
+  const blob = new Blob([fileContent], { type: mimeType });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `enterprise_data_${new Date().toISOString()}.${fileExtension}`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
 export default function EnterpriseOverviewPage() {
   const router = useRouter();
   const [selectedTurno, setSelectedTurno] = useState(null);
@@ -288,6 +340,7 @@ export default function EnterpriseOverviewPage() {
     ];
   });
   const [personal, setPersonal] = useState(allStaff);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Datos de áreas
   const areasData = [
@@ -765,12 +818,12 @@ export default function EnterpriseOverviewPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      {/* Botón para ver todo el personal */}
-      <div className="mb-8">
+      {/* Botones de acción */}
+      <div className="mb-8 flex justify-between items-center">
         <button
           onClick={() => setShowAllStaff(true)}
-          className="bg-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow
-                   text-gray-700 font-medium flex items-center space-x-2"
+          className="bg-blue-50 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow
+                   text-blue-600 font-medium flex items-center space-x-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -778,6 +831,68 @@ export default function EnterpriseOverviewPage() {
           </svg>
           <span>Ver Todo el Personal (98)</span>
         </button>
+
+        {/* Nuevo botón de exportar */}
+        <div className="relative">
+          <button
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="bg-blue-50 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow
+                     text-blue-600 font-medium flex items-center space-x-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Exportar Datos</span>
+          </button>
+
+          {/* Menú de opciones de exportación */}
+          {showExportMenu && (
+            <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+              <div className="py-1" role="menu" aria-orientation="vertical">
+                <button
+                  onClick={() => {
+                    exportEnterpriseData('json');
+                    setShowExportMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Exportar como JSON</span>
+                </button>
+                <button
+                  onClick={() => {
+                    exportEnterpriseData('csv');
+                    setShowExportMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Exportar como CSV</span>
+                </button>
+                <button
+                  onClick={() => {
+                    exportEnterpriseData('excel');
+                    setShowExportMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Exportar como Excel</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Grid Principal */}
