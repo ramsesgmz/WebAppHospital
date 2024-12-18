@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 interface Employee {
@@ -11,18 +10,11 @@ interface Employee {
   turno: string;
   estado: 'Activo' | 'Inactivo';
   fechaIngreso: string;
-  rol: 'usuario' | 'admin' | 'enterprise';
+  rol: 'usuario' | 'admin' | 'admin_principal' | 'enterprise';
   contacto: {
     email: string;
     telefono: string;
   };
-}
-
-interface Turno {
-  id: string;
-  nombre: string;
-  horario: string;
-  descripcion: string;
 }
 
 export default function RRHHPage() {
@@ -48,51 +40,18 @@ export default function RRHHPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTurnosModal, setShowTurnosModal] = useState(false);
 
-  // Agregar datos de ejemplo
-  const exampleEmployees: Employee[] = [
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      cargo: "Médico General",
-      departamento: "Emergencias",
-      turno: "Mañana",
-      estado: "Activo",
-      fechaIngreso: "2024-01-15",
-      rol: 'usuario',
-      contacto: {
-        email: "juan.perez@hospital.com",
-        telefono: "0414-1234567"
-      }
-    },
-    {
-      id: 2,
-      nombre: "María González",
-      cargo: "Enfermera",
-      departamento: "Quirofano",
-      turno: "Tarde",
-      estado: "Activo",
-      fechaIngreso: "2024-02-01",
-      rol: 'usuario',
-      contacto: {
-        email: "maria.gonzalez@hospital.com",
-        telefono: "0424-7654321"
-      }
-    },
-    {
-      id: 3,
-      nombre: "Carlos Rodríguez",
-      cargo: "Especialista",
-      departamento: "Consulta",
-      turno: "Mañana",
-      estado: "Activo",
-      fechaIngreso: "2024-01-20",
-      rol: 'usuario',
-      contacto: {
-        email: "carlos.rodriguez@hospital.com",
-        telefono: "0412-9876543"
-      }
+  // Funciones de manejo de empleados
+  const handleEditEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setShowModal(true);
+  };
+
+  const handleDeleteEmployee = (id: number) => {
+    if (window.confirm('¿Está seguro de que desea eliminar este usuario?')) {
+      setEmployees(employees.filter(emp => emp.id !== id));
+      toast.success('Usuario eliminado exitosamente');
     }
-  ];
+  };
 
   // Agregar useEffect para cargar datos de ejemplo
   useEffect(() => {
@@ -206,6 +165,7 @@ export default function RRHHPage() {
                   <option value="">Seleccionar rol</option>
                   <option value="usuario">Usuario</option>
                   <option value="admin">Administrador</option>
+                  <option value="admin_principal">Administrador Principal</option>
                   <option value="enterprise">Enterprise</option>
                 </select>
               </div>
@@ -286,254 +246,79 @@ export default function RRHHPage() {
     );
   };
 
-  // Definir los turnos disponibles
-  const TURNOS: Turno[] = [
+  // Agregar datos de ejemplo
+  const exampleEmployees: Employee[] = [
     {
-      id: 'mañana',
-      nombre: 'Turno Mañana',
-      horario: '07:00 - 15:00',
-      descripcion: 'Turno matutino'
+      id: 1,
+      nombre: "Juan Pérez",
+      cargo: "Médico General",
+      departamento: "Emergencias",
+      turno: "Mañana",
+      estado: "Activo",
+      fechaIngreso: "2024-01-15",
+      rol: 'usuario',
+      contacto: {
+        email: "juan.perez@hospital.com",
+        telefono: "0414-1234567"
+      }
     },
     {
-      id: 'tarde',
-      nombre: 'Turno Tarde',
-      horario: '15:00 - 23:00',
-      descripcion: 'Turno vespertino'
+      id: 2,
+      nombre: "María González",
+      cargo: "Enfermera",
+      departamento: "Quirofano",
+      turno: "Tarde",
+      estado: "Activo",
+      fechaIngreso: "2024-02-01",
+      rol: 'usuario',
+      contacto: {
+        email: "maria.gonzalez@hospital.com",
+        telefono: "0424-7654321"
+      }
     },
     {
-      id: 'noche',
-      nombre: 'Turno Noche',
-      horario: '23:00 - 07:00',
-      descripcion: 'Turno nocturno'
+      id: 3,
+      nombre: "Carlos Rodríguez",
+      cargo: "Especialista",
+      departamento: "Consulta",
+      turno: "Mañana",
+      estado: "Activo",
+      fechaIngreso: "2024-01-20",
+      rol: 'usuario',
+      contacto: {
+        email: "carlos.rodriguez@hospital.com",
+        telefono: "0412-9876543"
+      }
+    },
+    {
+      id: 4,
+      nombre: "Admin Principal",
+      cargo: "Administrador Principal",
+      departamento: "Administración",
+      turno: "Mañana",
+      estado: "Activo",
+      fechaIngreso: "2024-01-01",
+      rol: 'admin_principal',
+      contacto: {
+        email: "admin.principal@hospital.com",
+        telefono: "0414-9999999"
+      }
+    },
+    {
+      id: 5,
+      nombre: "Enterprise User",
+      cargo: "Enterprise",
+      departamento: "Dirección",
+      turno: "Mañana",
+      estado: "Activo",
+      fechaIngreso: "2024-01-01",
+      rol: 'enterprise',
+      contacto: {
+        email: "enterprise@hospital.com",
+        telefono: "0414-8888888"
+      }
     }
   ];
-
-  // Agregar el modal de gestión de turnos
-  const TurnosModal = () => {
-    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-    const [selectedTurno, setSelectedTurno] = useState('');
-
-    const handleChangeTurno = (employeeId: number, turnoId: string) => {
-      const updatedEmployees = employees.map(emp => {
-        if (emp.id === employeeId) {
-          return { ...emp, turno: turnoId };
-        }
-        return emp;
-      });
-      setEmployees(updatedEmployees);
-      toast.success('Turno actualizado exitosamente');
-    };
-
-    return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div className="relative top-20 mx-auto p-8 border w-3/4 shadow-lg rounded-xl bg-white">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-semibold text-gray-900">Gestión de Turnos</h3>
-            <button onClick={() => setShowTurnosModal(false)} className="text-gray-400 hover:text-gray-600">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Información de turnos */}
-          <div className="grid grid-cols-3 gap-6 mb-8">
-            {TURNOS.map(turno => (
-              <div key={turno.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h4 className="text-lg font-medium text-gray-900">{turno.nombre}</h4>
-                <p className="text-sm text-gray-500 mt-1">{turno.descripcion}</p>
-                <p className="text-sm font-medium text-gray-700 mt-2">{turno.horario}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Personal asignado: {employees.filter(emp => emp.turno === turno.id).length}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Tabla de asignación de turnos */}
-          <div className="mt-6">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Personal
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Turno Actual
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cambiar Turno
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {employees.map((employee) => (
-                  <tr key={employee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{employee.nombre}</div>
-                      <div className="text-sm text-gray-500">{employee.cargo}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {TURNOS.find(t => t.id === employee.turno)?.nombre || employee.turno}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <select
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value={employee.turno}
-                        onChange={(e) => handleChangeTurno(employee.id, e.target.value)}
-                      >
-                        {TURNOS.map(turno => (
-                          <option key={turno.id} value={turno.id}>
-                            {turno.nombre}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Agregar estos estados
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-
-  // Agregar estas funciones
-  const handleEditEmployee = (employee: Employee) => {
-    setEditingEmployee(employee);
-    setShowEditModal(true);
-  };
-
-  const handleDeleteEmployee = (id: number) => {
-    if (window.confirm('¿Está seguro de que desea eliminar este usuario?')) {
-      setEmployees(employees.filter(emp => emp.id !== id));
-      toast.success('Usuario eliminado exitosamente');
-    }
-  };
-
-  // Agregar el modal de edición
-  const EditEmployeeModal = () => {
-    const [editForm, setEditForm] = useState({
-      nombre: editingEmployee?.nombre || '',
-      rol: editingEmployee?.rol || '',
-      ubicacion: editingEmployee?.departamento || '',
-      estado: editingEmployee?.estado || 'Activo'
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      
-      const updatedEmployees = employees.map(emp => {
-        if (emp.id === editingEmployee?.id) {
-          return {
-            ...emp,
-            nombre: editForm.nombre,
-            rol: editForm.rol as 'usuario' | 'admin' | 'enterprise',
-            departamento: editForm.ubicacion,
-            estado: editForm.estado as 'Activo' | 'Inactivo'
-          };
-        }
-        return emp;
-      });
-
-      setEmployees(updatedEmployees);
-      setShowEditModal(false);
-      setEditingEmployee(null);
-      toast.success('Usuario actualizado exitosamente');
-    };
-
-    return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div className="relative top-10 mx-auto p-8 border w-[600px] shadow-lg rounded-xl bg-white">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-semibold text-gray-900">Editar Usuario</h3>
-            <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                value={editForm.nombre}
-                onChange={(e) => setEditForm({...editForm, nombre: e.target.value})}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Rol</label>
-              <select
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                value={editForm.rol}
-                onChange={(e) => setEditForm({...editForm, rol: e.target.value})}
-                required
-              >
-                <option value="usuario">Usuario</option>
-                <option value="admin">Administrador</option>
-                <option value="enterprise">Enterprise</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Ubicación</label>
-              <select
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                value={editForm.ubicacion}
-                onChange={(e) => setEditForm({...editForm, ubicacion: e.target.value})}
-                required
-              >
-                <option value="Emergencias">Emergencias</option>
-                <option value="Consulta">Consulta Externa</option>
-                <option value="Quirofano">Quirófano</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Estado</label>
-              <select
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                value={editForm.estado}
-                onChange={(e) => setEditForm({...editForm, estado: e.target.value})}
-                required
-              >
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
-              </select>
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-              >
-                Guardar Cambios
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -624,85 +409,42 @@ export default function RRHHPage() {
         </div>
       </div>
 
-      {/* Grid de tablas mejorado */}
+      {/* Tabla de empleados y Panel de Usuarios Especiales */}
       <div className="grid grid-cols-3 gap-6">
-        {/* Tabla Principal con diseño mejorado */}
-        <div className="col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
-          {/* Encabezado mejorado */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/10 rounded-lg">
-                  <svg 
-                    className="w-6 h-6 text-white" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth="2" 
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" 
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">Personal Registrado</h3>
-                  <p className="text-blue-100 text-sm">Gestión de empleados activos</p>
-                </div>
+        {/* Tabla Principal */}
+        <div className="col-span-2">
+          <div className="bg-blue-600 p-6 rounded-t-xl text-white">
+            <div className="flex items-center space-x-3">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <div>
+                <h2 className="text-xl font-bold">Personal Registrado</h2>
+                <p className="text-blue-100 text-sm">Gestión de empleados activos</p>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-blue-100 text-sm">
-                  Total: {employees.length} empleados
-                </span>
+              <div className="ml-auto">
+                <p className="text-sm text-blue-100">Total: {employees.filter(emp => emp.rol === 'usuario').length} empleados</p>
               </div>
             </div>
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="bg-white rounded-b-xl shadow-sm overflow-hidden">
+            <table className="min-w-full">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>Personal</span>
-                    </div>
+                    Personal
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span>Cargo</span>
-                    </div>
+                    Cargo
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                      <span>Departamento</span>
-                    </div>
+                    Departamento
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Estado</span>
-                    </div>
+                    Estado
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      <span>Acciones</span>
-                    </div>
+                    Acciones
                   </th>
                 </tr>
               </thead>
@@ -710,19 +452,19 @@ export default function RRHHPage() {
                 {employees
                   .filter(emp => emp.rol === 'usuario')
                   .map((employee) => (
-                    <tr key={employee.id} className="hover:bg-blue-50 transition-colors">
+                    <tr key={employee.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                              <span className="text-white font-medium">
+                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                              <span className="text-blue-600 font-medium">
                                 {employee.nombre.charAt(0)}
                               </span>
                             </div>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{employee.nombre}</div>
-                            <div className="text-sm text-blue-500">ID: {employee.id}</div>
+                            <div className="text-sm text-gray-500">ID: {employee.id}</div>
                           </div>
                         </div>
                       </td>
@@ -733,17 +475,18 @@ export default function RRHHPage() {
                         {employee.departamento}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                          ${employee.estado === 'Activo' 
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          employee.estado === 'Activo' 
                             ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'}`}>
+                            : 'bg-red-100 text-red-800'
+                        }`}>
                           {employee.estado}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button 
                           onClick={() => handleEditEmployee(employee)}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
+                          className="text-blue-600 hover:text-blue-900 mr-3"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -762,51 +505,37 @@ export default function RRHHPage() {
                   ))}
               </tbody>
             </table>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+              <p className="text-sm text-gray-500">
+                Mostrando página {page} de {totalPages}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Panel de Usuarios Especiales con diseño mejorado */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          {/* Encabezado mejorado */}
-          <div className="bg-gradient-to-r from-cyan-600 to-blue-500 p-6">
+        {/* Panel de Usuarios Especiales */}
+        <div>
+          <div className="bg-gradient-to-r from-cyan-600 to-blue-500 p-6 rounded-t-xl">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                <svg 
-                  className="w-6 h-6 text-white" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="2" 
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              </div>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
               <div>
                 <h3 className="text-xl font-bold text-white">Usuarios Especiales</h3>
                 <p className="text-cyan-50 text-sm">Administradores y Enterprise</p>
               </div>
             </div>
           </div>
-
-          <div className="p-6 bg-gradient-to-b from-white to-cyan-50/30">
-            <div className="space-y-4">
+          <div className="bg-white rounded-b-xl shadow-sm">
+            <div className="p-6 space-y-4">
               {employees
-                .filter(emp => emp.rol === 'admin' || emp.rol === 'enterprise')
+                .filter(emp => emp.rol === 'admin' || emp.rol === 'enterprise' || emp.rol === 'admin_principal')
                 .map(employee => (
-                  <div key={employee.id} 
-                    className="group p-4 bg-white rounded-xl 
-                             hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 
-                             transition-all duration-200 border border-cyan-100 
-                             hover:border-cyan-200 hover:shadow-md">
+                  <div key={employee.id} className="group p-4 bg-white rounded-xl border border-gray-200 hover:border-cyan-200 hover:shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 
-                                        flex items-center justify-center shadow-md">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
                             <span className="text-white font-medium text-lg">
                               {employee.nombre.charAt(0)}
                             </span>
@@ -815,29 +544,28 @@ export default function RRHHPage() {
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{employee.nombre}</div>
                           <div className="text-sm text-cyan-600">
-                            {employee.rol === 'admin' ? 'Administrador' : 'Enterprise'}
+                            {employee.cargo}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            ID: {employee.id}
                           </div>
                         </div>
                       </div>
-                      <div className="flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex space-x-2">
                         <button 
                           onClick={() => handleEditEmployee(employee)}
-                          className="text-cyan-600 hover:text-cyan-800 transition-colors p-1.5
-                                   hover:bg-cyan-100/50 rounded-full"
+                          className="p-1 text-cyan-600 hover:text-cyan-800 hover:bg-cyan-50 rounded-full"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </button>
                         <button 
                           onClick={() => handleDeleteEmployee(employee.id)}
-                          className="text-red-600 hover:text-red-800 transition-colors p-1.5
-                                   hover:bg-red-100/50 rounded-full"
+                          className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
                       </div>
@@ -849,62 +577,8 @@ export default function RRHHPage() {
         </div>
       </div>
 
-      {/* Paginación con diseño mejorado */}
-      <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
-        <div className="flex-1 flex justify-between sm:hidden">
-          <button
-            onClick={() => setPage(prev => Math.max(1, prev - 1))}
-            disabled={page === 1}
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Anterior
-          </button>
-          <button
-            onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={page === totalPages}
-            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Siguiente
-          </button>
-        </div>
-        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700">
-              Mostrando página <span className="font-medium">{page}</span> de{' '}
-              <span className="font-medium">{totalPages}</span>
-            </p>
-          </div>
-          <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <button
-                onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                disabled={page === 1}
-                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                <span className="sr-only">Anterior</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={page === totalPages}
-                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                <span className="sr-only">Siguiente</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </nav>
-          </div>
-        </div>
-      </div>
-
-      {/* Modales con diseño mejorado */}
+      {/* Modales */}
       {showAddModal && <AddEmployeeModal />}
-      {showEditModal && <EditEmployeeModal />}
-      {showTurnosModal && <TurnosModal />}
     </div>
   );
 }

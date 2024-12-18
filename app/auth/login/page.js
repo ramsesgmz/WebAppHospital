@@ -65,14 +65,16 @@ const LoginPage = () => {
         setIsLoading(true)
 
         try {
-            // Primero verificamos si es admin principal
+            // Primero verificamos si es admin principal (superadmin)
             if (formState.username === 'admin_principal' && formState.password === 'admin123') {
                 try {
                     localStorage.setItem('adminPrincipal', 'true');
                     localStorage.setItem('userRole', 'admin');
                     localStorage.setItem('adminId', '1');
+                    localStorage.setItem('isSuperAdmin', 'true');
                     document.cookie = `userRole=admin; path=/; max-age=86400; secure; samesite=strict`;
                     document.cookie = `adminPrincipal=true; path=/; max-age=86400; secure; samesite=strict`;
+                    document.cookie = `isSuperAdmin=true; path=/; max-age=86400; secure; samesite=strict`;
                     toast.success('Bienvenido Administrador Principal');
                     await router.push('/admin/dashboard');
                     return;
@@ -82,9 +84,8 @@ const LoginPage = () => {
                 }
             }
 
-            // Resto de las validaciones existentes
+            // Verificación para usuario normal con mapa
             if (formState.username === 'usuario' && formState.password === '123456') {
-                // Simular obtención de ubicación
                 const position = await new Promise((resolve) => {
                     resolve(simulateGPSPosition())
                 })
@@ -114,15 +115,21 @@ const LoginPage = () => {
                 } else {
                     throw new Error('Debes estar dentro del área de trabajo para iniciar sesión')
                 }
-            } else if (formState.username === 'admin' && formState.password === '123456') {
+            } 
+            // Verificación para admin normal
+            else if (formState.username === 'admin' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'admin')
                 localStorage.setItem('isAuthenticated', 'true')
                 localStorage.setItem('adminId', '3')
+                localStorage.setItem('isSuperAdmin', 'false')
                 document.cookie = `userRole=admin; path=/; max-age=86400; secure; samesite=strict`;
                 document.cookie = `isAuthenticated=true; path=/; max-age=86400; secure; samesite=strict`;
+                document.cookie = `isSuperAdmin=false; path=/; max-age=86400; secure; samesite=strict`;
                 await router.push('/admin/dashboard')
                 toast.success('Bienvenido Administrador')
-            } else if (formState.username === 'enterprise' && formState.password === '123456') {
+            } 
+            // Verificación para enterprise
+            else if (formState.username === 'enterprise' && formState.password === '123456') {
                 localStorage.setItem('userRole', 'enterprise')
                 localStorage.setItem('isAuthenticated', 'true')
                 document.cookie = `userRole=enterprise; path=/; max-age=86400; secure; samesite=strict`;
@@ -130,16 +137,40 @@ const LoginPage = () => {
                 await router.push('/enterprise/dashboard')
                 toast.success('Bienvenido Enterprise')
             } else {
-                throw new Error('Credenciales incorrectas')
+                setIsLoading(false)
+                toast.error('Las credenciales ingresadas no son correctas', {
+                    style: {
+                        background: '#FEE2E2',
+                        color: '#991B1B',
+                        padding: '16px',
+                        borderRadius: '10px',
+                        fontWeight: 'bold',
+                    },
+                    icon: '❌',
+                    position: 'top-center',
+                    duration: 3000,
+                })
             }
         } catch (error) {
-            console.error('Error en login:', error)
-            setLocationState(prev => ({ ...prev, error: error.message, isLoading: false }))
-            toast.error(error.message || 'Error al iniciar sesión')
+            setIsLoading(false)
+            if (error.message.includes('dentro del área')) {
+                toast.error('Debes estar dentro del área de trabajo para iniciar sesión', {
+                    style: {
+                        background: '#FEE2E2',
+                        color: '#991B1B',
+                        padding: '16px',
+                        borderRadius: '10px',
+                        fontWeight: 'bold',
+                    },
+                    icon: '⚠️',
+                    position: 'top-center',
+                    duration: 3000,
+                })
+            }
         } finally {
-            setLocationState(prev => ({ ...prev, isLoading: false }))
+            setIsLoading(false)
         }
-    }, [formState, router])
+    }, [formState, router, simulateGPSPosition])
 
     const handleMapConfirmation = useCallback(() => {
         if (locationState.showConfirmation) {
@@ -194,37 +225,33 @@ const LoginPage = () => {
                         <div className="mb-6 md:mb-10 transform transition-transform duration-300 hover:scale-105">
                             <Image
                                 src="/logo.jpg"
-                                alt="Hombres de Blanco"
+                                alt="Logo"
                                 width={100}
                                 height={100}
-                                className="mx-auto w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-2xl shadow-lg"
+                                className="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 rounded-2xl shadow-lg"
                                 priority
                             />
                         </div>
 
-                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-700 mb-2 md:mb-3 text-center tracking-tight">
-                            Bienvenido a
-                            <br />
-                            <span className="text-3xl sm:text-4xl lg:text-5xl mt-1 md:mt-2 block font-extrabold text-blue-800 tracking-tight">
-                                HOMBRES DE BLANCO
-                            </span>
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-blue-700 mb-2 md:mb-3 text-center tracking-tight">
+                            Bienvenido
                         </h2>
-                        <p className="text-gray-500 text-sm md:text-base text-center mb-6 md:mb-10 font-light">
+                        <p className="text-gray-700 text-base md:text-lg lg:text-xl text-center mb-6 md:mb-8 lg:mb-10 font-medium">
                             Ingresa tus credenciales para continuar
                         </p>
 
-                        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5 lg:space-y-6">
                             <div className="relative group">
                                 <FaUser className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-blue-500 text-lg transition-colors group-hover:text-blue-600" />
                                 <input
                                     type="text"
                                     value={formState.username}
                                     onChange={(e) => setFormState(prev => ({ ...prev, username: e.target.value }))}
-                                    className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3 border border-gray-200 rounded-xl text-sm md:text-base
+                                    className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3 lg:py-4 border border-gray-200 rounded-xl text-sm md:text-base lg:text-lg
                                              focus:border-blue-500 focus:ring-2 focus:ring-blue-200/50
                                              transition-all duration-200 bg-white/75 backdrop-blur-sm
                                              hover:border-blue-400"
-                                    placeholder="usuario"
+                                    placeholder="Ingresa tu usuario"
                                     required
                                 />
                             </div>
@@ -235,18 +262,20 @@ const LoginPage = () => {
                                     type={formState.showPassword ? 'text' : 'password'}
                                     value={formState.password}
                                     onChange={(e) => setFormState(prev => ({ ...prev, password: e.target.value }))}
-                                    className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3 border border-gray-200 rounded-xl text-sm md:text-base
+                                    className="w-full pl-10 md:pl-12 pr-24 py-2.5 md:py-3 lg:py-4 border border-gray-200 rounded-xl text-sm md:text-base lg:text-lg
                                              focus:border-blue-500 focus:ring-2 focus:ring-blue-200/50
                                              transition-all duration-200 bg-white/75 backdrop-blur-sm
                                              hover:border-blue-400"
-                                    placeholder="••••••"
+                                    placeholder="Ingresa tu contraseña"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setFormState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
-                                    className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 text-blue-500 text-xs md:text-sm
-                                             hover:text-blue-700 transition-all duration-200 opacity-75 hover:opacity-100"
+                                    className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 text-blue-600 text-sm md:text-base font-medium
+                                             bg-blue-50 px-3 py-1 rounded-lg
+                                             hover:bg-blue-100 hover:text-blue-700 
+                                             transition-all duration-200"
                                 >
                                     {formState.showPassword ? "Ocultar" : "Mostrar"}
                                 </button>
@@ -255,7 +284,7 @@ const LoginPage = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full py-3 md:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-base md:text-lg font-semibold
+                                className="w-full py-3 md:py-4 lg:py-5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-base md:text-lg lg:text-xl font-semibold
                                          hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-[1.02]
                                          focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
                                          disabled:from-blue-400 disabled:to-blue-400 disabled:cursor-not-allowed
@@ -280,8 +309,8 @@ const LoginPage = () => {
 
                         {/* Mapa para verificación de ubicación */}
                         {locationState.showMap && (
-                            <div className="mt-4 md:mt-6 space-y-3 md:space-y-4 animate-fadeIn">
-                                <div className="w-full h-48 sm:h-56 md:h-64 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200/50 backdrop-blur-sm">
+                            <div className="mt-4 md:mt-6 lg:mt-8 space-y-3 md:space-y-4 lg:space-y-5 animate-fadeIn">
+                                <div className="w-full h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200/50 backdrop-blur-sm">
                                     <Map 
                                         userLocation={locationState.userLocation}
                                         workArea={workArea}
@@ -292,7 +321,7 @@ const LoginPage = () => {
                                 {locationState.showConfirmation && (
                                     <button
                                         onClick={handleMapConfirmation}
-                                        className="w-full py-2.5 md:py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl text-base md:text-lg font-semibold
+                                        className="w-full py-2.5 md:py-3 lg:py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl text-base md:text-lg lg:text-xl font-semibold
                                                  hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-[1.02]
                                                  focus:ring-2 focus:ring-green-400 focus:ring-offset-2
                                                  shadow-lg hover:shadow-xl flex items-center justify-center"

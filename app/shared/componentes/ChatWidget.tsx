@@ -324,13 +324,15 @@ export default function ChatWidget({
 
   const renderMessageList = () => {
     // Filtrar mensajes según el rol
-    const filteredMessages = isAdminPrincipal 
-      ? messages // Admin principal ve todos los mensajes
-      : messages.filter(msg => msg.adminId === currentAdminId); // Admin normal solo ve sus mensajes
-
-    console.log('isAdminPrincipal:', isAdminPrincipal);
-    console.log('currentAdminId:', currentAdminId);
-    console.log('filtered messages:', filteredMessages);
+    const isSuperAdmin = localStorage.getItem('isSuperAdmin') === 'true';
+    const currentAdminIdFromStorage = localStorage.getItem('adminId');
+    
+    console.log('isSuperAdmin:', isSuperAdmin);
+    console.log('currentAdminId from storage:', currentAdminIdFromStorage);
+    
+    const filteredMessages = isSuperAdmin 
+      ? messages // Super admin ve todos los mensajes
+      : messages.filter(msg => msg.adminId?.toString() === currentAdminIdFromStorage); // Admin normal solo ve sus mensajes
 
     return (
       <div className="card w-96 bg-base-100 shadow-2xl border border-base-200">
@@ -338,7 +340,7 @@ export default function ChatWidget({
           <div className="bg-primary text-primary-content p-4 rounded-t-2xl">
             <div className="flex justify-between items-center">
               <h2 className="card-title text-primary-content font-bold">
-                {isAdminPrincipal 
+                {isSuperAdmin 
                   ? `Todos los Mensajes (${messages.length})` 
                   : `Mis Mensajes (${filteredMessages.length})`}
               </h2>
@@ -368,7 +370,7 @@ export default function ChatWidget({
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-primary mb-1">
                       {msg.type === 'report' ? '🚨' : msg.type === 'question' ? '❓' : '💬'} 
-                      {isAdminPrincipal ? `${msg.adminName} (${getAdminCargo(msg.adminId)})` : 'Mensaje'}
+                      {isSuperAdmin ? `${msg.adminName} (${getAdminCargo(msg.adminId)})` : 'Mensaje'}
                     </div>
                     <div className="font-medium truncate text-base-content/70">
                       {msg.subject || 'Sin asunto'}
