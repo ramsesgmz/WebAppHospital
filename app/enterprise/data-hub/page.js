@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { dataHubService } from '@/services/dataHubService';
-import { utils, writeFile } from 'xlsx';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 export default function DataHubPage() {
   const [data, setData] = useState({
@@ -43,9 +44,44 @@ export default function DataHubPage() {
   const handleExport = async (format) => {
     try {
       setLoading(true);
-      await dataHubService.exportEnterpriseData(format);
-    } catch (err) {
-      setError(err.message);
+
+      // Verificar datos
+      if (!data || !data.organizations) {
+        throw new Error('No hay datos disponibles para exportar');
+      }
+
+      // Datos básicos para exportar
+      const exportData = {
+        empresas: data.organizations.map(org => ({
+          nombre: org.nombre,
+          estado: org.estado,
+          personal: org.personal.total,
+          areas: org.areas.total,
+          servicios: org.actividad.total
+        }))
+      };
+
+      // Exportar según el formato
+      if (format === 'excel') {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(exportData.empresas);
+        XLSX.utils.book_append_sheet(wb, ws, 'Empresas');
+        XLSX.writeFile(wb, 'empresas.xlsx');
+      } 
+      else if (format === 'csv') {
+        const ws = XLSX.utils.json_to_sheet(exportData.empresas);
+        const csv = XLSX.utils.sheet_to_csv(ws);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        saveAs(blob, 'empresas.csv');
+      }
+      else if (format === 'json') {
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        saveAs(blob, 'empresas.json');
+      }
+
+    } catch (error) {
+      console.error('Error al exportar:', error);
+      alert('Error al exportar los datos: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -113,59 +149,68 @@ export default function DataHubPage() {
   const handleDownloadTemplate = async (format) => {
     try {
       if (format === 'excel') {
-        const wb = utils.book_new();
+        const wb = XLSX.utils.book_new();
         
-        // Datos ficticios de empresas de tecnología y transporte
+        // Datos ficticios de empresas de RRHH y Telecomunicaciones
         const templateData = [
           {
-            nombre: "TechSolutions S.A.",
+            nombre: "HR Solutions Global",
             type: "empresa",
             estado: "Activo",
-            logo_url: "https://ejemplo.com/tech1.png",
-            personal: 250,
-            areas: 8,
-            servicios: 520
-          },
-          {
-            nombre: "TransporteExpress Global",
-            type: "empresa",
-            estado: "Activo",
-            logo_url: "https://ejemplo.com/trans1.png",
-            personal: 380,
+            logo_url: "https://ejemplo.com/hr1.png",
+            personal: 180,
             areas: 6,
-            servicios: 890
+            servicios: 450
           },
           {
-            nombre: "InnovaTech Systems",
+            nombre: "TelecomNet Services",
             type: "empresa",
             estado: "Activo",
-            logo_url: "https://ejemplo.com/tech2.png",
-            personal: 175,
-            areas: 5,
-            servicios: 320
+            logo_url: "https://ejemplo.com/telecom1.png",
+            personal: 320,
+            areas: 8,
+            servicios: 780
           },
           {
-            nombre: "LogísticaPro Internacional",
+            nombre: "Talent Hub RH",
             type: "empresa",
             estado: "Activo",
-            logo_url: "https://ejemplo.com/trans2.png",
-            personal: 420,
-            areas: 7,
-            servicios: 950
-          },
-          {
-            nombre: "CyberSecurity Plus",
-            type: "empresa",
-            estado: "Activo",
-            logo_url: "https://ejemplo.com/tech3.png",
+            logo_url: "https://ejemplo.com/hr2.png",
             personal: 150,
+            areas: 5,
+            servicios: 380
+          },
+          {
+            nombre: "ConnectTech Solutions",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/telecom2.png",
+            personal: 280,
+            areas: 7,
+            servicios: 650
+          },
+          {
+            nombre: "People First RRHH",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/hr3.png",
+            personal: 120,
             areas: 4,
-            servicios: 280
+            servicios: 290
+          },
+          {
+            nombre: "DataComm Networks",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/telecom3.png",
+            personal: 250,
+            areas: 6,
+            servicios: 580
           }
         ];
 
         // Crear hoja de datos
-        const ws = utils.json_to_sheet(templateData);
+        const ws = XLSX.utils.json_to_sheet(templateData);
         
         // Ajustar ancho de columnas
         ws['!cols'] = [
@@ -178,10 +223,10 @@ export default function DataHubPage() {
           { wch: 12 }  // servicios
         ];
 
-        utils.book_append_sheet(wb, ws, "Datos");
+        XLSX.utils.book_append_sheet(wb, ws, "Datos");
 
         // Descargar archivo
-        writeFile(wb, 'empresas_tech_transporte.xlsx');
+        XLSX.writeFile(wb, 'empresas_rrhh_telecom.xlsx');
         return;
       }
 
@@ -227,6 +272,21 @@ export default function DataHubPage() {
   };
 
   const totalPages = Math.ceil(data.organizations.length / itemsPerPage);
+
+  const handleDeleteOrganization = async (id) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
+      try {
+        setLoading(true);
+        await dataHubService.deleteOrganization(id);
+        await loadData(); // Recargar los datos
+      } catch (err) {
+        console.error('Error al eliminar:', err);
+        alert('Error al eliminar la empresa');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -420,7 +480,28 @@ export default function DataHubPage() {
       {/* Grid de organizaciones */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {getCurrentOrganizations().map((org) => (
-          <div key={org.id} className="bg-white rounded-lg shadow-lg p-6">
+          <div key={org.id} className="bg-white rounded-lg shadow-lg p-6 relative">
+            {/* Botón de eliminar */}
+            <button
+              onClick={() => handleDeleteOrganization(org.id)}
+              className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-500 transition-colors"
+              title="Eliminar empresa"
+            >
+              <svg 
+                className="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                />
+              </svg>
+            </button>
+
             <div className="flex items-center mb-4">
               {org.logo ? (
                 <img src={org.logo} alt={org.nombre} className="w-12 h-12 rounded-full" />

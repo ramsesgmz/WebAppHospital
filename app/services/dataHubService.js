@@ -458,5 +458,22 @@ export const dataHubService = {
       console.error('Error generando plantilla:', error);
       throw new Error('Error al generar la plantilla: ' + error.message);
     }
+  },
+
+  // Agregar esta función al objeto dataHubService
+  async deleteOrganization(id) {
+    try {
+      const { error } = await supabase
+        .from('organizations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      return { success: true, message: 'Empresa eliminada correctamente' };
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      throw new Error('Error al eliminar la empresa');
+    }
   }
 } 
