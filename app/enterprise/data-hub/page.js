@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { dataHubService } from '@/services/dataHubService';
+import { utils, writeFile } from 'xlsx';
 
 export default function DataHubPage() {
   const [data, setData] = useState({
@@ -20,7 +21,8 @@ export default function DataHubPage() {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const fileInputRef = useRef(null);
-  const [importType, setImportType] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     loadData();
@@ -42,11 +44,8 @@ export default function DataHubPage() {
     try {
       setLoading(true);
       await dataHubService.exportEnterpriseData(format);
-      alert('Datos exportados correctamente');
     } catch (err) {
-      console.error('Error al exportar:', err);
       setError(err.message);
-      alert('Error al exportar: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -56,18 +55,10 @@ export default function DataHubPage() {
     try {
       setLoading(true);
       const result = await dataHubService.importExternalData();
-      console.log('Datos importados:', result);
-      
-      // Recargar los datos después de importar
-      await loadData();
-      
-      // Mostrar mensaje de éxito
-      alert('Datos importados correctamente');
+      await loadData(); // Recargar datos después de importar
       setShowImportMenu(false);
     } catch (err) {
-      console.error('Error al importar:', err);
       setError(err.message);
-      alert('Error al importar: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -76,41 +67,166 @@ export default function DataHubPage() {
   const handleFileImport = async (event) => {
     try {
       const file = event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        alert('Por favor seleccione un archivo');
+        return;
+      }
 
       setLoading(true);
       const fileExtension = file.name.split('.').pop().toLowerCase();
 
       let result;
-      switch (fileExtension) {
-        case 'xlsx':
-        case 'xls':
-          result = await dataHubService.importFromExcel(file);
-          break;
-        case 'csv':
-          result = await dataHubService.importFromCSV(file);
-          break;
-        case 'json':
-          result = await dataHubService.importFromJSON(file);
-          break;
-        default:
-          throw new Error('Formato de archivo no soportado');
-      }
+      try {
+        switch (fileExtension) {
+          case 'xlsx':
+          case 'xls':
+            result = await dataHubService.importFromExcel(file);
+            break;
+          case 'csv':
+            result = await dataHubService.importFromCSV(file);
+            break;
+          case 'json':
+            result = await dataHubService.importFromJSON(file);
+            break;
+          default:
+            throw new Error(`Formato de archivo no soportado: ${fileExtension}`);
+        }
 
-      await loadData(); // Recargar datos
-      alert('Archivo importado correctamente');
-      setShowImportMenu(false);
+        await loadData();
+        alert(result.message);
+        setShowImportMenu(false);
+      } catch (importError) {
+        console.error('Error al importar:', importError);
+        alert(`Error al importar: ${importError.message}`);
+      }
     } catch (err) {
-      console.error('Error al importar archivo:', err);
-      setError(err.message);
-      alert('Error al importar: ' + err.message);
+      console.error('Error general:', err);
+      alert(`Error: ${err.message}`);
     } finally {
       setLoading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''; // Limpiar input
+        fileInputRef.current.value = '';
       }
     }
   };
+
+  const handleDownloadTemplate = async (format) => {
+    try {
+      if (format === 'excel') {
+        const wb = utils.book_new();
+        
+        // Datos ficticios de empresas de tecnología y transporte
+        const templateData = [
+          {
+            nombre: "TechSolutions S.A.",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/tech1.png",
+            personal: 250,
+            areas: 8,
+            servicios: 520
+          },
+          {
+            nombre: "TransporteExpress Global",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/trans1.png",
+            personal: 380,
+            areas: 6,
+            servicios: 890
+          },
+          {
+            nombre: "InnovaTech Systems",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/tech2.png",
+            personal: 175,
+            areas: 5,
+            servicios: 320
+          },
+          {
+            nombre: "LogísticaPro Internacional",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/trans2.png",
+            personal: 420,
+            areas: 7,
+            servicios: 950
+          },
+          {
+            nombre: "CyberSecurity Plus",
+            type: "empresa",
+            estado: "Activo",
+            logo_url: "https://ejemplo.com/tech3.png",
+            personal: 150,
+            areas: 4,
+            servicios: 280
+          }
+        ];
+
+        // Crear hoja de datos
+        const ws = utils.json_to_sheet(templateData);
+        
+        // Ajustar ancho de columnas
+        ws['!cols'] = [
+          { wch: 35 }, // nombre
+          { wch: 15 }, // type
+          { wch: 15 }, // estado
+          { wch: 40 }, // logo_url
+          { wch: 12 }, // personal
+          { wch: 10 }, // areas
+          { wch: 12 }  // servicios
+        ];
+
+        utils.book_append_sheet(wb, ws, "Datos");
+
+        // Descargar archivo
+        writeFile(wb, 'empresas_tech_transporte.xlsx');
+        return;
+      }
+
+      // Para CSV
+      if (format === 'csv') {
+        const csvContent = 'nombre,tipo,estado\nEmpresa de Ejemplo,empresa,Activo\nProveedor de Ejemplo,proveedor,Activo';
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'plantilla_organizaciones.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+
+      // Para JSON
+      if (format === 'json') {
+        const jsonContent = JSON.stringify([
+          { nombre: "Empresa de Ejemplo", tipo: "empresa", estado: "Activo" },
+          { nombre: "Proveedor de Ejemplo", tipo: "proveedor", estado: "Activo" }
+        ], null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'plantilla_organizaciones.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+
+    } catch (err) {
+      console.error('Error al descargar plantilla:', err);
+      alert('Error al descargar la plantilla');
+    }
+  };
+
+  const getCurrentOrganizations = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return data.organizations.slice(startIndex, endIndex);
+  };
+
+  const totalPages = Math.ceil(data.organizations.length / itemsPerPage);
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -123,6 +239,7 @@ export default function DataHubPage() {
       </div>
 
       <div className="flex justify-between mb-8">
+        {/* Menú de Exportación */}
         <div className="relative">
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
@@ -156,6 +273,8 @@ export default function DataHubPage() {
             </div>
           )}
         </div>
+
+        {/* Menú de Importación */}
         <div className="relative">
           <button
             onClick={() => setShowImportMenu(!showImportMenu)}
@@ -190,6 +309,32 @@ export default function DataHubPage() {
                   />
                 </div>
                 
+                <div className="border-t border-gray-100"></div>
+                
+                <div className="px-4 py-2">
+                  <p className="text-sm text-gray-500 mb-2">Descargar plantillas:</p>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleDownloadTemplate('excel')}
+                      className="block w-full text-left px-2 py-1 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      📑 Plantilla Excel
+                    </button>
+                    <button
+                      onClick={() => handleDownloadTemplate('csv')}
+                      className="block w-full text-left px-2 py-1 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      📑 Plantilla CSV
+                    </button>
+                    <button
+                      onClick={() => handleDownloadTemplate('json')}
+                      className="block w-full text-left px-2 py-1 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      🔧 Plantilla JSON
+                    </button>
+                  </div>
+                </div>
+                
                 <div className="px-4 py-2">
                   <p className="text-xs text-gray-500">
                     Formatos soportados: Excel, CSV, JSON
@@ -201,100 +346,136 @@ export default function DataHubPage() {
         </div>
       </div>
 
-      {/* Tarjetas de resumen */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-lg shadow">
+      {/* Agregar los contadores en la parte superior */}
+      <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="bg-white rounded-lg p-4 shadow">
           <div className="flex items-center">
-            <div className="bg-blue-100 p-3 rounded-full">🏢</div>
+            <div className="bg-blue-100 p-2 rounded">🏢</div>
             <div className="ml-4">
               <p className="text-sm text-gray-500">Total Empresas</p>
               <p className="text-xl font-bold">{data.summary.totalEmpresas}</p>
             </div>
           </div>
         </div>
-        {/* ... Otras tarjetas de resumen similares ... */}
+        <div className="bg-white rounded-lg p-4 shadow">
+          <div className="flex items-center">
+            <div className="bg-green-100 p-2 rounded">👥</div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-500">Total Personal</p>
+              <p className="text-xl font-bold">{data.summary.totalPersonal}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow">
+          <div className="flex items-center">
+            <div className="bg-purple-100 p-2 rounded">📊</div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-500">Promedio Actividad</p>
+              <p className="text-xl font-bold">{data.summary.promedioActividad}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow">
+          <div className="flex items-center">
+            <div className="bg-yellow-100 p-2 rounded">💰</div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-500">Total Ingresos</p>
+              <p className="text-xl font-bold">{data.summary.totalIngresos}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Filtros y búsqueda */}
-      <div className="flex gap-4 mb-8">
+      {/* Barra de búsqueda y filtros */}
+      <div className="flex justify-between mb-6">
         <input
           type="text"
           placeholder="Buscar empresa..."
-          className="flex-1 p-2 border rounded"
+          className="px-4 py-2 border rounded-lg w-1/3"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="p-2 border rounded"
-        >
-          <option>Todas las empresas</option>
-          <option>Activas</option>
-          <option>Inactivas</option>
-        </select>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="p-2 border rounded"
-        >
-          <option>Ordenar por nombre</option>
-          <option>Ordenar por personal</option>
-          <option>Ordenar por áreas</option>
-        </select>
+        <div className="flex gap-4">
+          <select
+            className="px-4 py-2 border rounded-lg"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option>Todas las empresas</option>
+            <option>Activas</option>
+            <option>Inactivas</option>
+          </select>
+          <select
+            className="px-4 py-2 border rounded-lg"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option>Ordenar por nombre</option>
+            <option>Ordenar por personal</option>
+            <option>Ordenar por actividad</option>
+          </select>
+        </div>
       </div>
 
-      {/* Lista de empresas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {data.organizations.map(org => (
-          <div key={org.id} className="bg-white p-6 rounded-lg shadow">
+      {/* Grid de organizaciones */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {getCurrentOrganizations().map((org) => (
+          <div key={org.id} className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center mb-4">
-              {org.logo && (
-                <img
-                  src={org.logo}
-                  alt={org.nombre}
-                  className="w-12 h-12 rounded mr-4"
-                />
+              {org.logo ? (
+                <img src={org.logo} alt={org.nombre} className="w-12 h-12 rounded-full" />
+              ) : (
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                  {org.nombre.charAt(0)}
+                </div>
               )}
-              <div>
-                <h3 className="font-bold">{org.nombre}</h3>
-                <p className="text-sm text-gray-500">ID: {org.id}</p>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold">{org.nombre}</h3>
+                <p className="text-sm text-gray-500">{org.estado}</p>
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-blue-50 p-3 rounded">
-                <div className="flex items-center">
-                  <span className="mr-2">👥</span>
-                  <div>
-                    <p className="text-sm text-gray-500">Personal</p>
-                    <p className="font-bold">{org.personal.total} {org.personal.label}</p>
-                  </div>
-                </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-500">Personal</p>
+                <p className="font-semibold">{org.personal.total} {org.personal.label}</p>
               </div>
-
-              <div className="bg-green-50 p-3 rounded">
-                <div className="flex items-center">
-                  <span className="mr-2">🏢</span>
-                  <div>
-                    <p className="text-sm text-gray-500">Áreas</p>
-                    <p className="font-bold">{org.areas.total} {org.areas.label}</p>
-                  </div>
-                </div>
+              <div className="bg-green-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-500">Áreas</p>
+                <p className="font-semibold">{org.areas.total} {org.areas.label}</p>
               </div>
-
-              <div className="bg-purple-50 p-3 rounded">
-                <div className="flex items-center">
-                  <span className="mr-2">📊</span>
-                  <div>
-                    <p className="text-sm text-gray-500">Actividad</p>
-                    <p className="font-bold">{org.actividad.total} {org.actividad.label}</p>
-                  </div>
-                </div>
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-500">Actividad</p>
+                <p className="font-semibold">{org.actividad.total} {org.actividad.label}</p>
               </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Agregar botones de paginación */}
+      <div className="mt-6 flex justify-center items-center gap-2">
+        <nav className="inline-flex rounded-md shadow">
+          <button
+            className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          
+          {/* Indicador de páginas */}
+          <span className="px-4 py-2 border-t border-b border-gray-300 bg-white text-sm text-gray-700">
+            Página {currentPage} de {totalPages}
+          </span>
+          
+          <button
+            className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </nav>
       </div>
     </div>
   );
