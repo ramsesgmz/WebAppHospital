@@ -292,6 +292,7 @@ export default function EnterpriseOverviewPage() {
   });
   const [personal, setPersonal] = useState(allStaff);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Datos de áreas
   const areasData = [
@@ -768,59 +769,74 @@ export default function EnterpriseOverviewPage() {
   }, []);
 
   const handleExport = async (format) => {
+    if (loading) return;
+
     try {
       setLoading(true);
-      
-      // Preparar datos del dashboard de manera estructurada
-      const dashboardData = {
+      setShowExportMenu(false);
+
+      // Recopilación de datos reales
+      const resumenGeneral = {
         resumen: {
           turnos: {
-            mañana: turnosData[0],
-            tarde: turnosData[1],
-            noche: turnosData[2]
+            mañana: turnosData[0].personal.map(p => ({
+              nombre: p.nombre,
+              area: p.area,
+              estado: p.estado
+            })),
+            tarde: turnosData[1].personal.map(p => ({
+              nombre: p.nombre,
+              area: p.area,
+              estado: p.estado
+            })),
+            noche: turnosData[2].personal.map(p => ({
+              nombre: p.nombre,
+              area: p.area,
+              estado: p.estado
+            }))
           },
+          areas: areasData.map(area => {
+            const areaTareas = areasTareas.find(a => a.nombre === area.nombre);
+            const personalArea = allStaff.filter(p => p.area === area.nombre);
+            return {
+              nombre: area.nombre,
+              personal_total: personalArea.length,
+              personal_activo: personalArea.filter(p => p.estado === 'Activo').length,
+              tareas_total: areaTareas?.tareas.length || 0,
+              tareas_completadas: areaTareas?.tareas.filter(t => t.estado === 'completada').length || 0,
+              tareas_pendientes: areaTareas?.tareas.filter(t => t.estado === 'pendiente').length || 0,
+              tareas_en_progreso: areaTareas?.tareas.filter(t => t.estado === 'en_progreso').length || 0
+            };
+          }),
           personal: {
             total: allStaff.length,
             activos: allStaff.filter(p => p.estado === 'Activo').length,
-            supervisores: allStaff.filter(p => p.rol === 'Supervisor').length,
-            por_turno: turnosData.map(t => ({
-              turno: t.nombre,
-              total: t.total,
-              activos: t.activos
-            }))
+            por_rol: {
+              supervisores: allStaff.filter(p => p.rol === 'Supervisor').length,
+              operarios: allStaff.filter(p => p.rol === 'Limpieza General').length,
+              especialistas: allStaff.filter(p => p.rol === 'Especialista').length
+            }
           },
-          areas: areasData.map(a => ({
-            nombre: a.nombre,
-            personal: a.personal,
-            porcentaje: Math.round((a.personal / areasData.reduce((acc, curr) => acc + curr.personal, 0)) * 100)
-          })),
-          inventario: {
-            critico: inventarioCritico.filter(i => i.estado === 'critico').length,
-            advertencia: inventarioCritico.filter(i => i.estado === 'advertencia').length,
-            items: inventarioCritico.map(i => ({
-              nombre: i.nombre,
-              stock: i.stock,
-              minimo: i.minimo,
-              area: i.area,
-              estado: i.estado
-            }))
-          }
-        },
-        tareas: areasTareas.map(area => ({
-          area: area.nombre,
-          total: area.tareas.length,
-          completadas: area.tareas.filter(t => t.estado === 'completada').length,
-          pendientes: area.tareas.filter(t => t.estado === 'pendiente').length,
-          en_progreso: area.tareas.filter(t => t.estado === 'en_progreso').length,
-          detalle: area.tareas.map(t => ({
-            descripcion: t.descripcion,
-            asignado: t.asignado,
-            estado: t.estado,
-            prioridad: t.prioridad,
-            inicio: t.startTime,
-            fin: t.endTime
+          inventario: inventarioCritico.map(item => ({
+            nombre: item.nombre,
+            stock_actual: item.stock,
+            stock_minimo: item.minimo,
+            area: item.area,
+            estado: item.estado,
+            ultimo_uso: item.ultimoUso
           }))
-        }))
+        },
+        detalle_tareas: areasTareas.flatMap(area => 
+          area.tareas.map(tarea => ({
+            area: area.nombre,
+            descripcion: tarea.descripcion,
+            asignado: tarea.asignado,
+            estado: tarea.estado,
+            prioridad: tarea.prioridad,
+            inicio: tarea.startTime,
+            fin: tarea.endTime
+          }))
+        )
       };
 
       switch (format) {
@@ -829,60 +845,63 @@ export default function EnterpriseOverviewPage() {
           
           // Hoja de Resumen General
           const resumenSheet = XLSX.utils.json_to_sheet([{
-            total_personal: dashboardData.resumen.personal.total,
-            personal_activo: dashboardData.resumen.personal.activos,
-            supervisores: dashboardData.resumen.personal.supervisores,
-            total_areas: dashboardData.resumen.areas.length,
-            items_criticos: dashboardData.resumen.inventario.critico
+            total_personal: resumenGeneral.resumen.personal.total,
+            personal_activo: resumenGeneral.resumen.personal.activos,
+            total_areas: resumenGeneral.resumen.areas.length,
+            total_tareas: resumenGeneral.detalle_tareas.length,
+            items_criticos: resumenGeneral.resumen.inventario.filter(i => i.estado === 'critico').length
           }]);
           XLSX.utils.book_append_sheet(wb, resumenSheet, 'Resumen');
 
-          // Hoja de Personal por Turno
-          const turnosSheet = XLSX.utils.json_to_sheet(dashboardData.resumen.personal.por_turno);
-          XLSX.utils.book_append_sheet(wb, turnosSheet, 'Turnos');
-
-          // Hoja de Áreas
-          const areasSheet = XLSX.utils.json_to_sheet(dashboardData.resumen.areas);
-          XLSX.utils.book_append_sheet(wb, areasSheet, 'Areas');
+          // Hoja de Personal por Área
+          const personalSheet = XLSX.utils.json_to_sheet(
+            resumenGeneral.resumen.areas.map(area => ({
+              area: area.nombre,
+              total_personal: area.personal_total,
+              personal_activo: area.personal_activo,
+              tareas_total: area.tareas_total,
+              tareas_completadas: area.tareas_completadas
+            }))
+          );
+          XLSX.utils.book_append_sheet(wb, personalSheet, 'Personal por Área');
 
           // Hoja de Tareas
-          const tareasSheet = XLSX.utils.json_to_sheet(
-            dashboardData.tareas.flatMap(a => a.detalle.map(t => ({ area: a.area, ...t })))
-          );
+          const tareasSheet = XLSX.utils.json_to_sheet(resumenGeneral.detalle_tareas);
           XLSX.utils.book_append_sheet(wb, tareasSheet, 'Tareas');
 
           // Hoja de Inventario
-          const inventarioSheet = XLSX.utils.json_to_sheet(dashboardData.resumen.inventario.items);
+          const inventarioSheet = XLSX.utils.json_to_sheet(resumenGeneral.resumen.inventario);
           XLSX.utils.book_append_sheet(wb, inventarioSheet, 'Inventario');
 
-          XLSX.writeFile(wb, 'dashboard_reporte.xlsx');
+          XLSX.writeFile(wb, 'reporte_completo.xlsx');
           break;
 
         case 'json':
-          const blob = new Blob([JSON.stringify(dashboardData, null, 2)], { type: 'application/json' });
-          saveAs(blob, 'dashboard_reporte.json');
+          const blob = new Blob([JSON.stringify(resumenGeneral, null, 2)], 
+            { type: 'application/json' });
+          saveAs(blob, 'reporte_completo.json');
           break;
 
         case 'csv':
-          const csvData = dashboardData.tareas.flatMap(a => 
-            a.detalle.map(t => ({
-              area: a.area,
-              descripcion: t.descripcion,
-              asignado: t.asignado,
-              estado: t.estado,
-              prioridad: t.prioridad
-            }))
-          );
+          // Para CSV exportamos un resumen más detallado por área
+          const csvData = resumenGeneral.resumen.areas.map(area => ({
+            area: area.nombre,
+            personal_total: area.personal_total,
+            personal_activo: area.personal_activo,
+            tareas_total: area.tareas_total,
+            tareas_completadas: area.tareas_completadas,
+            tareas_pendientes: area.tareas_pendientes,
+            tareas_en_progreso: area.tareas_en_progreso
+          }));
+          
           const csv = XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet(csvData));
           const csvBlob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-          saveAs(csvBlob, 'dashboard_tareas.csv');
+          saveAs(csvBlob, 'reporte_areas.csv');
           break;
       }
-
-      setShowExportMenu(false);
     } catch (error) {
       console.error('Error al exportar:', error);
-      alert('Error al exportar los datos');
+      alert('Error al exportar los datos: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -928,14 +947,21 @@ export default function EnterpriseOverviewPage() {
         <div className="relative">
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
-            className="bg-blue-50 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow
-                     text-blue-600 font-medium flex items-center space-x-2"
+            disabled={loading}
+            className={`bg-blue-50 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow
+                     text-blue-600 font-medium flex items-center space-x-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            <span>Exportar Datos</span>
+            {loading ? (
+              <span>Exportando...</span>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Exportar Datos</span>
+              </>
+            )}
           </button>
 
           {/* Menú de opciones de exportación */}
