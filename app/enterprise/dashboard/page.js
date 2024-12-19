@@ -8,6 +8,9 @@ import {
 import { FaClock, FaRegCalendarCheck } from 'react-icons/fa';
 import { getAreas, getPersonal, getTareas } from '@/utils/initLocalStorage';
 import { demoTasks, getTaskStats } from '../../mocks/taskData';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 
 // Datos de todo el personal
 const allStaff = [
@@ -36,58 +39,6 @@ const personalTotal = [
   { id: 5, nombre: 'Pedro Sánchez', area: 'Área de Almacenes', estado: 'Activo', rol: 'Supervisor' },
   { id: 16, nombre: 'usuario', area: 'Administración', estado: 'Activo', rol: 'Administrativo' }
 ];
-
-// Agregar la función para exportar datos antes del componente principal
-const exportEnterpriseData = (format) => {
-  // Recolectar todos los datos del enterprise
-  const enterpriseData = {
-    personal: allStaff,
-    areas: areasData,
-    turnos: turnosData,
-    inventario: inventarioCritico,
-    tareas: areasTareas,
-  };
-
-  // Simular la descarga según el formato
-  let fileContent;
-  let mimeType;
-  let fileExtension;
-
-  switch (format) {
-    case 'json':
-      fileContent = JSON.stringify(enterpriseData, null, 2);
-      mimeType = 'application/json';
-      fileExtension = 'json';
-      break;
-    case 'csv':
-      // Simplificado para el ejemplo - se necesitaría una función real de conversión a CSV
-      fileContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(JSON.stringify(enterpriseData));
-      mimeType = 'text/csv';
-      fileExtension = 'csv';
-      break;
-    case 'excel':
-      // Simplificado - se necesitaría una biblioteca real para exportar a Excel
-      fileContent = JSON.stringify(enterpriseData);
-      mimeType = 'application/vnd.ms-excel';
-      fileExtension = 'xlsx';
-      break;
-    default:
-      fileContent = JSON.stringify(enterpriseData);
-      mimeType = 'application/json';
-      fileExtension = 'json';
-  }
-
-  // Crear el blob y descargar
-  const blob = new Blob([fileContent], { type: mimeType });
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `enterprise_data_${new Date().toISOString()}.${fileExtension}`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
-};
 
 export default function EnterpriseOverviewPage() {
   const router = useRouter();
@@ -816,6 +767,147 @@ export default function EnterpriseOverviewPage() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  const handleExport = async (format) => {
+    try {
+      setLoading(true);
+      
+      // Preparar datos del dashboard de manera estructurada
+      const dashboardData = {
+        resumen: {
+          turnos: {
+            mañana: turnosData[0],
+            tarde: turnosData[1],
+            noche: turnosData[2]
+          },
+          personal: {
+            total: allStaff.length,
+            activos: allStaff.filter(p => p.estado === 'Activo').length,
+            supervisores: allStaff.filter(p => p.rol === 'Supervisor').length,
+            por_turno: turnosData.map(t => ({
+              turno: t.nombre,
+              total: t.total,
+              activos: t.activos
+            }))
+          },
+          areas: areasData.map(a => ({
+            nombre: a.nombre,
+            personal: a.personal,
+            porcentaje: Math.round((a.personal / areasData.reduce((acc, curr) => acc + curr.personal, 0)) * 100)
+          })),
+          inventario: {
+            critico: inventarioCritico.filter(i => i.estado === 'critico').length,
+            advertencia: inventarioCritico.filter(i => i.estado === 'advertencia').length,
+            items: inventarioCritico.map(i => ({
+              nombre: i.nombre,
+              stock: i.stock,
+              minimo: i.minimo,
+              area: i.area,
+              estado: i.estado
+            }))
+          }
+        },
+        tareas: areasTareas.map(area => ({
+          area: area.nombre,
+          total: area.tareas.length,
+          completadas: area.tareas.filter(t => t.estado === 'completada').length,
+          pendientes: area.tareas.filter(t => t.estado === 'pendiente').length,
+          en_progreso: area.tareas.filter(t => t.estado === 'en_progreso').length,
+          detalle: area.tareas.map(t => ({
+            descripcion: t.descripcion,
+            asignado: t.asignado,
+            estado: t.estado,
+            prioridad: t.prioridad,
+            inicio: t.startTime,
+            fin: t.endTime
+          }))
+        }))
+      };
+
+      switch (format) {
+        case 'excel':
+          const wb = XLSX.utils.book_new();
+          
+          // Hoja de Resumen General
+          const resumenSheet = XLSX.utils.json_to_sheet([{
+            total_personal: dashboardData.resumen.personal.total,
+            personal_activo: dashboardData.resumen.personal.activos,
+            supervisores: dashboardData.resumen.personal.supervisores,
+            total_areas: dashboardData.resumen.areas.length,
+            items_criticos: dashboardData.resumen.inventario.critico
+          }]);
+          XLSX.utils.book_append_sheet(wb, resumenSheet, 'Resumen');
+
+          // Hoja de Personal por Turno
+          const turnosSheet = XLSX.utils.json_to_sheet(dashboardData.resumen.personal.por_turno);
+          XLSX.utils.book_append_sheet(wb, turnosSheet, 'Turnos');
+
+          // Hoja de Áreas
+          const areasSheet = XLSX.utils.json_to_sheet(dashboardData.resumen.areas);
+          XLSX.utils.book_append_sheet(wb, areasSheet, 'Areas');
+
+          // Hoja de Tareas
+          const tareasSheet = XLSX.utils.json_to_sheet(
+            dashboardData.tareas.flatMap(a => a.detalle.map(t => ({ area: a.area, ...t })))
+          );
+          XLSX.utils.book_append_sheet(wb, tareasSheet, 'Tareas');
+
+          // Hoja de Inventario
+          const inventarioSheet = XLSX.utils.json_to_sheet(dashboardData.resumen.inventario.items);
+          XLSX.utils.book_append_sheet(wb, inventarioSheet, 'Inventario');
+
+          XLSX.writeFile(wb, 'dashboard_reporte.xlsx');
+          break;
+
+        case 'json':
+          const blob = new Blob([JSON.stringify(dashboardData, null, 2)], { type: 'application/json' });
+          saveAs(blob, 'dashboard_reporte.json');
+          break;
+
+        case 'csv':
+          const csvData = dashboardData.tareas.flatMap(a => 
+            a.detalle.map(t => ({
+              area: a.area,
+              descripcion: t.descripcion,
+              asignado: t.asignado,
+              estado: t.estado,
+              prioridad: t.prioridad
+            }))
+          );
+          const csv = XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet(csvData));
+          const csvBlob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          saveAs(csvBlob, 'dashboard_tareas.csv');
+          break;
+      }
+
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error('Error al exportar:', error);
+      alert('Error al exportar los datos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Primero, agregar la función para eliminar una empresa
+  const handleDeleteOrganization = async (id) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
+      try {
+        const { error } = await supabase
+          .from('organizations')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        // Actualizar la lista de empresas
+        loadData();
+      } catch (err) {
+        console.error('Error al eliminar:', err);
+        alert('Error al eliminar la empresa');
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Botones de acción */}
@@ -852,7 +944,7 @@ export default function EnterpriseOverviewPage() {
               <div className="py-1" role="menu" aria-orientation="vertical">
                 <button
                   onClick={() => {
-                    exportEnterpriseData('json');
+                    handleExport('json');
                     setShowExportMenu(false);
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
@@ -865,7 +957,7 @@ export default function EnterpriseOverviewPage() {
                 </button>
                 <button
                   onClick={() => {
-                    exportEnterpriseData('csv');
+                    handleExport('csv');
                     setShowExportMenu(false);
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
@@ -878,7 +970,7 @@ export default function EnterpriseOverviewPage() {
                 </button>
                 <button
                   onClick={() => {
-                    exportEnterpriseData('excel');
+                    handleExport('excel');
                     setShowExportMenu(false);
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
@@ -1028,9 +1120,8 @@ export default function EnterpriseOverviewPage() {
                       <span className="text-sm text-gray-500">
                         {area.personal} personal
                       </span>
-                      <span className="text-sm font-medium" 
-                        style={{ color: area.color }}>
-                        {Math.round((area.personal / areasData.reduce((acc, curr) => acc + curr.personal, 0)) * 100)}%
+                      <span className="text-sm font-medium" style={{ color: area.color }}>
+                        {`${Math.round((area.personal / areasData.reduce((acc, curr) => acc + curr.personal, 0)) * 100)}%`}
                       </span>
                     </div>
                   </div>

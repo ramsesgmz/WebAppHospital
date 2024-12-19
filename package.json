@@ -10,16 +10,23 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
+<<<<<<< HEAD
     "@supabase/supabase-js": "^2.47.6",
     "axios": "^1.7.7",
+=======
+    "@supabase/supabase-js": "^2.47.9",
+    "axios": "^1.7.9",
+>>>>>>> decf6b3a0caf3ef00689035c544ee67c0ee29f7e
     "daisyui": "^4.12.14",
     "date-fns": "^4.1.0",
     "file-saver": "^2.0.5",
     "firebase": "^11.1.0",
     "jspdf": "^2.5.2",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "next": "15.0.3",
     "papaparse": "^5.4.1",
+    "pdf-parse": "^1.1.1",
     "react": "^18.3.1",
     "react-confetti": "^6.1.0",
     "react-datepicker": "^7.5.0",
